@@ -2,6 +2,7 @@ package com.clonz.blastfromthepast.init;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
+import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -33,20 +34,21 @@ public class ModEntities {
     }
 
     public static final DeferredHolder<EntityType<?>, EntityType<GlacerosEntity>> GLACEROS = registerMob("glaceros", GlacerosEntity::new,
-            0.4f, 0.7f, 0x302219, 0xACACAC);
-    // () -> EntityType.Builder.of(GlacerosEntity::new, MobCategory.CREATURE).sized(1, 3)
-    //         .build( ResourceLocation.tryBuild(BlastFromThePast.MODID, "glaceros").toString()));
+            1f, 2.2f, 0x302219, 0xACACAC);
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SnowdoEntity>> SNOWDO = registerMob("snowdo",   SnowdoEntity::new,
+            0.6f, 1.1f, 0x302219, 0xACACAC);
+
 
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-            GlacerosEntity.init();
-        });
+        event.enqueueWork(() -> GlacerosEntity.init());
+        event.enqueueWork(() -> SnowdoEntity.init());
     }
 
-
     @SubscribeEvent
-    public static void registerAttributes(EntityAttributeCreationEvent event) {
-        event.put(GLACEROS.get(), GlacerosEntity.createAttributes().build());
+    public static void  registerAttributes(EntityAttributeCreationEvent event) {
+        event.put(ModEntities.GLACEROS.get(), GlacerosEntity.createAttributes().build());
+        event.put(ModEntities.SNOWDO.get(), SnowdoEntity.createAttributes().build());
     }
 }

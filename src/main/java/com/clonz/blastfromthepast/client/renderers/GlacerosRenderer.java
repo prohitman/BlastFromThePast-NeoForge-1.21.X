@@ -10,18 +10,28 @@ import net.minecraft.resources.ResourceLocation;
 
 public class GlacerosRenderer extends MobRenderer<GlacerosEntity, GlacerosModel> {
 
-    private static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath("blastfromthepast","textures/entity/glaceros.png");
+    private static final ResourceLocation NORMAL = ResourceLocation.fromNamespaceAndPath("blastfromthepast","textures/entity/glaceros/glaceros.png");
+    private static final ResourceLocation BROAD = ResourceLocation.fromNamespaceAndPath("blastfromthepast","textures/entity/glaceros/glaceros_broad.png");
+    private static final ResourceLocation CURLY = ResourceLocation.fromNamespaceAndPath("blastfromthepast","textures/entity/glaceros/glaceros_curly.png");
+    private static final ResourceLocation CURVY = ResourceLocation.fromNamespaceAndPath("blastfromthepast","textures/entity/glaceros/glaceros_curvy.png");
+    private static final ResourceLocation SPIKEY = ResourceLocation.fromNamespaceAndPath("blastfromthepast","textures/entity/glaceros/glaceros_spikey.png");
 
     public GlacerosRenderer(EntityRendererProvider.Context context, GlacerosModel model, float shadowRadius) {
         super(context, model, shadowRadius);
     }
 
     public GlacerosRenderer(EntityRendererProvider.Context pContext) {
-        super(pContext, new GlacerosModel((Ducling) pContext.bakeLayer(GlacerosModel.LAYER_LOCATION)), 1.5f);
+        super(pContext, new GlacerosModel((Ducling) pContext.bakeLayer(GlacerosModel.LAYER_LOCATION)), 0.8f);
     }
 
     @Override
     public ResourceLocation getTextureLocation(GlacerosEntity entity) {
-        return LOCATION;
+        return switch (entity.getVariant()) {
+            case NOMRAL -> NORMAL;
+            case BROAD -> BROAD;
+            case CURLY -> CURLY;
+            case CURVY -> CURVY;
+            case SPIKEY -> SPIKEY;
+        };
     }
 }
