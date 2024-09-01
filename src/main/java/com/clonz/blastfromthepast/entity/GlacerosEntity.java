@@ -4,6 +4,7 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.client.models.GlacerosModel;
 import com.clonz.blastfromthepast.entity.ai.GlacerosFightGoal;
 import com.clonz.blastfromthepast.init.ModEntities;
+import com.clonz.blastfromthepast.init.ModSounds;
 import com.mojang.serialization.Codec;
 import io.github.itskillerluc.duclib.client.animation.DucAnimation;
 import io.github.itskillerluc.duclib.entity.Animatable;
@@ -233,20 +234,17 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
 
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSource) {
-        return (SoundEvent) BuiltInRegistries.SOUND_EVENT
-                .get(ResourceLocation.fromNamespaceAndPath("blastfromthepast","glaceros_hurt"));
+        return ModSounds.SOUND_ENTITY_GLACEROS_HURT.get();
     }
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return (SoundEvent) BuiltInRegistries.SOUND_EVENT
-                .get(ResourceLocation.fromNamespaceAndPath("blastfromthepast","glaceros_idle"));
+        return ModSounds.SOUND_ENTITY_GLACEROS_IDLE.get();
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return (SoundEvent) BuiltInRegistries.SOUND_EVENT
-                .get(ResourceLocation.fromNamespaceAndPath("blastfromthepast","glaceros_death"));
+        return ModSounds.SOUND_ENTITY_GLACEROS_DEATH.get();
     }
 
     //////////////////////////////// VARIANTSSSSSSSSSSS
