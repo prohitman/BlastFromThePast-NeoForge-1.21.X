@@ -1,0 +1,16 @@
+{
+  "block.blastfromthepast.cedar_door": "Cedar Door",
+  "block.blastfromthepast.cedar_leaves": "Cedar Leaves",
+  "block.blastfromthepast.cedar_log": "Cedar Log",
+  "block.blastfromthepast.cedar_planks": "Cedar Planks",
+  "block.blastfromthepast.sappy_cedar_log": "Sappy Cedar Log",
+  "block.blastfromthepast.stripped_cedar_log": "Stripped Cedar Log",
+  "entity.blastfromthepast.glaceros": "Glaceros",
+  "entity.blastfromthepast.snowdo": "Snowdo",
+  "item.blastfromthepast.cooked_venison": "Cooked Venison",
+  "item.blastfromthepast.glaceros_spawn_egg": "Glaceros Spawn Egg",
+  "item.blastfromthepast.raw_venison": "Raw Venison",
+  "item.blastfromthepast.sap_ball": "Sap Ball",
+  "item.blastfromthepast.snowdo_spawn_egg": "Snowdo Spawn Egg",
+  "itemGroup.blastfromthepast": "Blast From The Past"
+}

@@ -18,7 +18,6 @@ public class ModTabs {
                     .title(Component.translatable("itemGroup.blastfromthepast")).withTabsBefore(CreativeModeTabs.COMBAT)
                     .icon(() -> ModItems.RAW_VENISON.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
-
                         output.accept(ModItems.GLACEROS_SPAWN_EGG.get());
                         output.accept(ModItems.SNOWDO_SPAWN_EGG.get());
                         output.accept(ModBlocks.CEDAR_LOG.get());
@@ -26,13 +25,10 @@ public class ModTabs {
                         output.accept(ModBlocks.SAPPY_CEDAR_LOG.get());
                         output.accept(ModBlocks.CEDAR_PLANKS.get());
                         output.accept(ModBlocks.CEDAR_LEAVES.get());
-                        output.accept(ModItems.CEDAR_DOOR.get());
+                        output.accept(ModBlocks.CEDAR_DOOR.get());
                         output.accept(ModItems.RAW_VENISON.get());
                         output.accept(ModItems.COOKED_VENISON.get());
                         output.accept(ModItems.SAP_BALL.get());
-
-
-
                     }).build());
 
 }

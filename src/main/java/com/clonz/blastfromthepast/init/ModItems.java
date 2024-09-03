@@ -20,24 +20,24 @@ public class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(BlastFromThePast.MODID);
 
     public static final DeferredItem<Item> RAW_VENISON = ITEMS.register("raw_venison",
-            () -> new Item(new Item.Properties().stacksTo(64).food(ModFoods.RAW_VENSION)));
+            () -> new Item(new Item.Properties().food(ModFoods.RAW_VENSION)));
 
     public static final DeferredItem<Item> COOKED_VENISON = ITEMS.register("cooked_venison",
-            () -> new Item(new Item.Properties().stacksTo(64).food(ModFoods.COOKED_VENSION)));
+            () -> new Item(new Item.Properties().food(ModFoods.COOKED_VENSION)));
 
     public static final DeferredItem<Item> SAP_BALL = ITEMS.register("sap_ball",
-            () -> new Item(new Item.Properties().stacksTo(64)));
+            () -> new Item(new Item.Properties()));
 
     public static final DeferredItem<Item> GLACEROS_SPAWN_EGG = ITEMS.register("glaceros_spawn_egg",
-            () -> new DeferredSpawnEggItem((Supplier)ModEntities.GLACEROS, 0x7c908b, 0xffb122, new Item.Properties()));
+            () -> new DeferredSpawnEggItem(ModEntities.GLACEROS, 0x7c908b, 0xffb122, new Item.Properties()));
 
     public static final DeferredItem<Item> SNOWDO_SPAWN_EGG = ITEMS.register("snowdo_spawn_egg",
-            () -> new DeferredSpawnEggItem((Supplier)ModEntities.SNOWDO, 0x74a3af, 0xcdc9df, new Item.Properties()));
+            () -> new DeferredSpawnEggItem(ModEntities.SNOWDO, 0x74a3af, 0xcdc9df, new Item.Properties()));
 
 
 
 
-    public static final DeferredItem<BlockItem> FROZEN_PINE_LOG =
+/*    public static final DeferredItem<BlockItem> FROZEN_PINE_LOG =
             ITEMS.registerSimpleBlockItem("cedar_log", ModBlocks.CEDAR_LOG);
 
     public static final DeferredItem<BlockItem> STRIPPED_FROZEN_PINE_LOG =
@@ -52,7 +52,7 @@ public class ModItems {
     public static final DeferredItem<BlockItem> CEDAR_LEAVES =
             ITEMS.registerSimpleBlockItem("cedar_leaves", ModBlocks.CEDAR_LEAVES);
     public static final DeferredItem<BlockItem> CEDAR_DOOR =
-            ITEMS.registerSimpleBlockItem("cedar_door", ModBlocks.CEDAR_DOOR);
+            ITEMS.registerSimpleBlockItem("cedar_door", ModBlocks.CEDAR_DOOR);*/
 
 
 }
