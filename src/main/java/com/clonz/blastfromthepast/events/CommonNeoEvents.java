@@ -14,10 +14,5 @@ public class CommonNeoEvents {
 
     @SubscribeEvent
     public static void setup(final FMLCommonSetupEvent event){
-        event.enqueueWork(() -> {
-            AxeItem.STRIPPABLES = new ImmutableMap.Builder<Block, Block>().putAll(AxeItem.STRIPPABLES)
-                    .put(ModBlocks.CEDAR_LOG.get(), ModBlocks.STRIPPED_CEDAR_LOG.get())
-                    .put(ModBlocks.SAPPY_CEDAR_LOG.get(), ModBlocks.STRIPPED_CEDAR_LOG.get()).build();
-        });
     }
 }
