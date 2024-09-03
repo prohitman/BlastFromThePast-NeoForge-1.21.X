@@ -6,6 +6,7 @@ import com.clonz.blastfromthepast.client.renderers.GlacerosRenderer;
 import com.clonz.blastfromthepast.client.renderers.SnowdoRenderer;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
+import com.clonz.blastfromthepast.events.CommonNeoEvents;
 import com.clonz.blastfromthepast.init.*;
 import io.github.itskillerluc.duclib.client.model.BaseDucModel;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -42,7 +43,7 @@ public class BlastFromThePast {
     public BlastFromThePast(IEventBus modEventBus, ModContainer modContainer)
     {
         // Register the commonSetup method for modloading
-        modEventBus.addListener(this::commonSetup);
+        //modEventBus.addListener(CommonNeoEvents::setup);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
@@ -60,9 +61,6 @@ public class BlastFromThePast {
         ModSounds.SOUND_EVENTS.register(modEventBus);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
-    }
-
-    private void commonSetup(final FMLCommonSetupEvent event) {
     }
 
     // Add the example block item to the building blocks tab
