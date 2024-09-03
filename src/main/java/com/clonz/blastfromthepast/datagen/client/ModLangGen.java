@@ -49,15 +49,15 @@ public class ModLangGen extends LanguageProvider {
         add("itemGroup." + BlastFromThePast.MODID, "Blast From The Past");
     }
 
-    private void addBlock(DeferredBlock<Block> key) {
+    private void addBlock(DeferredBlock<? extends Block> key) {
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
     }
 
-    private void addItem(DeferredItem<Item> key){
+    private void addItem(DeferredItem<? extends Item> key){
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
     }
 
-    private <T extends Entity> void  addEntity(DeferredHolder<EntityType<?>, EntityType<T>> key){
+    private <T extends Entity> void addEntity(DeferredHolder<EntityType<?>, EntityType<T>> key){
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
     }
 

@@ -5,6 +5,7 @@ import com.clonz.blastfromthepast.init.ModItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
@@ -25,5 +26,8 @@ public class ModItemTagsGen extends ItemTagsProvider {
         tag(ItemTags.MEAT)
                 .add(ModItems.COOKED_VENISON.get())
                 .add(ModItems.RAW_VENISON.get());
+        copy(BlockTags.LOGS_THAT_BURN, ItemTags.LOGS_THAT_BURN);
+        copy(BlockTags.PLANKS, ItemTags.PLANKS);
+        copy(BlockTags.LEAVES, ItemTags.LEAVES);
     }
 }

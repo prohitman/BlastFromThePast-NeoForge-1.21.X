@@ -41,11 +41,11 @@ public class ModItemModelGen extends ItemModelProvider {
         singleTextureBlock(ModBlocks.CEDAR_DOOR);
     }
 
-    private void createWithParent(DeferredBlock<Block> key) {
+    private void createWithParent(DeferredBlock<? extends Block> key) {
         withExistingParent(key.getId().getPath(), modLoc( "block/" + key.getId().getPath()));
     }
 
-    private void singleTextureBlock(DeferredBlock<Block> key){
+    private void singleTextureBlock(DeferredBlock<? extends Block> key){
         singleTexture(key.getId().getPath(), mcLoc("item/generated"), "layer0",
                 modLoc("item/" + key.getId().getPath())).renderType("cutout_mipped");
     }

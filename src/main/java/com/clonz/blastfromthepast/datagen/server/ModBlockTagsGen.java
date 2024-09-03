@@ -26,5 +26,7 @@ public class ModBlockTagsGen extends BlockTagsProvider {
                 .add(ModBlocks.STRIPPED_CEDAR_LOG.get());
         tag(BlockTags.PLANKS)
                 .add(ModBlocks.CEDAR_PLANKS.get());
+        tag(BlockTags.LEAVES)
+                .add(ModBlocks.CEDAR_LEAVES.get());
     }
 }
