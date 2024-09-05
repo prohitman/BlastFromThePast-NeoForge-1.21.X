@@ -3,24 +3,18 @@ package com.clonz.blastfromthepast.init;
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
-import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import net.neoforged.neoforge.registries.RegistryBuilder;
-import net.minecraft.core.registries.Registries;
 
-import static net.minecraft.core.registries.Registries.ENTITY_TYPE;
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class ModEntities {
     public static DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(Registries.ENTITY_TYPE, BlastFromThePast.MODID);
@@ -36,19 +30,24 @@ public class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<GlacerosEntity>> GLACEROS = registerMob("glaceros", GlacerosEntity::new,
             1f, 2.2f, 0x302219, 0xACACAC);
 
-    public static final DeferredHolder<EntityType<?>, EntityType<SnowdoEntity>> SNOWDO = registerMob("snowdo",   SnowdoEntity::new,
+    public static final DeferredHolder<EntityType<?>, EntityType<SnowdoEntity>> SNOWDO = registerMob("snowdo", SnowdoEntity::new,
             0.6f, 1.1f, 0x302219, 0xACACAC);
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SpeartoothTiger>> SPEARTOOTH = registerMob("speartooth_tiger", SpeartoothTiger::new
+            , 1.0F, 1.0F, 0x302220, 0xACACAC);
 
 
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> GlacerosEntity.init());
         event.enqueueWork(() -> SnowdoEntity.init());
+        event.enqueueWork(() -> SpeartoothTiger.init());
     }
 
     @SubscribeEvent
-    public static void  registerAttributes(EntityAttributeCreationEvent event) {
+    public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(ModEntities.GLACEROS.get(), GlacerosEntity.createAttributes().build());
         event.put(ModEntities.SNOWDO.get(), SnowdoEntity.createAttributes().build());
+        event.put(ModEntities.SPEARTOOTH.get(), SpeartoothTiger.createAttributes().build());
     }
 }

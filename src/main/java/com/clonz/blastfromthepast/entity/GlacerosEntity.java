@@ -9,28 +9,23 @@ import com.mojang.serialization.Codec;
 import io.github.itskillerluc.duclib.client.animation.DucAnimation;
 import io.github.itskillerluc.duclib.entity.Animatable;
 import net.minecraft.Util;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -38,6 +33,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.IntFunction;
@@ -51,7 +47,7 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
     private final Lazy<Map<String, AnimationState>> animations = Lazy.of(() -> GlacerosModel.createStateMap(getAnimation()));
     private static final EntityDataAccessor<Integer> DATA_STRENGTH_ID = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.INT);
-    public  static final EntityDataAccessor<Boolean> PANICKING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> PANICKING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
 
     public int a = 0;
     public boolean readytoPlay = false;
@@ -77,19 +73,19 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new PanicGoal(this, 2.0) {
 
-          //  @Override
+            //  @Override
             //   public boolean canUse() {
-             //   for (Player player : GlacerosEntity.this.level()
-              //          .getEntitiesOfClass(Player.class, GlacerosEntity.this.getBoundingBox().inflate(5.0, 2.0, 5.0))) {
-              //     if (super.canUse() && player.isSprinting()) {
-              //            return true;
-               ///       }
-              //    }
-             //   return false;
-           // }
+            //   for (Player player : GlacerosEntity.this.level()
+            //          .getEntitiesOfClass(Player.class, GlacerosEntity.this.getBoundingBox().inflate(5.0, 2.0, 5.0))) {
+            //     if (super.canUse() && player.isSprinting()) {
+            //            return true;
+            ///       }
+            //    }
+            //   return false;
+            // }
         });
 
-       // this.goalSelector.addGoal(2, new GlacerosAvoidEntityGoal<>(this, Player.class, 8.0f, 2,2, null , null));
+        // this.goalSelector.addGoal(2, new GlacerosAvoidEntityGoal<>(this, Player.class, 8.0f, 2,2, null , null));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 1.0));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 5.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
@@ -102,7 +98,7 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         this.setRandomStrength(randomsource);
         GlacerosEntity.Variant glaceros$variant;
         if (spawnGroupData instanceof GlacerosEntity.GlacerosGroupData) {
-            glaceros$variant = ((GlacerosEntity.GlacerosGroupData)spawnGroupData).variant;
+            glaceros$variant = ((GlacerosEntity.GlacerosGroupData) spawnGroupData).variant;
         } else {
             glaceros$variant = Util.getRandom(GlacerosEntity.Variant.values(), randomsource);
             spawnGroupData = new GlacerosEntity.GlacerosGroupData(glaceros$variant);
@@ -128,7 +124,8 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         }
 
         if (!isMoving(this))
-        this.a ++;;
+            this.a++;
+        ;
 
         if (!level().isClientSide() && this.a == this.random) {
             this.readytoPlay = true;
@@ -250,7 +247,7 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
     //////////////////////////////// VARIANTSSSSSSSSSSS
 
     public static enum Variant implements StringRepresentable {
-        NOMRAL(0,"normal"),
+        NOMRAL(0, "normal"),
         BROAD(1, "broad"),
         CURLY(2, "curly"),
         CURVY(3, "curvy"),
@@ -282,19 +279,19 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
 
 
     // class GlacerosPanicGoal extends PanicGoal {
-     //   public GlacerosPanicGoal(PathfinderMob mob, double speedModifier) {
-     //       super(GlacerosEntity.this, 2.0);
-     //   }
+    //   public GlacerosPanicGoal(PathfinderMob mob, double speedModifier) {
+    //       super(GlacerosEntity.this, 2.0);
+    //   }
 
     //    @Override
-     //   public boolean canUse() {
-     //       if (super.canUse()) {
-     //           for (Player player : GlacerosEntity.this.level()
-     //                   .getEntitiesOfClass(Player.class, GlacerosEntity.this.getBoundingBox().inflate(5.0, 2.0, 5.0))) {
-             //       if (player.isSprinting())
-      //              return true;
-      //          }
-      //      }
-     //       return false;
+    //   public boolean canUse() {
+    //       if (super.canUse()) {
+    //           for (Player player : GlacerosEntity.this.level()
+    //                   .getEntitiesOfClass(Player.class, GlacerosEntity.this.getBoundingBox().inflate(5.0, 2.0, 5.0))) {
+    //       if (player.isSprinting())
+    //              return true;
+    //          }
+    //      }
+    //       return false;
     //    }//  }
 }

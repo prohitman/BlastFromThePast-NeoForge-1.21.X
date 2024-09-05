@@ -2,16 +2,10 @@ package com.clonz.blastfromthepast.init;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.SpawnEggItem;
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-
-import java.util.function.Supplier;
 
 
 public class ModItems {
@@ -33,6 +27,9 @@ public class ModItems {
 
     public static final DeferredItem<Item> SNOWDO_SPAWN_EGG = ITEMS.register("snowdo_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.SNOWDO, 0x74a3af, 0xcdc9df, new Item.Properties()));
+
+    public static final DeferredItem<Item> SPEARTOOTH_SPAWN_EGG = ITEMS.register("speartooth_tiger_spawn_egg",
+            () -> new DeferredSpawnEggItem(ModEntities.SPEARTOOTH, 0x74a3af, 0xcdc9df, new Item.Properties()));
 
 
 
