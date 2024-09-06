@@ -169,7 +169,7 @@ public class BFTPWalkNodeProcessor extends WalkNodeEvaluator {
                     int y = yStep + pYOffset;
                     int z = zStep + pZOffset;
                     PathType currentType = this.getPathType(pathfindingContext, x, y, z);
-                    currentType = this.evaluateBlockPathType(pPos, currentType);
+                    currentType = this.evaluateBlockPathType(pathfindingContext, pPos, currentType);
                     if (xStep == 0 && yStep == 0 && zStep == 0) {
                         resultType = currentType;
                     }
@@ -183,7 +183,7 @@ public class BFTPWalkNodeProcessor extends WalkNodeEvaluator {
     }
 
     // Removed after 1.20.1, so we recreate it here from WalkNodeEvaluator#getPathTypeWithinMobBB
-    protected PathType evaluateBlockPathType(BlockPos pPos, PathType pPathTypes) {
+    protected PathType evaluateBlockPathType(PathfindingContext pathfindingContext, BlockPos pPos, PathType pPathTypes) {
         boolean flag = this.canPassDoors();
         if (pPathTypes == PathType.DOOR_WOOD_CLOSED && this.canOpenDoors() && flag) {
             pPathTypes = PathType.WALKABLE_DOOR;
@@ -193,7 +193,7 @@ public class BFTPWalkNodeProcessor extends WalkNodeEvaluator {
             pPathTypes = PathType.BLOCKED;
         }
 
-        if (pPathTypes == PathType.RAIL && this.getPathType(this.currentContext, pPos.getX(), pPos.getY(), pPos.getZ()) != PathType.RAIL && this.getPathType(this.currentContext, pPos.getX(), pPos.getY() - 1, pPos.getZ()) != PathType.RAIL) {
+        if (pPathTypes == PathType.RAIL && this.getPathType(pathfindingContext, pPos.getX(), pPos.getY(), pPos.getZ()) != PathType.RAIL && this.getPathType(pathfindingContext, pPos.getX(), pPos.getY() - 1, pPos.getZ()) != PathType.RAIL) {
             pPathTypes = PathType.UNPASSABLE_RAIL;
         }
 
