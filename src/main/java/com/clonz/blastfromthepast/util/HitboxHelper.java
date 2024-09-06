@@ -9,21 +9,20 @@ public class HitboxHelper {
 
     //https://gist.github.com/dGr8LookinSparky/bd64a9f5f9deecf61e2c3c1592169c00
     public static double getDistSqrBetweenHitboxes(AABB first, AABB second){
-        double[] firstMins = new double[]{first.minX, first.minY, first.minZ};
-        double[] secondMins = new double[]{second.minX, second.minY, second.minZ};
-        double[] firstMaxs = new double[]{first.maxX, first.maxY, first.maxZ};
-        double[] secondMaxs = new double[]{second.maxX, second.maxY, second.maxZ};
         double distSqr = 0;
-        for(int i = 0; i < 3; i++){
-            if(secondMaxs[i] < firstMins[i]) {
-                double dist = secondMaxs[i] - firstMins[i];
-                distSqr += Mth.square(dist);
-            } else if(secondMins[i] > firstMaxs[i]) {
-                double dist = secondMins[i] - firstMaxs[i];
-                distSqr += Mth.square(dist);
-            }
-        }
+        distSqr += Mth.square(getDistBetweenCorners(first.minX, second.minX, first.maxX, second.maxX));
+        distSqr += Mth.square(getDistBetweenCorners(first.minY, second.minY, first.maxY, second.maxY));
+        distSqr += Mth.square(getDistBetweenCorners(first.minZ, second.minZ, first.maxZ, second.maxZ));
         return distSqr;
+    }
+
+    private static double getDistBetweenCorners(double min1, double min2, double max1, double max2) {
+        if(max2 < min1) {
+            return max2 - min1;
+        } else if(min2 > max1) {
+            return min2 - max1;
+        }
+        return 0;
     }
 
     public static double getDistSqrBetweenHitboxes(Entity first, Entity second){
