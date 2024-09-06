@@ -5,10 +5,8 @@ import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
 import net.minecraft.data.PackOutput;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.LanguageProvider;
@@ -16,8 +14,6 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import org.codehaus.plexus.util.StringUtils;
-
-import java.util.function.Consumer;
 
 public class ModLangGen extends LanguageProvider {
 
@@ -45,6 +41,7 @@ public class ModLangGen extends LanguageProvider {
         //Entities
         addEntity(ModEntities.GLACEROS);
         addEntity(ModEntities.SNOWDO);
+        addEntity(ModEntities.FROSTOMPER);
 
         add("itemGroup." + BlastFromThePast.MODID, "Blast From The Past");
     }

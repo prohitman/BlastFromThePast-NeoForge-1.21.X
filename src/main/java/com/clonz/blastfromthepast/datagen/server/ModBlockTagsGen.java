@@ -2,11 +2,10 @@ package com.clonz.blastfromthepast.datagen.server;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.init.ModBlocks;
+import com.clonz.blastfromthepast.init.ModTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.Nullable;
@@ -28,5 +27,7 @@ public class ModBlockTagsGen extends BlockTagsProvider {
                 .add(ModBlocks.CEDAR_PLANKS.get());
         tag(BlockTags.LEAVES)
                 .add(ModBlocks.CEDAR_LEAVES.get());
+        tag(ModTags.Blocks.FROSTOMPER_CAN_BREAK)
+                .addTag(BlockTags.LEAVES);
     }
 }
