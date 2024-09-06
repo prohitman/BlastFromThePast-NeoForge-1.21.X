@@ -35,4 +35,8 @@ public class HitboxHelper {
         double distanceToSqr = getDistSqrBetweenHitboxes(attacker, target);
         return !(distanceToSqr > Mth.square(maxDistance));
     }
+
+    public static float pixelsToBlocks(float pixels) {
+        return pixels / 16.0F;
+    }
 }

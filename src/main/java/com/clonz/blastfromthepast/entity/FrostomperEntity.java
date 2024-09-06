@@ -6,6 +6,7 @@ import com.clonz.blastfromthepast.entity.ai.HitboxAdjustedFollowParentGoal;
 import com.clonz.blastfromthepast.entity.ai.navigation.BFTPGroundPathNavigation;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModTags;
+import com.clonz.blastfromthepast.mixin.AbstractChestedHorseAccessor;
 import com.clonz.blastfromthepast.util.HitboxHelper;
 import io.github.itskillerluc.duclib.client.animation.DucAnimation;
 import io.github.itskillerluc.duclib.entity.Animatable;
@@ -36,7 +37,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
@@ -48,6 +48,7 @@ import java.util.Optional;
 public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel> {
     public static final DucAnimation ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId());
     public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId().withPrefix("baby_"));
+    public static final EntityDimensions BABY_FROSTOMPER_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(28.0F), HitboxHelper.pixelsToBlocks(22.0F));
     private static final double PARENT_TARGETING_DISTANCE = 16.0D;
     private final Lazy<Map<String, AnimationState>> animations = Lazy.of(() -> FrostomperModel.createStateMap(getAnimation()));
     protected static final TargetingConditions PARENT_TARGETING = TargetingConditions.forNonCombat()
@@ -59,6 +60,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         super(entityType, level);
         this.setPathfindingMalus(PathType.LEAVES, 0.0F);
         this.parentTargeting = PARENT_TARGETING.copy().selector(entity -> HitboxHelper.isCloseEnoughForTargeting(this, entity, true, PARENT_TARGETING_DISTANCE));
+        ((AbstractChestedHorseAccessor)this).setBabyDimensions(BABY_FROSTOMPER_DIMENSIONS);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -77,7 +79,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new PanicGoal(this, 1.2));
-        this.goalSelector.addGoal(1, new RunAroundLikeCrazyGoal(this, 1.2));
+        //this.goalSelector.addGoal(1, new RunAroundLikeCrazyGoal(this, 1.2));
         this.goalSelector.addGoal(2, new HitboxAdjustedBreedGoal(this, 1.0));
         this.goalSelector.addGoal(4, new HitboxAdjustedFollowParentGoal(this, 1.0));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7));
@@ -108,6 +110,13 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             if (mommy != null && HitboxHelper.getDistSqrBetweenHitboxes(this, mommy) > 4.0D) {
                 this.navigation.createPath(mommy, 0);
             }
+        }
+    }
+
+    @Override
+    protected void doPlayerRide(Player player) {
+        if(this.isTamed()){
+            super.doPlayerRide(player);
         }
     }
 
@@ -248,25 +257,31 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         if (!this.isFood(stack)) {
             return false;
         } else {
-            boolean injured = this.getHealth() < this.getMaxHealth();
-            if (injured) {
+            boolean fed = false;
+            if (this.getHealth() < this.getMaxHealth()) {
                 this.heal(2.0F);
+                fed = true;
             }
-
-            boolean canMate = this.isTamed() && this.getAge() == 0 && this.canFallInLove();
-            if (canMate) {
+            if (this.isTamed() && this.getAge() == 0 && this.canFallInLove()) {
                 this.setInLove(player);
+                fed = true;
             }
-
-            boolean baby = this.isBaby();
-            if (baby) {
+            if (this.isBaby()) {
                 this.level().addParticle(ParticleTypes.HAPPY_VILLAGER, this.getRandomX(1.0), this.getRandomY() + 0.5, this.getRandomZ(1.0), 0.0, 0.0, 0.0);
                 if (!this.level().isClientSide) {
                     this.ageUp(10);
+                    fed = true;
                 }
             }
+            if (!this.isTamed() && this.getTemper() < this.getMaxTemper() && !this.level().isClientSide) {
+                this.modifyTemper(10);
+                if (this.getTemper() >= this.getMaxTemper() && !EventHooks.onAnimalTame(this, player)) {
+                    this.tameWithName(player);
+                }
+                fed = true;
+            }
 
-            if (!injured && !canMate && !baby) {
+            if (!fed) {
                 return false;
             } else {
                 if (!this.isSilent()) {
@@ -309,30 +324,6 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     @Override
     public SoundEvent getSaddleSoundEvent() {
         return SoundEvents.HORSE_SADDLE;
-    }
-
-    @Override
-    protected boolean canAddPassenger(Entity passenger) {
-        return this.getPassengers().size() < 3;
-    }
-
-    @Override
-    protected Vec3 getPassengerAttachmentPoint(Entity entity, EntityDimensions dimensions, float partialTick) {
-        int passengerIndex = Math.max(this.getPassengers().indexOf(entity), 0);
-        boolean firstPassenger = passengerIndex == 0;
-        float zOffset = 0.5F;
-        float yOffset = (float)(this.isRemoved() ? 0.01 : (dimensions.height() - 0.375F * partialTick));
-        if (this.getPassengers().size() > 1) {
-            if (!firstPassenger) {
-                zOffset = (-0.7F * passengerIndex);
-            }
-
-            if (entity instanceof Animal) {
-                zOffset += 0.2F;
-            }
-        }
-
-        return (new Vec3(0.0, yOffset, zOffset * partialTick)).yRot(-this.getYRot() * Mth.DEG_TO_RAD);
     }
 
     static class FrostomperGroupData extends AgeableMob.AgeableMobGroupData {

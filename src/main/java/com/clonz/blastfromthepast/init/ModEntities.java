@@ -4,6 +4,7 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import com.clonz.blastfromthepast.entity.FrostomperEntity;
+import com.clonz.blastfromthepast.util.HitboxHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
@@ -34,7 +35,7 @@ public class ModEntities {
             0.6f, 1.1f, 0x302219, 0xACACAC);
 
     public static final DeferredHolder<EntityType<?>, EntityType<FrostomperEntity>> FROSTOMPER = registerMob("frostomper", FrostomperEntity::new,
-            77.0F / 16.0F, 70.0F / 16.0F, 0x302219, 0xACACAC);
+            HitboxHelper.pixelsToBlocks(77.0F), HitboxHelper.pixelsToBlocks(70.0F), 0x302219, 0xACACAC);
 
 
     @SubscribeEvent
