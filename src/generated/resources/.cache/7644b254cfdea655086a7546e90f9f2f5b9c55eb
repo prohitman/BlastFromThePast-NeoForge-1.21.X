@@ -1,9 +1,10 @@
-// 1.21	2024-09-03T17:23:03.5773005	Item Models: blastfromthepast
+// 1.21	2024-09-05T21:44:03.1939783	Item Models: blastfromthepast
 ef282fe501063065586f718b651a4b3c7ead1226 assets/blastfromthepast/models/item/cedar_door.json
 6ec2308f1b8d936d19fc41d0ccaa938249ba641f assets/blastfromthepast/models/item/cedar_leaves.json
 4c32e9d01f6d6374de35da0cb58481e11a63bbfd assets/blastfromthepast/models/item/cedar_log.json
 944078a7764f59874f265247c1018f71f3ee1115 assets/blastfromthepast/models/item/cedar_planks.json
 16b43f844757b8d2ab270ac0bd8dcc4e20c5c651 assets/blastfromthepast/models/item/cooked_venison.json
+63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/blastfromthepast/models/item/frostomper_spawn_egg.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/blastfromthepast/models/item/glaceros_spawn_egg.json
 3cdfe541fec8705ce661aec83138548b12b1daa9 assets/blastfromthepast/models/item/raw_venison.json
 bf574dfb2afe26a4a22bf4734637430ef9cf682c assets/blastfromthepast/models/item/sappy_cedar_log.json

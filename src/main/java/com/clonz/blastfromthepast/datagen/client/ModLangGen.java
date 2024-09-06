@@ -29,6 +29,7 @@ public class ModLangGen extends LanguageProvider {
         addItem(ModItems.COOKED_VENISON);
         addItem(ModItems.GLACEROS_SPAWN_EGG);
         addItem(ModItems.SNOWDO_SPAWN_EGG);
+        addItem(ModItems.FROSTOMPER_SPAWN_EGG);
 
         //Blocks
         addBlock(ModBlocks.CEDAR_DOOR);

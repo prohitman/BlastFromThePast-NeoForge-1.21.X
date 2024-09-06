@@ -20,6 +20,7 @@ public class ModTabs {
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.GLACEROS_SPAWN_EGG.get());
                         output.accept(ModItems.SNOWDO_SPAWN_EGG.get());
+                        output.accept(ModItems.FROSTOMPER_SPAWN_EGG.get());
                         output.accept(ModBlocks.CEDAR_LOG.get());
                         output.accept(ModBlocks.STRIPPED_CEDAR_LOG.get());
                         output.accept(ModBlocks.SAPPY_CEDAR_LOG.get());
