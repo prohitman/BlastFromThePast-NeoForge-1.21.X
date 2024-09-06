@@ -3,16 +3,27 @@ package com.clonz.blastfromthepast.client;
 import net.minecraft.resources.ResourceLocation;
 
 public class ClientResourceHelper {
-    public static ResourceLocation textureLocation(ResourceLocation entityLocation) {
-        return ResourceLocation.fromNamespaceAndPath(entityLocation.getNamespace(), String.format("textures/entity/%s.png", entityLocation.getPath()));
+    public static ResourceLocation entityTexLoc(ResourceLocation entityLocation) {
+        return entityLocation.withPath(ClientResourceHelper::entityTexLocPath);
     }
-    public static ResourceLocation textureLocationWithFolder(ResourceLocation entityLocation) {
-        return ResourceLocation.fromNamespaceAndPath(entityLocation.getNamespace(), String.format("textures/entity/%s/%s.png", entityLocation.getPath(), entityLocation.getPath()));
+
+    public static String entityTexLocPath(String path) {
+        return "textures/entity/" + path + ".png";
     }
-    public static ResourceLocation textureLocationWithFolderAndSuffix(ResourceLocation entityLocation, String suffix) {
-        return ResourceLocation.fromNamespaceAndPath(entityLocation.getNamespace(), String.format("textures/entity/%s/%s_%s.png", entityLocation.getPath(), entityLocation.getPath(), suffix));
+
+    public static ResourceLocation entityTexLocWithTypeSubFolder(ResourceLocation entityLocation) {
+        return entityLocation.withPath(path -> entityTexLocPath(path + "/" + path));
     }
-    public static ResourceLocation textureLocationWithFolderAndPrefix(ResourceLocation entityLocation, String prefix) {
-        return ResourceLocation.fromNamespaceAndPath(entityLocation.getNamespace(), String.format("textures/entity/%s/%s_%s.png", entityLocation.getPath(), prefix, entityLocation.getPath()));
+
+    public static ResourceLocation entityTecLocWithTypeSubFolderWithSuffix(ResourceLocation entityLocation, String suffix) {
+        return entityLocation.withPath(path -> entityTexLocPath(path + "/" + path + suffix));
+    }
+
+    public static ResourceLocation entityTexLocWithTypeSubFolderWithPrefix(ResourceLocation entityLocation, String prefix) {
+        return entityLocation.withPath(path -> entityTexLocPath(path + "/" + prefix + path));
+    }
+
+    public static ResourceLocation entityTexLocWithTypeSubFolderWithPrefixAndSuffix(ResourceLocation entityLocation, String prefix, String suffix) {
+        return entityLocation.withPath(path -> entityTexLocPath(path + "/" + prefix + path + suffix));
     }
 }

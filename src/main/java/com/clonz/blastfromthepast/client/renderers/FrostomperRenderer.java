@@ -13,9 +13,9 @@ import net.minecraft.resources.ResourceLocation;
 
 public class FrostomperRenderer extends MobRenderer<FrostomperEntity, FrostomperModel> {
 
-    private static final ResourceLocation NORMAL_TEXTURE = ClientResourceHelper.textureLocationWithFolder(ModEntities.FROSTOMPER.getId());
-    private static final ResourceLocation SADDLED_TEXTURE = ClientResourceHelper.textureLocationWithFolderAndSuffix(ModEntities.FROSTOMPER.getId(), "saddled");
-    private static final ResourceLocation BABY_TEXTURE = ClientResourceHelper.textureLocationWithFolderAndPrefix(ModEntities.FROSTOMPER.getId(), "baby");
+    private static final ResourceLocation NORMAL_TEXTURE = ClientResourceHelper.entityTexLocWithTypeSubFolder(ModEntities.FROSTOMPER.getId());
+    private static final ResourceLocation SADDLED_TEXTURE = ClientResourceHelper.entityTecLocWithTypeSubFolderWithSuffix(ModEntities.FROSTOMPER.getId(), "_saddled");
+    private static final ResourceLocation BABY_TEXTURE = ClientResourceHelper.entityTexLocWithTypeSubFolderWithPrefix(ModEntities.FROSTOMPER.getId(), "baby_");
 
     private final FrostomperModel adult;
     private final FrostomperModel baby;
