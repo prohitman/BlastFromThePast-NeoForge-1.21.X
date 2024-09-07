@@ -33,5 +33,9 @@ public class ModItemTagsGen extends ItemTagsProvider {
                 .add(ModItems.SAP_BALL.get());
         tag(ModTags.Items.FROSTOMPER_TEMPT_ITEMS)
                 .addTag(ModTags.Items.FROSTOMPER_FOOD);
+        tag(ModTags.Items.BABY_FROSTOMPER_FOOD)
+                .add(ModItems.SAP_BALL.get());
+        tag(ModTags.Items.BABY_FROSTOMPER_TEMPT_ITEMS)
+                .addTag(ModTags.Items.BABY_FROSTOMPER_FOOD);
     }
 }

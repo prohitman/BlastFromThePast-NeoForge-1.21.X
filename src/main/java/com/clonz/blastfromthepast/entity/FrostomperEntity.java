@@ -102,7 +102,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     @Override
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(3, new TemptGoal(this, 1.25, (stack) -> stack.is(ModTags.Items.FROSTOMPER_TEMPT_ITEMS), false));
+        this.goalSelector.addGoal(3, new TemptGoal(this, 1.25, (stack) -> stack.is(this.isBaby() ? ModTags.Items.BABY_FROSTOMPER_TEMPT_ITEMS : ModTags.Items.FROSTOMPER_TEMPT_ITEMS), false));
     }
 
     @Override
@@ -205,7 +205,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     @Override
     public boolean isFood(ItemStack itemStack) {
-        return itemStack.is(ModTags.Items.FROSTOMPER_FOOD);
+        return itemStack.is(this.isBaby() ? ModTags.Items.BABY_FROSTOMPER_FOOD : ModTags.Items.FROSTOMPER_FOOD);
     }
 
     @Nullable
@@ -232,7 +232,16 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         if(spawnGroupData instanceof FrostomperGroupData frostomperGroupData){
             frostomperGroupData.addPackMember(this);
         }
-        return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
+        SpawnGroupData spawnData = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
+        if(this.isBaby()){
+            this.setAge(AgeableMob.BABY_START_AGE * 3);
+        }
+        return spawnData;
+    }
+
+    @Override
+    public void setBaby(boolean baby) {
+        this.setAge(baby ? AgeableMob.BABY_START_AGE * 3 : 0);
     }
 
     @Override
@@ -289,7 +298,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             }
             if (!this.isTamed() && this.getTemper() < this.getMaxTemper() && !this.level().isClientSide) {
                 this.modifyTemper(10);
-                if (this.getTemper() >= this.getMaxTemper() && !EventHooks.onAnimalTame(this, player)) {
+                if (this.getTemper() >= this.getMaxTemper() && this.canBeTamed() && !EventHooks.onAnimalTame(this, player)) {
                     this.tameWithName(player);
                 }
                 fed = true;
@@ -309,6 +318,10 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 return true;
             }
         }
+    }
+
+    protected boolean canBeTamed() {
+        return this.isBaby() || this.isBred();
     }
 
     @Override

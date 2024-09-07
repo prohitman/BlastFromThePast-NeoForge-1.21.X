@@ -1,4 +1,6 @@
-// 1.21	2024-09-05T17:37:09.6356013	Tags for minecraft:item mod id blastfromthepast
+// 1.21	2024-09-06T20:56:55.2089442	Tags for minecraft:item mod id blastfromthepast
+d0ed0d5c4b6c486a5c755d7963d1d5e884170133 data/blastfromthepast/tags/item/baby_frostomper_food.json
+3f9ee7e575a4e21dadef974b0fa582d4bfc6c762 data/blastfromthepast/tags/item/baby_frostomper_tempt_items.json
 d0ed0d5c4b6c486a5c755d7963d1d5e884170133 data/blastfromthepast/tags/item/frostomper_food.json
 67c50e3c228c549b522561d3dc1f9d773ea680a9 data/blastfromthepast/tags/item/frostomper_tempt_items.json
 baa6c765b710fa56ad81e7b238020f184a80e6f1 data/minecraft/tags/item/leaves.json

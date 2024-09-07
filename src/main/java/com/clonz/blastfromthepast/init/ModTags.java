@@ -9,6 +9,8 @@ public class ModTags {
     public static class Items{
         public static final TagKey<Item> FROSTOMPER_FOOD = TagKey.create(Registries.ITEM, ModEntities.FROSTOMPER.getId().withSuffix("_food"));
         public static final TagKey<Item> FROSTOMPER_TEMPT_ITEMS = TagKey.create(Registries.ITEM, ModEntities.FROSTOMPER.getId().withSuffix("_tempt_items"));
+        public static final TagKey<Item> BABY_FROSTOMPER_FOOD = TagKey.create(Registries.ITEM, ModEntities.FROSTOMPER.getId().withPrefix("baby_").withSuffix("_food"));
+        public static final TagKey<Item> BABY_FROSTOMPER_TEMPT_ITEMS = TagKey.create(Registries.ITEM, ModEntities.FROSTOMPER.getId().withPrefix("baby_").withSuffix("_tempt_items"));
     }
     public static class Blocks{
         public static final TagKey<Block> FROSTOMPER_CAN_BREAK = TagKey.create(Registries.BLOCK, ModEntities.FROSTOMPER.getId().withSuffix("_can_break"));
