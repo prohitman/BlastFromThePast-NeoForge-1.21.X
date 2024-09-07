@@ -4,6 +4,7 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.client.models.FrostomperModel;
 import com.clonz.blastfromthepast.entity.ai.HitboxAdjustedBreedGoal;
 import com.clonz.blastfromthepast.entity.ai.HitboxAdjustedFollowParentGoal;
+import com.clonz.blastfromthepast.entity.ai.PackHurtByTargetGoal;
 import com.clonz.blastfromthepast.entity.pack.EntityPack;
 import com.clonz.blastfromthepast.entity.ai.navigation.BFTPGroundPathNavigation;
 import com.clonz.blastfromthepast.entity.pack.EntityPackAgeableMobData;
@@ -87,6 +88,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         //this.goalSelector.addGoal(1, new RunAroundLikeCrazyGoal(this, 1.2));
         this.goalSelector.addGoal(2, new HitboxAdjustedBreedGoal(this, 1.0));
         this.goalSelector.addGoal(4, new HitboxAdjustedFollowParentGoal(this, 1.0));
+        this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.0, true));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
@@ -94,6 +96,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             this.goalSelector.addGoal(9, new RandomStandGoal(this));
         }
         this.addBehaviourGoals();
+        this.targetSelector.addGoal(0, new PackHurtByTargetGoal<>(this, FrostomperEntity.class));
     }
 
     @Override
