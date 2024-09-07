@@ -8,12 +8,17 @@ import com.clonz.blastfromthepast.client.renderers.SnowdoRenderer;
 import com.clonz.blastfromthepast.client.renderers.FrostomperRenderer;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
+import com.clonz.blastfromthepast.entity.pack.EntityPacks;
 import com.clonz.blastfromthepast.init.*;
 import io.github.itskillerluc.duclib.client.model.BaseDucModel;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -57,6 +62,14 @@ public class BlastFromThePast {
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
     }
 
+    public static EntityPacks getEntityPacks(ServerLevel level) {
+        return level.getDataStorage().computeIfAbsent(EntityPacks.factory(level), EntityPacks.getFileId());
+    }
+
+    public static EntityPacks getUniversalEntityPacks(MinecraftServer server) {
+        return getEntityPacks(server.overworld());
+    }
+
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
       //  if (event.getTabKey() == CreativeModeTabs.COMBAT) {
@@ -76,6 +89,13 @@ public class BlastFromThePast {
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
+    }
+
+    @SubscribeEvent
+    public void onServerTick(LevelTickEvent.Post event){
+        if(event.getLevel() instanceof ServerLevel serverLevel && event.getLevel().dimension().equals(Level.OVERWORLD) && serverLevel.tickRateManager().runsNormally()){
+            getEntityPacks(serverLevel).tick();
+        }
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent

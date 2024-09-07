@@ -1,9 +1,13 @@
 package com.clonz.blastfromthepast.entity;
 
+import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.client.models.FrostomperModel;
 import com.clonz.blastfromthepast.entity.ai.HitboxAdjustedBreedGoal;
 import com.clonz.blastfromthepast.entity.ai.HitboxAdjustedFollowParentGoal;
+import com.clonz.blastfromthepast.entity.pack.EntityPack;
 import com.clonz.blastfromthepast.entity.ai.navigation.BFTPGroundPathNavigation;
+import com.clonz.blastfromthepast.entity.pack.EntityPackAgeableMobData;
+import com.clonz.blastfromthepast.entity.pack.EntityPackHolder;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModTags;
 import com.clonz.blastfromthepast.mixin.AbstractChestedHorseAccessor;
@@ -12,6 +16,7 @@ import io.github.itskillerluc.duclib.client.animation.DucAnimation;
 import io.github.itskillerluc.duclib.entity.Animatable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -41,11 +46,9 @@ import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
-public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel> {
+public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel>, EntityPackHolder<FrostomperEntity> {
     public static final DucAnimation ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId());
     public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId().withPrefix("baby_"));
     public static final EntityDimensions BABY_FROSTOMPER_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(28.0F), HitboxHelper.pixelsToBlocks(22.0F));
@@ -55,6 +58,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             .ignoreLineOfSight()
             .selector(entity -> entity instanceof FrostomperEntity && ((FrostomperEntity)entity).isBred());
     protected final TargetingConditions parentTargeting;
+    @Nullable
+    private EntityPack<FrostomperEntity> pack;
 
     public FrostomperEntity(EntityType<? extends FrostomperEntity> entityType, Level level) {
         super(entityType, level);
@@ -177,9 +182,11 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                     BlockState nearbyBlockState;
                     do {
                         if (!nearbyBlockPositions.hasNext()) {
+                            /*
                             if (!destroyedBlock && this.onGround()) {
                                 this.jumpFromGround();
                             }
+                             */
                             break breakNearbyBlocks;
                         }
 
@@ -216,7 +223,11 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
         if (spawnGroupData == null) {
-            spawnGroupData = new FrostomperEntity.FrostomperGroupData();
+            spawnGroupData = new FrostomperEntity.FrostomperGroupData(BlastFromThePast.getUniversalEntityPacks(level.getLevel().getServer()).createFreshPack(), true);
+        }
+
+        if(spawnGroupData instanceof FrostomperGroupData frostomperGroupData){
+            frostomperGroupData.addPackMember(this);
         }
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
@@ -326,9 +337,34 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         return SoundEvents.HORSE_SADDLE;
     }
 
-    static class FrostomperGroupData extends AgeableMob.AgeableMobGroupData {
-        FrostomperGroupData() {
-            super(true);
+    @Override
+    @Nullable
+    public EntityPack<FrostomperEntity> getPack() {
+        return this.pack;
+    }
+
+    @Override
+    public void setPack(@Nullable EntityPack<FrostomperEntity> pack) {
+        this.pack = pack;
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag compound) {
+        super.readAdditionalSaveData(compound);
+        if (this.level() instanceof ServerLevel serverLevel) {
+            this.readPackData(compound, this, serverLevel);
+        }
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag compound) {
+        super.addAdditionalSaveData(compound);
+        this.savePackData(compound);
+    }
+
+    protected static class FrostomperGroupData extends EntityPackAgeableMobData<FrostomperEntity> {
+        public FrostomperGroupData(EntityPack<FrostomperEntity> entityPack, boolean shouldSpawnBaby) {
+            super(entityPack, shouldSpawnBaby);
         }
     }
 }
