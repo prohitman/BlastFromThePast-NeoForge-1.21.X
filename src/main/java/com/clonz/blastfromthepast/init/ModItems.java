@@ -31,6 +31,9 @@ public class ModItems {
     public static final DeferredItem<Item> SPEARTOOTH_SPAWN_EGG = ITEMS.register("speartooth_tiger_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.SPEARTOOTH, 0x74a3af, 0xcdc9df, new Item.Properties()));
 
+    public static final DeferredItem<Item> ICE_SPEAR = ITEMS.register("ice_spear", () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> SPEARTOOTH = ITEMS.register("speartooth", () -> new Item(new Item.Properties()));
 
 
 
