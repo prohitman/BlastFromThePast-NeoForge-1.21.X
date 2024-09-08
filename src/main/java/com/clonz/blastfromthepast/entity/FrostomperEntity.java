@@ -94,7 +94,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(1, new PanicGoal(this, 1.2));
+        this.goalSelector.addGoal(1, new WithoutTargetPanicGoal(this, 1.2));
         //this.goalSelector.addGoal(1, new RunAroundLikeCrazyGoal(this, 1.2));
         this.goalSelector.addGoal(2, new HitboxAdjustedBreedGoal(this, 1.0));
         this.goalSelector.addGoal(4, new HitboxAdjustedFollowParentGoal(this, 1.0));
@@ -522,20 +522,22 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         }
     }
 
+    private static final double MINIMUM_ATTACK_SIZE = 1.695169D;
+    private static final Vec3 DEFAULT_ATTACK_SIZE = new Vec3(MINIMUM_ATTACK_SIZE + 1, MINIMUM_ATTACK_SIZE + 1, MINIMUM_ATTACK_SIZE + 1);
     public enum FrostomperAttackType implements AttackType<FrostomperEntity, FrostomperAttackType>{
-        FLING(Mth.floor(0.38F * 20), Mth.floor(0.75F * 20), new Vec3(0.5, 0.5, 0.5), 8),
-        DOUBLE_STOMP(Mth.floor(0.63F * 20), 20, new Vec3(0.5, 0.5, 0.5), 10),
-        CHARGE(5, 10, new Vec3(0.5, 0.5, 0.5), 12);
+        FLING(Mth.floor(0.38F * 20), Mth.floor(0.75F * 20), DEFAULT_ATTACK_SIZE, 8),
+        DOUBLE_STOMP(Mth.floor(0.63F * 20), 20, DEFAULT_ATTACK_SIZE, 10),
+        CHARGE(5, 10, DEFAULT_ATTACK_SIZE, 12);
 
         private final int attackPoint;
         private final int attackDuration;
-        private final Vec3 attackRadius;
+        private final Vec3 attackSize;
         private final float attackDamage;
 
-        FrostomperAttackType(int attackPoint, int attackDuration, Vec3 attackRadius, float attackDamage) {
+        FrostomperAttackType(int attackPoint, int attackDuration, Vec3 attackSize, float attackDamage) {
             this.attackPoint = attackPoint;
             this.attackDuration = attackDuration;
-            this.attackRadius = attackRadius;
+            this.attackSize = attackSize;
             this.attackDamage = attackDamage;
         }
 
@@ -550,8 +552,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         }
 
         @Override
-        public Vec3 getAttackRadius(){
-            return this.attackRadius;
+        public Vec3 getAttackSize(){
+            return this.attackSize;
         }
 
         @Override

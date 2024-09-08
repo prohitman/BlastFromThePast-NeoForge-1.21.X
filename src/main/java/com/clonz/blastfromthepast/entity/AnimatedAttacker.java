@@ -22,17 +22,20 @@ public interface AnimatedAttacker<T extends Mob & AnimatedAttacker<T, A>, A exte
 
         int getAttackDuration();
 
-        Vec3 getAttackRadius();
+        Vec3 getAttackSize();
 
         float getAttackDamage();
 
         default void executeAttackPoint(T attacker){
-            AABB attackBounds = HitboxHelper.createRelativeForwardHitbox(attacker, this.getAttackRadius());
+            Vec3 attackSize = this.getAttackSize();
+            AABB attackBounds = HitboxHelper.createHitboxRelativeToFront(attacker, attackSize.x(), attackSize.y(), attackSize.z());
             EntityHelper.doAreaOfEffectAttack(attacker, attackBounds, this.getAttackDamage());
         }
 
-        default boolean isWithinAttackRange(T attacker, LivingEntity target) {
-            return HitboxHelper.createRelativeForwardHitbox(attacker, this.getAttackRadius()).intersects(target.getHitbox());
+        default boolean isTargetCloseEnoughToStart(T attacker, LivingEntity target) {
+            Vec3 startAttackSize = this.getAttackSize().multiply(1, 1, 0.5D);
+            AABB startAttackBounds = HitboxHelper.createHitboxRelativeToFront(attacker, startAttackSize.x(), startAttackSize.y(), startAttackSize.z());
+            return startAttackBounds.intersects(target.getHitbox());
         }
 
         boolean hasAttackPointAt(int attackTicker);

@@ -51,7 +51,7 @@ public class AnimatedMeleeAttackGoal<T extends PathfinderMob & AnimatedAttacker<
     protected boolean canPerformAttack(LivingEntity target) {
         return this.isTimeToAttack()
                 && this.selectedAttackType != null
-                && this.selectedAttackType.isWithinAttackRange(this.attacker, target)
+                && this.selectedAttackType.isTargetCloseEnoughToStart(this.attacker, target)
                 && this.mob.getSensing().hasLineOfSight(target);
     }
 
