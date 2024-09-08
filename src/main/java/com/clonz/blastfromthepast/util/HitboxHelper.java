@@ -4,6 +4,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class HitboxHelper {
 
@@ -38,5 +39,12 @@ public class HitboxHelper {
 
     public static float pixelsToBlocks(float pixels) {
         return pixels / 16.0F;
+    }
+
+    public static AABB createRelativeForwardHitbox(LivingEntity mob, Vec3 radius){
+        Vec3 baseOffset = Vec3.ZERO.add(0, 0, mob.getBbWidth() * 0.5F).yRot(-mob.getYHeadRot() * Mth.DEG_TO_RAD);
+        Vec3 radiusOffset = radius.yRot(-mob.getYHeadRot() * Mth.DEG_TO_RAD);
+        Vec3 centerPos = mob.position().add(baseOffset).add(radiusOffset).add(0, radius.y(), 0);
+        return AABB.ofSize(centerPos, radius.x() * 2, radius.y() * 2, radius.z() * 2);
     }
 }

@@ -8,12 +8,16 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.phys.AABB;
 
+import java.util.function.Predicate;
+
 public class PackHurtByTargetGoal<T extends PathfinderMob & EntityPackHolder<T>> extends HurtByTargetGoal {
     protected final T packMob;
+    protected final Predicate<T> canIgnoreAlert;
 
-    public PackHurtByTargetGoal(T packMob, Class<?>... toIgnoreDamage) {
+    public PackHurtByTargetGoal(T packMob, Predicate<T> canIgnoreAlert, Class<?>... toIgnoreDamage) {
         super(packMob, toIgnoreDamage);
         this.packMob = packMob;
+        this.canIgnoreAlert = canIgnoreAlert;
         this.setAlertOthers();
     }
 
@@ -40,20 +44,7 @@ public class PackHurtByTargetGoal<T extends PathfinderMob & EntityPackHolder<T>>
                 && member.getTarget() == null
                 && !EntityHelper.haveSameOwners(this.packMob, member)
                 && !member.isAlliedTo(lastHurtByMob)
-                && !this.ignoresAlert(member);
-    }
-
-    protected boolean ignoresAlert(T member) {
-        if (this.access().getToIgnoreAlert() == null) {
-            return false;
-        }
-        Class<?>[] toIgnoreAlert = this.access().getToIgnoreAlert();
-        for (Class<?> ignoresAlert : toIgnoreAlert) {
-            if (member.getClass() == ignoresAlert) {
-                return true;
-            }
-        }
-        return false;
+                && !this.canIgnoreAlert.test(member);
     }
 
     protected HurtByTargetGoalAccessor access(){

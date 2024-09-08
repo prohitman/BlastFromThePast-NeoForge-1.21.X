@@ -85,15 +85,14 @@ public class EntityPack<T extends Mob> {
             this.convertFromUuids(level);
             this.conversionDelay = 2;
         }
-        Iterator<T> iterator = this.members.iterator();
+        Iterator<T> membersIterator = this.members.iterator();
 
-        while(iterator.hasNext()) {
-            T member = iterator.next();
-            Entity.RemovalReason entity$removalreason = member.getRemovalReason();
-            if (entity$removalreason != null) {
-                this.members.remove(member);
-                iterator.remove();
-                switch (entity$removalreason) {
+        while(membersIterator.hasNext()) {
+            T member = membersIterator.next();
+            Entity.RemovalReason removalReason = member.getRemovalReason();
+            if (removalReason != null) {
+                membersIterator.remove();
+                switch (removalReason) {
                     case CHANGED_DIMENSION:
                     case UNLOADED_TO_CHUNK:
                     case UNLOADED_WITH_PLAYER:
@@ -109,14 +108,16 @@ public class EntityPack<T extends Mob> {
         while(iterator.hasNext()) {
             UUID memberByUUID = iterator.next();
             Entity memberFromLevel = level.getEntity(memberByUUID);
-            T member = this.typedMember(memberFromLevel);
-            if (member != null) {
-                this.members.add(member);
-                iterator.remove();
-            } else{
-                if(DebugFlags.DEBUG_ENTITY_PACK)
-                    BlastFromThePast.LOGGER.error("Entity pack {} has an invalid member who will be removed: {}", this.getPackName(), memberFromLevel);
-                iterator.remove();
+            if(memberFromLevel != null){
+                T member = this.typedMember(memberFromLevel);
+                if (member != null) {
+                    this.members.add(member);
+                    iterator.remove();
+                } else{
+                    if(DebugFlags.DEBUG_ENTITY_PACK)
+                        BlastFromThePast.LOGGER.error("Entity pack {} has an invalid member who will be removed: {}", this.getPackName(), memberFromLevel);
+                    iterator.remove();
+                }
             }
         }
     }

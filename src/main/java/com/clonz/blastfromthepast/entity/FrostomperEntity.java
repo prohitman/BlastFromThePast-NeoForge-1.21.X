@@ -2,9 +2,9 @@ package com.clonz.blastfromthepast.entity;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.client.models.FrostomperModel;
-import com.clonz.blastfromthepast.entity.ai.HitboxAdjustedBreedGoal;
-import com.clonz.blastfromthepast.entity.ai.HitboxAdjustedFollowParentGoal;
-import com.clonz.blastfromthepast.entity.ai.PackHurtByTargetGoal;
+import com.clonz.blastfromthepast.entity.ai.*;
+import com.clonz.blastfromthepast.entity.ai.attacker.AnimatedMeleeAttackGoal;
+import com.clonz.blastfromthepast.entity.ai.attacker.AttackerBodyRotationControl;
 import com.clonz.blastfromthepast.entity.pack.EntityPack;
 import com.clonz.blastfromthepast.entity.ai.navigation.BFTPGroundPathNavigation;
 import com.clonz.blastfromthepast.entity.pack.EntityPackAgeableMobData;
@@ -18,6 +18,9 @@ import io.github.itskillerluc.duclib.entity.Animatable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -29,6 +32,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -43,17 +47,21 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel>, EntityPackHolder<FrostomperEntity> {
+public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel>, EntityPackHolder<FrostomperEntity>, AnimatedAttacker<FrostomperEntity, FrostomperEntity.FrostomperAttackType> {
     public static final DucAnimation ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId());
     public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId().withPrefix("baby_"));
     public static final EntityDimensions BABY_FROSTOMPER_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(28.0F), HitboxHelper.pixelsToBlocks(22.0F));
+    private static final EntityDataAccessor<OptionalInt> DATA_ACTIVE_ATTACK_TYPE = SynchedEntityData.defineId(FrostomperEntity.class, EntityDataSerializers.OPTIONAL_UNSIGNED_INT);
     private static final double PARENT_TARGETING_DISTANCE = 16.0D;
+    private static final int CHARGE_ATTACK_COOLDOWN = 900;
     private final Lazy<Map<String, AnimationState>> animations = Lazy.of(() -> FrostomperModel.createStateMap(getAnimation()));
     protected static final TargetingConditions PARENT_TARGETING = TargetingConditions.forNonCombat()
             .ignoreLineOfSight()
@@ -61,6 +69,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     protected final TargetingConditions parentTargeting;
     @Nullable
     private EntityPack<FrostomperEntity> pack;
+    private final AnimatedAttacker.AttackTicker<FrostomperEntity, FrostomperAttackType> attackTicker = new AttackTicker<>(this);
+    private int ticksUntilNextCharge;
 
     public FrostomperEntity(EntityType<? extends FrostomperEntity> entityType, Level level) {
         super(entityType, level);
@@ -88,7 +98,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         //this.goalSelector.addGoal(1, new RunAroundLikeCrazyGoal(this, 1.2));
         this.goalSelector.addGoal(2, new HitboxAdjustedBreedGoal(this, 1.0));
         this.goalSelector.addGoal(4, new HitboxAdjustedFollowParentGoal(this, 1.0));
-        this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.0, true));
+        this.goalSelector.addGoal(5, new AnimatedMeleeAttackGoal<>(this, 1.0, true));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
@@ -96,13 +106,17 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             this.goalSelector.addGoal(9, new RandomStandGoal(this));
         }
         this.addBehaviourGoals();
-        this.targetSelector.addGoal(0, new PackHurtByTargetGoal<>(this, FrostomperEntity.class));
+        this.targetSelector.addGoal(0, new PackHurtByTargetGoal<>(this, AgeableMob::isBaby, FrostomperEntity.class));
     }
 
     @Override
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(3, new TemptGoal(this, 1.25, (stack) -> stack.is(this.isBaby() ? ModTags.Items.BABY_FROSTOMPER_TEMPT_ITEMS : ModTags.Items.FROSTOMPER_TEMPT_ITEMS), false));
+        this.goalSelector.addGoal(3, new TemptGoal(this, 1.25, this::isTemptItem, false));
+    }
+
+    protected boolean isTemptItem(ItemStack stack) {
+        return stack.is(this.isBaby() ? ModTags.Items.BABY_FROSTOMPER_TEMPT_ITEMS : ModTags.Items.FROSTOMPER_TEMPT_ITEMS);
     }
 
     @Override
@@ -160,14 +174,6 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     @Override
     public int tickCount() {
         return this.tickCount;
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        if (this.level().isClientSide()) {
-            this.animateWhen("idle", !this.isMoving(this) && this.onGround());
-        }
     }
 
     @Override
@@ -320,6 +326,16 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         }
     }
 
+    @Override
+    public void finalizeSpawnChildFromBreeding(ServerLevel level, Animal animal, @Nullable AgeableMob baby) {
+        super.finalizeSpawnChildFromBreeding(level, animal, baby);
+        if(baby instanceof FrostomperEntity babyFrostomper){
+            Optional.ofNullable(this.getLoveCause())
+                    .or(() -> Optional.ofNullable(animal.getLoveCause()))
+                    .ifPresent(loveCause -> babyFrostomper.setBred(true));
+        }
+    }
+
     protected boolean canBeTamed() {
         return this.isBaby() || this.isBred();
     }
@@ -378,9 +394,210 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         this.savePackData(compound);
     }
 
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_ACTIVE_ATTACK_TYPE, OptionalInt.empty());
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> pKey) {
+        super.onSyncedDataUpdated(pKey);
+        if(DATA_ACTIVE_ATTACK_TYPE.equals(pKey)){
+            this.attackTicker.reset();
+            if(this.getActiveAttackType() == FrostomperAttackType.CHARGE){
+                this.ticksUntilNextCharge = CHARGE_ATTACK_COOLDOWN;
+            }
+        }
+    }
+
+    @Override
+    protected BodyRotationControl createBodyControl() {
+        return new AttackerBodyRotationControl<>(this);
+    }
+
+    @Override
+    public void setActiveAttackType(@Nullable FrostomperAttackType attackType){
+        this.entityData.set(DATA_ACTIVE_ATTACK_TYPE, attackType == null ? OptionalInt.empty() : OptionalInt.of(attackType.ordinal()));
+    }
+
+    @Override
+    @Nullable
+    public FrostomperAttackType getActiveAttackType(){
+        OptionalInt ordinal = this.entityData.get(DATA_ACTIVE_ATTACK_TYPE);
+        return ordinal.isEmpty() ? null : FrostomperAttackType.byOrdinal(ordinal.getAsInt());
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        FrostomperAttackType activeAttackType = this.getActiveAttackType();
+        if (this.level().isClientSide()) {
+            this.animateWhen("idle", !this.isMoving(this) && this.onGround() && activeAttackType == null);
+            if(!this.isBaby()){
+                this.animateWhen("double_stomp", activeAttackType == FrostomperAttackType.DOUBLE_STOMP);
+                this.animateWhen("fling", activeAttackType == FrostomperAttackType.FLING);
+                this.animateWhen("charge", activeAttackType == FrostomperAttackType.CHARGE);
+            }
+        }
+        if (activeAttackType != null && activeAttackType.blocksHeadRotation()) {
+            this.clampHeadRotationToBody();
+        }
+        this.attackTicker.tick();
+        this.ticksUntilNextCharge = Math.max(this.ticksUntilNextCharge - 1, 0);
+    }
+
+    @Override
+    public void travel(Vec3 travelVector) {
+        FrostomperAttackType attackType = this.getActiveAttackType();
+        if (attackType != null && attackType.blocksMovementInput() && this.onGround()) {
+            this.setDeltaMovement(this.getDeltaMovement().multiply(0.0D, 1.0D, 0.0D));
+            travelVector = travelVector.multiply(0.0D, 1.0D, 0.0D);
+        }
+        super.travel(travelVector);
+    }
+
+    @Override
+    public boolean isAlliedTo(Entity other) {
+        if(other == null){
+            return false;
+        } else if (super.isAlliedTo(other)) {
+            return true;
+        } else if (this.isAlliedToDefault(other)) {
+            return this.getTeam() == null && other.getTeam() == null;
+        } else {
+            return false;
+        }
+    }
+
+    protected boolean isAlliedToDefault(Entity other) {
+        return other.getType().equals(this.getType());
+    }
+
+    @Override
+    public FrostomperAttackType selectAttackTypeForTarget(@Nullable LivingEntity target) {
+        if(target != null){
+            boolean canCharge = this.ticksUntilNextCharge <= 0;
+            int randomInt;
+            if(canCharge){
+                randomInt = this.random.nextInt(10);
+                if(randomInt < 7){
+                    return FrostomperAttackType.CHARGE;
+                } else if(randomInt < 9){
+                    return FrostomperAttackType.FLING;
+                } else{
+                    return FrostomperAttackType.DOUBLE_STOMP;
+                }
+            } else{
+                randomInt = this.random.nextInt(3);
+                if(randomInt < 2){
+                    return FrostomperAttackType.FLING;
+                } else{
+                    return FrostomperAttackType.DOUBLE_STOMP;
+                }
+            }
+        }
+        return null;
+    }
+
+
+
+    @Override
+    protected Vec2 getRiddenRotation(LivingEntity entity) {
+        FrostomperAttackType activeAttackType = this.getActiveAttackType();
+        boolean rotationBlocked = activeAttackType != null && activeAttackType.blocksRotationInput();
+        return rotationBlocked ? new Vec2(this.getXRot(), this.getYRot()) : super.getRiddenRotation(entity);
+    }
+
+    @Override
+    protected Vec3 getRiddenInput(Player player, Vec3 travelVector) {
+        FrostomperAttackType activeAttackType = this.getActiveAttackType();
+        boolean movementBlocked = activeAttackType != null && activeAttackType.blocksMovementInput();
+        return movementBlocked ? Vec3.ZERO : super.getRiddenInput(player, travelVector);
+    }
+
     protected static class FrostomperGroupData extends EntityPackAgeableMobData<FrostomperEntity> {
         public FrostomperGroupData(EntityPack<FrostomperEntity> entityPack, boolean shouldSpawnBaby) {
             super(entityPack, shouldSpawnBaby);
+        }
+    }
+
+    public enum FrostomperAttackType implements AttackType<FrostomperEntity, FrostomperAttackType>{
+        FLING(Mth.floor(0.38F * 20), Mth.floor(0.75F * 20), new Vec3(0.5, 0.5, 0.5), 8),
+        DOUBLE_STOMP(Mth.floor(0.63F * 20), 20, new Vec3(0.5, 0.5, 0.5), 10),
+        CHARGE(5, 10, new Vec3(0.5, 0.5, 0.5), 12);
+
+        private final int attackPoint;
+        private final int attackDuration;
+        private final Vec3 attackRadius;
+        private final float attackDamage;
+
+        FrostomperAttackType(int attackPoint, int attackDuration, Vec3 attackRadius, float attackDamage) {
+            this.attackPoint = attackPoint;
+            this.attackDuration = attackDuration;
+            this.attackRadius = attackRadius;
+            this.attackDamage = attackDamage;
+        }
+
+        @Override
+        public int getAttackPoint() {
+            return this.attackPoint;
+        }
+
+        @Override
+        public int getAttackDuration() {
+            return this.attackDuration;
+        }
+
+        @Override
+        public Vec3 getAttackRadius(){
+            return this.attackRadius;
+        }
+
+        @Override
+        public float getAttackDamage() {
+            return this.attackDamage;
+        }
+
+        @Override
+        public boolean blocksMovementInput() {
+            return this == DOUBLE_STOMP;
+        }
+
+        @Override
+        public boolean blocksWalkAnimation() {
+            return this == DOUBLE_STOMP || this == CHARGE;
+        }
+
+        @Override
+        public boolean blocksRotationInput() {
+            return this == DOUBLE_STOMP;
+        }
+
+        @Override
+        public boolean blocksBodyRotation() {
+            return this == DOUBLE_STOMP;
+        }
+
+        @Override
+        public boolean blocksHeadRotation() {
+            return this == DOUBLE_STOMP || this == FLING;
+        }
+
+        @Override
+        public boolean hasAttackPointAt(int attackTicker) {
+            if(this == CHARGE){
+                return true;
+            }
+            return attackTicker == this.getAttackPoint();
+        }
+
+        public static FrostomperAttackType byOrdinal(int pOrdinal) {
+            if (pOrdinal < 0 || pOrdinal > values().length) {
+                pOrdinal = 0;
+            }
+
+            return values()[pOrdinal];
         }
     }
 }

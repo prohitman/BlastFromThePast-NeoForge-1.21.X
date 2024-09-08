@@ -11,6 +11,7 @@
     "AbstractChestedHorseAccessor",
     "BreedGoalAccessor",
     "FollowParentGoalAccessor",
+    "MeleeAttackGoalAccessor",
     "PathAccessor",
     "WalkNodeEvaluatorAccess"
   ],

@@ -25,8 +25,13 @@ public class FrostomperModel extends AnimatableDucModel<FrostomperEntity> {
     @Override
     public void setupAnim(FrostomperEntity pEntity, float pLimbSwing, float pLimbSwingAmount, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
         super.setupAnim(pEntity, pLimbSwing, pLimbSwingAmount, pAgeInTicks, pNetHeadYaw, pHeadPitch);
-        this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.frostomper.walk").animation(), pLimbSwing, pLimbSwingAmount, 1, 2);
-        this.animateLook(pNetHeadYaw, pHeadPitch);
+        FrostomperEntity.FrostomperAttackType attackType = pEntity.getActiveAttackType();
+        if(attackType == null || !attackType.blocksWalkAnimation()){
+            this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.frostomper.walk").animation(), pLimbSwing, pLimbSwingAmount, 1, 2);
+        }
+        if(attackType == null || !attackType.blocksLookAnimation()){
+            this.animateLook(pNetHeadYaw, pHeadPitch);
+        }
     }
 
     private void animateLook(float pNetHeadYaw, float pHeadPitch) {
