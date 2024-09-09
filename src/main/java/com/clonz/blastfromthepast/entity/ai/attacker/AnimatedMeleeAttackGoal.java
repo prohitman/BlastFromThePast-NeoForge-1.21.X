@@ -33,7 +33,7 @@ public class AnimatedMeleeAttackGoal<T extends PathfinderMob & AnimatedAttacker<
 
     @Override
     protected void checkAndPerformAttack(LivingEntity pEnemy) {
-        if(this.isTimeToAttack() && this.selectedAttackType == null){
+        if(this.isTimeToAttack() && this.attacker.getActiveAttackType() == null && this.selectedAttackType == null){
             this.selectedAttackType = this.attacker.selectAttackTypeForTarget(pEnemy);
             if(DebugFlags.DEBUG_ANIMATED_ATTACK)
                 BlastFromThePast.LOGGER.info("{} selected attack type {}", this.attacker, this.selectedAttackType);

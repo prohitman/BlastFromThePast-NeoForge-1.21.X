@@ -4,16 +4,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.List;
 
 public class EntityHelper {
     public static boolean haveSameOwners(Entity entity1, Entity entity2) {
@@ -23,22 +17,7 @@ public class EntityHelper {
         return false;
     }
 
-    public static void doAreaOfEffectAttack(LivingEntity mob, AABB attackBounds, float damage){
-        if(!mob.level().isClientSide){
-            List<LivingEntity> targets = mob.level().getNearbyEntities(LivingEntity.class, TargetingConditions.DEFAULT, mob, attackBounds);
-            AttributeInstance attackDamage = mob.getAttribute(Attributes.ATTACK_DAMAGE);
-            if(attackDamage != null){
-                double originalAttackDamage = attackDamage.getBaseValue();
-                attackDamage.setBaseValue(damage);
-                targets.forEach(mob::doHurtTarget);
-                attackDamage.setBaseValue(originalAttackDamage);
-            }
-        } else{
-            spawnAreaOfEffectParticles(mob.level(), attackBounds, 750);
-        }
-    }
-
-    public static void spawnAreaOfEffectParticles(LevelAccessor level, AABB attackBounds, int power) {
+    public static void spawnSmashAttackParticles(LevelAccessor level, AABB attackBounds, int power) {
         Vec3 boundsBottomCenter = attackBounds.getBottomCenter();
         BlockPos pos = BlockPos.containing(boundsBottomCenter);
         Vec3 particleCenter = boundsBottomCenter.add(0.0, 0.5, 0.0);

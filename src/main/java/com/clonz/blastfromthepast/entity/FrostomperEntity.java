@@ -12,6 +12,7 @@ import com.clonz.blastfromthepast.entity.pack.EntityPackHolder;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModTags;
 import com.clonz.blastfromthepast.mixin.AbstractChestedHorseAccessor;
+import com.clonz.blastfromthepast.util.DebugFlags;
 import com.clonz.blastfromthepast.util.HitboxHelper;
 import io.github.itskillerluc.duclib.client.animation.DucAnimation;
 import io.github.itskillerluc.duclib.entity.Animatable;
@@ -25,6 +26,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
@@ -55,11 +57,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel>, EntityPackHolder<FrostomperEntity>, AnimatedAttacker<FrostomperEntity, FrostomperEntity.FrostomperAttackType> {
+public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel>, EntityPackHolder<FrostomperEntity>, AnimatedAttacker<FrostomperEntity, FrostomperEntity.FrostomperAttackType>, ChargeForward {
     public static final DucAnimation ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId());
     public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId().withPrefix("baby_"));
     public static final EntityDimensions BABY_FROSTOMPER_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(28.0F), HitboxHelper.pixelsToBlocks(22.0F));
     private static final EntityDataAccessor<OptionalInt> DATA_ACTIVE_ATTACK_TYPE = SynchedEntityData.defineId(FrostomperEntity.class, EntityDataSerializers.OPTIONAL_UNSIGNED_INT);
+    private static final EntityDataAccessor<Boolean> DATA_CHARGING_FORWARD = SynchedEntityData.defineId(FrostomperEntity.class, EntityDataSerializers.BOOLEAN);
     private static final double PARENT_TARGETING_DISTANCE = 16.0D;
     private static final int CHARGE_ATTACK_COOLDOWN = 900;
     private final Lazy<Map<String, AnimationState>> animations = Lazy.of(() -> FrostomperModel.createStateMap(getAnimation()));
@@ -83,7 +86,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         return AgeableMob.createMobAttributes()
                 .add(Attributes.MOVEMENT_SPEED, 0.3)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.75)
-                .add(Attributes.ATTACK_DAMAGE, 12.0)
+                .add(Attributes.ATTACK_DAMAGE, 8.0)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5)
                 .add(Attributes.FOLLOW_RANGE, 32.0)
                 .add(Attributes.STEP_HEIGHT, 1.0);
@@ -97,7 +100,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         this.goalSelector.addGoal(1, new WithoutTargetPanicGoal(this, 1.2));
         //this.goalSelector.addGoal(1, new RunAroundLikeCrazyGoal(this, 1.2));
         this.goalSelector.addGoal(2, new HitboxAdjustedBreedGoal(this, 1.0));
-        this.goalSelector.addGoal(4, new HitboxAdjustedFollowParentGoal(this, 1.0));
+        this.goalSelector.addGoal(3, new HitboxAdjustedFollowParentGoal(this, 1.0));
+        this.goalSelector.addGoal(4, new ChargeForwardAttackGoal<>(this, 25, 1.2));
         this.goalSelector.addGoal(5, new AnimatedMeleeAttackGoal<>(this, 1.0, true));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.7));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 6.0F));
@@ -398,6 +402,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_ACTIVE_ATTACK_TYPE, OptionalInt.empty());
+        builder.define(DATA_CHARGING_FORWARD, false);
     }
 
     @Override
@@ -405,9 +410,9 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         super.onSyncedDataUpdated(pKey);
         if(DATA_ACTIVE_ATTACK_TYPE.equals(pKey)){
             this.attackTicker.reset();
-            if(this.getActiveAttackType() == FrostomperAttackType.CHARGE){
-                this.ticksUntilNextCharge = CHARGE_ATTACK_COOLDOWN;
-            }
+        }
+        if (!this.firstTick && DATA_CHARGING_FORWARD.equals(pKey)) {
+            this.ticksUntilNextCharge = this.ticksUntilNextCharge == 0 ? CHARGE_ATTACK_COOLDOWN : this.ticksUntilNextCharge;
         }
     }
 
@@ -444,7 +449,13 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             this.clampHeadRotationToBody();
         }
         this.attackTicker.tick();
-        this.ticksUntilNextCharge = Math.max(this.ticksUntilNextCharge - 1, 0);
+        // tick charge cooldown
+        if (this.ticksUntilNextCharge > 0) {
+            --this.ticksUntilNextCharge;
+            if (this.ticksUntilNextCharge == 0) {
+                this.level().playSound(null, this.blockPosition(), SoundEvents.CAMEL_DASH_READY, SoundSource.NEUTRAL, 1.0F, 1.0F);
+            }
+        }
     }
 
     @Override
@@ -477,7 +488,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     @Override
     public FrostomperAttackType selectAttackTypeForTarget(@Nullable LivingEntity target) {
         if(target != null){
-            boolean canCharge = this.ticksUntilNextCharge <= 0;
+            boolean canCharge = DebugFlags.DEBUG_CHARGE_FORWARD || this.ticksUntilNextCharge <= 0;
             int randomInt;
             if(canCharge){
                 randomInt = this.random.nextInt(10);
@@ -516,18 +527,30 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         return movementBlocked ? Vec3.ZERO : super.getRiddenInput(player, travelVector);
     }
 
+    @Override
+    public boolean isChargingForward() {
+        return this.entityData.get(DATA_CHARGING_FORWARD);
+    }
+
+    @Override
+    public void setIsChargingForward(boolean charging) {
+        this.entityData.set(DATA_CHARGING_FORWARD, charging);
+    }
+
     protected static class FrostomperGroupData extends EntityPackAgeableMobData<FrostomperEntity> {
         public FrostomperGroupData(EntityPack<FrostomperEntity> entityPack, boolean shouldSpawnBaby) {
             super(entityPack, shouldSpawnBaby);
         }
     }
 
+    // Calculated from doubling (the center-to_corner distance of the Frostomper's hitbox (2.8938345), minus half of the Frostomper's hitbox width (2.04625))
     private static final double MINIMUM_ATTACK_SIZE = 1.695169D;
+    // Adding 1 to the minimum attack size allows the Frostomper to attack targets whose hitboxes are up to 0.5F blocks away from one of its hitbox's corners
     private static final Vec3 DEFAULT_ATTACK_SIZE = new Vec3(MINIMUM_ATTACK_SIZE + 1, MINIMUM_ATTACK_SIZE + 1, MINIMUM_ATTACK_SIZE + 1);
     public enum FrostomperAttackType implements AttackType<FrostomperEntity, FrostomperAttackType>{
         FLING(Mth.floor(0.38F * 20), Mth.floor(0.75F * 20), DEFAULT_ATTACK_SIZE, 8),
         DOUBLE_STOMP(Mth.floor(0.63F * 20), 20, DEFAULT_ATTACK_SIZE, 10),
-        CHARGE(5, 10, DEFAULT_ATTACK_SIZE, 12);
+        CHARGE(0, 10, DEFAULT_ATTACK_SIZE, 12);
 
         private final int attackPoint;
         private final int attackDuration;
@@ -583,7 +606,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
         @Override
         public boolean blocksHeadRotation() {
-            return this == DOUBLE_STOMP || this == FLING;
+            return this == DOUBLE_STOMP || this == FLING || this == CHARGE;
         }
 
         @Override
@@ -592,6 +615,31 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 return true;
             }
             return attackTicker == this.getAttackPoint();
+        }
+
+        @Override
+        public void executeAttackPoint(FrostomperEntity attacker, int attackTicker) {
+            if(this == CHARGE){
+                if(attackTicker == 0){
+                    if(!attacker.level().isClientSide){
+                        attacker.setIsChargingForward(true);
+                    }
+                }
+                if(attacker.isChargingForward()){
+                    AttackType.executeSimpleAreaOfEffectAttack(attacker, this.getAttackSize(), this.getAttackDamage(), false);
+                }
+            } else{
+                AttackType.executeSimpleAreaOfEffectAttack(attacker, this.getAttackSize(), this.getAttackDamage(), true);
+            }
+        }
+
+        @Override
+        public boolean isFinished(FrostomperEntity attacker, int attackTicker) {
+            if(this == CHARGE){
+                return !attacker.isChargingForward();
+            } else{
+                return attackTicker >= this.getAttackDuration();
+            }
         }
 
         public static FrostomperAttackType byOrdinal(int pOrdinal) {
