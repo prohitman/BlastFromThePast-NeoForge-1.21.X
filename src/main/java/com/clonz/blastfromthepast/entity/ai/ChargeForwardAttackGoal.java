@@ -4,7 +4,7 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.ChargeForward;
 import com.clonz.blastfromthepast.mixin.LivingEntityAccessor;
 import com.clonz.blastfromthepast.util.DebugFlags;
-import net.minecraft.util.Mth;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -14,13 +14,13 @@ import java.util.*;
 
 public class ChargeForwardAttackGoal<T extends PathfinderMob & ChargeForward> extends Goal {
     private final T mob;
-    private final int maxDistance;
+    private final UniformInt duration;
     private final double speedModifier;
-    private Vec3 startPos;
+    private long endTimestamp = 0L;
 
-    public ChargeForwardAttackGoal(T mob, int maxDistance, double speedModifier) {
+    public ChargeForwardAttackGoal(T mob, UniformInt duration, double speedModifier) {
         this.mob = mob;
-        this.maxDistance = maxDistance;
+        this.duration = duration;
         this.speedModifier = speedModifier;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
@@ -37,17 +37,18 @@ public class ChargeForwardAttackGoal<T extends PathfinderMob & ChargeForward> ex
 
     @Override
     public void start() {
-        this.startPos = this.mob.position();
         this.mob.getNavigation().stop();
+        int duration = this.duration.sample(this.mob.getRandom());
+        this.endTimestamp = this.mob.level().getGameTime() + duration;
         if(DebugFlags.DEBUG_CHARGE_FORWARD)
-            BlastFromThePast.LOGGER.info("{} is charging forward!", this.mob);
+            BlastFromThePast.LOGGER.info("{} is charging forward for {} ticks!", this.mob, duration);
     }
 
     @Override
     public boolean canContinueToUse() {
         return this.mob.isChargingForward()
                 && !this.mob.hasRestriction()
-                && this.startPos.distanceToSqr(this.mob.position()) <= Mth.square(this.maxDistance);
+                && this.mob.level().getGameTime() <= this.endTimestamp;
     }
 
     @Override
