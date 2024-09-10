@@ -4,6 +4,8 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import com.clonz.blastfromthepast.entity.FrostomperEntity;
+import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
+import com.clonz.blastfromthepast.entity.boats.BFTPChestBoat;
 import com.clonz.blastfromthepast.util.HitboxHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -37,6 +39,17 @@ public class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<FrostomperEntity>> FROSTOMPER = registerMob("frostomper", FrostomperEntity::new,
             HitboxHelper.pixelsToBlocks(77.0F), HitboxHelper.pixelsToBlocks(70.0F), 0x302219, 0xACACAC);
 
+    public static final DeferredHolder<EntityType<?>, EntityType<BFTPBoat>> BFTPBOAT = ENTITIES.register("boat",() -> EntityType.Builder
+            .<BFTPBoat>of(BFTPBoat::new, MobCategory.MISC)
+            .sized(1.375F, 0.5625F)
+            .clientTrackingRange(10)
+            .build(getName("boat")));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<BFTPChestBoat>> BFTPCHEST_BOAT = ENTITIES.register("chest_boat",() -> EntityType.Builder
+            .<BFTPChestBoat>of(BFTPChestBoat::new, MobCategory.MISC)
+            .sized(1.375F, 0.5625F)
+            .clientTrackingRange(10)
+            .build(getName("chest_boat")));
 
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
@@ -50,5 +63,9 @@ public class ModEntities {
         event.put(ModEntities.GLACEROS.get(), GlacerosEntity.createAttributes().build());
         event.put(ModEntities.SNOWDO.get(), SnowdoEntity.createAttributes().build());
         event.put(ModEntities.FROSTOMPER.get(), FrostomperEntity.createAttributes().build());
+    }
+
+    private static String getName(String name) {
+        return BlastFromThePast.MODID + ":" + name;
     }
 }

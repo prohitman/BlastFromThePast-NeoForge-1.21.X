@@ -30,6 +30,8 @@ public class ModTabs {
                         output.accept(ModItems.RAW_VENISON.get());
                         output.accept(ModItems.COOKED_VENISON.get());
                         output.accept(ModItems.SAP_BALL.get());
+                        output.accept(ModItems.CEDAR_BOAT.get());
+                        output.accept(ModItems.CEDAR_CHEST_BOAT.get());
                     }).build());
 
 }
