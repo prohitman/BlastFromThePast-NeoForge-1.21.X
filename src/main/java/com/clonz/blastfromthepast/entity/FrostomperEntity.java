@@ -90,6 +90,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     public static AttributeSupplier.Builder createAttributes() {
         return AgeableMob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 100.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.3)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.75)
                 .add(Attributes.ATTACK_DAMAGE, 12.0)
@@ -306,6 +307,21 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     }
 
     @Override
+    protected void playJumpSound() {
+        this.playSound(SoundEvents.DONKEY_JUMP, 0.4F, 1.0F);
+    }
+
+    @Override
+    protected void playChestEquipsSound() {
+        this.playSound(SoundEvents.DONKEY_CHEST, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
+    }
+
+    @Override
+    public SoundEvent getSaddleSoundEvent() {
+        return SoundEvents.HORSE_SADDLE;
+    }
+
+    @Override
     protected boolean handleEating(Player player, ItemStack stack) {
         if (!this.isFood(stack)) {
             return false;
@@ -376,21 +392,6 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         }
 
         return false;
-    }
-
-    @Override
-    protected void playJumpSound() {
-        this.playSound(SoundEvents.DONKEY_JUMP, 0.4F, 1.0F);
-    }
-
-    @Override
-    protected void playChestEquipsSound() {
-        this.playSound(SoundEvents.DONKEY_CHEST, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
-    }
-
-    @Override
-    public SoundEvent getSaddleSoundEvent() {
-        return SoundEvents.HORSE_SADDLE;
     }
 
     @Override
