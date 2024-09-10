@@ -31,7 +31,7 @@ public class EntityHelper {
 
     public static void spawnSmashAttackParticles(LevelAccessor level, AABB attackBounds, int power) {
         Vec3 boundsBottomCenter = attackBounds.getBottomCenter();
-        BlockPos pos = BlockPos.containing(boundsBottomCenter);
+        BlockPos pos = BlockPos.containing(boundsBottomCenter.subtract(0, 1.0E-5F, 0));
         Vec3 particleCenter = boundsBottomCenter.add(0.0, 0.5, 0.0);
         BlockParticleOption dustPillar = new BlockParticleOption(ParticleTypes.DUST_PILLAR, level.getBlockState(pos));
 
@@ -64,8 +64,7 @@ public class EntityHelper {
 
     }
 
-    public static <T extends Mob & AnimatedAttacker<T, A>, A extends AnimatedAttacker.AttackType<T, A>> List<LivingEntity> hitTargetsWithAOEAttack(T attacker, Vec3 attackSize, float attackDamage, float attackKnockback, boolean spawnParticles) {
-        AABB attackBounds = HitboxHelper.createHitboxRelativeToFront(attacker, attackSize.x(), attackSize.y(), attackSize.z());
+    public static <T extends Mob & AnimatedAttacker<T, A>, A extends AnimatedAttacker.AttackType<T, A>> List<LivingEntity> hitTargetsWithAOEAttack(T attacker, AABB attackBounds, float attackDamage, float attackKnockback, boolean spawnParticles) {
         List<LivingEntity> hitTargets = new ArrayList<>();
         if(!attacker.level().isClientSide){
             List<LivingEntity> targets = attacker.level().getNearbyEntities(LivingEntity.class, TargetingConditions.DEFAULT, attacker, attackBounds);

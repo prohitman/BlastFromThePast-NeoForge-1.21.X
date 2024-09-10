@@ -44,6 +44,7 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -53,6 +54,7 @@ import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.scores.PlayerTeam;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
@@ -60,7 +62,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel>, EntityPackHolder<FrostomperEntity>, AnimatedAttacker<FrostomperEntity, FrostomperEntity.FrostomperAttackType>, ChargeForward {
-    public static final DucAnimation ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId());
+    public static final DucAnimation ADULT_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId());
     public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId().withPrefix("baby_"));
     public static final EntityDimensions BABY_FROSTOMPER_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(28.0F), HitboxHelper.pixelsToBlocks(22.0F));
     private static final EntityDataAccessor<OptionalInt> DATA_ACTIVE_ATTACK_TYPE = SynchedEntityData.defineId(FrostomperEntity.class, EntityDataSerializers.OPTIONAL_UNSIGNED_INT);
@@ -68,7 +70,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     private static final double PARENT_TARGETING_DISTANCE = 16.0D;
     private static final int CHARGE_ATTACK_COOLDOWN = 900;
     private static final UniformInt CHARGE_ATTACK_DURATION = UniformInt.of(Mth.floor(20 / 0.3F), Mth.floor(25 / 0.3F)); // Distances in blocks divided by Frostomper's base speed of 0.3 blocks/tick
-    private final Lazy<Map<String, AnimationState>> animations = Lazy.of(() -> FrostomperModel.createStateMap(getAnimation()));
+    private final Lazy<Map<String, AnimationState>> babyAnimations = Lazy.of(() -> FrostomperModel.createStateMap(BABY_ANIMATION));
+    private final Lazy<Map<String, AnimationState>> adultAnimations = Lazy.of(() -> FrostomperModel.createStateMap(ADULT_ANIMATION));
     protected static final TargetingConditions PARENT_TARGETING = TargetingConditions.forNonCombat()
             .ignoreLineOfSight()
             .selector(entity -> entity instanceof FrostomperEntity && ((FrostomperEntity)entity).isBred());
@@ -114,6 +117,16 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         }
         this.addBehaviourGoals();
         this.targetSelector.addGoal(0, new PackHurtByTargetGoal<>(this, AgeableMob::isBaby, FrostomperEntity.class));
+    }
+
+    @Override
+    protected void updateControlFlags() {
+        boolean canControlMove = this.getControllingPassenger() == null;
+        boolean canControlJump = !(this.getVehicle() instanceof Boat);
+        this.goalSelector.setControlFlag(Goal.Flag.MOVE, canControlMove);
+        this.goalSelector.setControlFlag(Goal.Flag.JUMP, canControlMove && canControlJump);
+        this.goalSelector.setControlFlag(Goal.Flag.LOOK, canControlMove);
+        this.goalSelector.setControlFlag(Goal.Flag.TARGET, canControlMove);
     }
 
     @Override
@@ -165,17 +178,21 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     @Override
     public DucAnimation getAnimation() {
-        return this.isBaby() ? BABY_ANIMATION : ANIMATION;
+        return this.isBaby() ? BABY_ANIMATION : ADULT_ANIMATION;
     }
 
     @Override
     public Lazy<Map<String, AnimationState>> getAnimations() {
-        return this.animations;
+        return this.isBaby() ? this.babyAnimations : this.adultAnimations;
     }
 
     @Override
     public Optional<AnimationState> getAnimationState(String animation) {
-        return Optional.ofNullable(this.getAnimations().get().get("animation.frostomper." + animation));
+        return Optional.ofNullable(this.getAnimations().get().get(this.getAnimationKey(animation)));
+    }
+
+    public String getAnimationKey(String animation) {
+        return this.isBaby() ? "animation.baby_frostomper." + animation : "animation.frostomper." + animation;
     }
 
     @Override
@@ -298,7 +315,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 this.heal(2.0F);
                 fed = true;
             }
-            if (this.isTamed() && this.getAge() == 0 && this.canFallInLove()) {
+            if (this.getAge() == 0 && this.canFallInLove()) {
                 this.setInLove(player);
                 fed = true;
             }
@@ -444,6 +461,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             this.animateWhen("idle", !this.isMoving(this) && this.onGround() && activeAttackType == null);
             if(!this.isBaby()){
                 this.animateWhen("double_stomp", activeAttackType == FrostomperAttackType.DOUBLE_STOMP);
+                this.animateWhen("stomp", activeAttackType == FrostomperAttackType.SINGLE_STOMP && !this.isLeftHanded());
+                this.animateWhen("stomp_flipped", activeAttackType == FrostomperAttackType.SINGLE_STOMP && this.isLeftHanded());
                 this.animateWhen("fling", activeAttackType == FrostomperAttackType.FLING);
                 this.animateWhen("charge", activeAttackType == FrostomperAttackType.CHARGE);
             }
@@ -472,10 +491,38 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     }
 
     @Override
+    public boolean canAttack(LivingEntity target) {
+        return this.getOwner() != target && super.canAttack(target);
+    }
+
+    @Override
+    public PlayerTeam getTeam() {
+        if (this.isTamed()) {
+            LivingEntity owner = this.getOwner();
+            if (owner != null) {
+                return owner.getTeam();
+            }
+        }
+        return super.getTeam();
+    }
+
+    @Override
     public boolean isAlliedTo(Entity other) {
         if(other == null){
             return false;
-        } else if (super.isAlliedTo(other)) {
+        }
+
+        if (this.isTamed()) {
+            LivingEntity owner = this.getOwner();
+            if (other == owner) {
+                return true;
+            }
+            if (owner != null) {
+                return owner.isAlliedTo(other);
+            }
+        }
+
+        if (super.isAlliedTo(other)) {
             return true;
         } else if (this.isAlliedToDefault(other)) {
             return this.getTeam() == null && other.getTeam() == null;
@@ -549,6 +596,31 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         }
     }
 
+    @Override
+    public boolean canJump() {
+        return this.getActiveAttackType() == null && super.canJump();
+    }
+
+    @Override
+    public void handleStartJump(int jumpPower) {
+        if(jumpPower >= 90) {
+            this.setActiveAttackType(FrostomperAttackType.DOUBLE_STOMP);
+        } else{
+            this.setActiveAttackType(FrostomperAttackType.SINGLE_STOMP);
+        }
+    }
+
+    @Override
+    public int getJumpCooldown() {
+        return this.attackTicker.get();
+    }
+
+    @Override
+    protected boolean canParent() {
+        // does not need to be tamed to parent
+        return !this.isVehicle() && !this.isPassenger() && !this.isBaby() && this.getHealth() >= this.getMaxHealth() && this.isInLove();
+    }
+
     protected static class FrostomperGroupData extends EntityPackAgeableMobData<FrostomperEntity> {
         public FrostomperGroupData(EntityPack<FrostomperEntity> entityPack, boolean shouldSpawnBaby) {
             super(entityPack, shouldSpawnBaby);
@@ -561,6 +633,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     private static final Vec3 DEFAULT_ATTACK_SIZE = new Vec3(MINIMUM_ATTACK_SIZE + 1, MINIMUM_ATTACK_SIZE + 1, MINIMUM_ATTACK_SIZE + 1);
     public enum FrostomperAttackType implements AttackType<FrostomperEntity, FrostomperAttackType>{
         FLING(Mth.floor(0.38F * 20), Mth.floor(0.75F * 20), DEFAULT_ATTACK_SIZE, 8, 1.5F),
+        SINGLE_STOMP(Mth.floor(0.63F * 20), 20, DEFAULT_ATTACK_SIZE.scale(0.5D), 5, 0.75F),
         DOUBLE_STOMP(Mth.floor(0.63F * 20), 20, DEFAULT_ATTACK_SIZE, 10, 1.5F),
         CHARGE(0, 10, DEFAULT_ATTACK_SIZE, 12, 1.5F);
 
@@ -638,6 +711,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
         @Override
         public void executeAttackPoint(FrostomperEntity attacker, int attackTicker) {
+            AABB attackBounds = HitboxHelper.createHitboxRelativeToFront(attacker, this.getAttackSize().x(), this.getAttackSize().y(), this.getAttackSize().z());
             if(this == CHARGE){
                 if(attackTicker == 0){
                     if(!attacker.level().isClientSide){
@@ -646,7 +720,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 }
                 if(attacker.isChargingForward()){
                     // Passed in zero for attack knockback to prevent normal attack knockback application to targets
-                    List<LivingEntity> hitTargets = EntityHelper.hitTargetsWithAOEAttack(attacker, this.getAttackSize(), this.getAttackDamage(), 0, false);
+                    List<LivingEntity> hitTargets = EntityHelper.hitTargetsWithAOEAttack(attacker, attackBounds, this.getAttackDamage(), 0, false);
                     for(LivingEntity hitTarget : hitTargets){
                         // Now apply the attack knockback value to targets to push them back significantly
                         EntityHelper.strongKnockback(attacker, hitTarget, this.getAttackKnockback());
@@ -654,19 +728,23 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 }
             } else if(this == FLING){
                 // Passed in zero for attack knockback to prevent normal attack knockback application to targets
-                List<LivingEntity> hitTargets = EntityHelper.hitTargetsWithAOEAttack(attacker, this.getAttackSize(), this.getAttackDamage(), 0, false);
+                List<LivingEntity> hitTargets = EntityHelper.hitTargetsWithAOEAttack(attacker, attackBounds, this.getAttackDamage(), 0, false);
                 for(LivingEntity hitTarget : hitTargets){
                     // Now apply the attack knockback value to targets to fling them upwards
                     EntityHelper.throwTarget(attacker, hitTarget, this.getAttackKnockback());
                 }
+            } else if(this == SINGLE_STOMP){
+                Vec3 lateralOffset = Vec3.ZERO.add(attacker.isLeftHanded() ? 1 : -1, 0, 0).yRot(-attacker.getYHeadRot() * Mth.DEG_TO_RAD);
+                attackBounds = attackBounds.move(lateralOffset);
+                EntityHelper.hitTargetsWithAOEAttack(attacker, attackBounds, this.getAttackDamage(), this.getAttackKnockback(), true);
             } else if(this == DOUBLE_STOMP){
-                List<LivingEntity> hitTargets = EntityHelper.hitTargetsWithAOEAttack(attacker, this.getAttackSize(), this.getAttackDamage(), this.getAttackKnockback(), true);
+                List<LivingEntity> hitTargets = EntityHelper.hitTargetsWithAOEAttack(attacker, attackBounds, this.getAttackDamage(), this.getAttackKnockback(), true);
                 for(LivingEntity hitTarget : hitTargets){
                     // desired freeze time is 15 seconds aka 300 ticks, but vanilla will decrease the freeze timer at a rate of 2 ticks for every tick outside powdered snow, so we double it
                     hitTarget.setTicksFrozen(hitTarget.getTicksFrozen() + 300 * 2);
                 }
             } else{
-                EntityHelper.hitTargetsWithAOEAttack(attacker, this.getAttackSize(), this.getAttackDamage(), this.getAttackKnockback(), true);
+                EntityHelper.hitTargetsWithAOEAttack(attacker, attackBounds, this.getAttackDamage(), this.getAttackKnockback(), true);
             }
         }
 

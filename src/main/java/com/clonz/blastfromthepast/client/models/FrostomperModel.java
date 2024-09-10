@@ -19,7 +19,7 @@ public class FrostomperModel extends AnimatableDucModel<FrostomperEntity> {
 
     @Override
     protected Set<String> excludeAnimations() {
-        return Set.of("animation.frostomper.walk");
+        return Set.of("animation.frostomper.walk", "animation.baby_frostomper.walk");
     }
 
     @Override
@@ -27,7 +27,7 @@ public class FrostomperModel extends AnimatableDucModel<FrostomperEntity> {
         super.setupAnim(pEntity, pLimbSwing, pLimbSwingAmount, pAgeInTicks, pNetHeadYaw, pHeadPitch);
         FrostomperEntity.FrostomperAttackType attackType = pEntity.getActiveAttackType();
         if(attackType == null || !attackType.blocksWalkAnimation()){
-            this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.frostomper.walk").animation(), pLimbSwing, pLimbSwingAmount, 1, 2);
+            this.animateWalk(pEntity.getAnimation().getAnimations().get(pEntity.getAnimationKey("walk")).animation(), pLimbSwing, pLimbSwingAmount, 1, 2);
         }
         if(attackType == null || !attackType.blocksLookAnimation()){
             this.animateLook(pNetHeadYaw, pHeadPitch);

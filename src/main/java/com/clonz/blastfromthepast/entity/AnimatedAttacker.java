@@ -31,7 +31,8 @@ public interface AnimatedAttacker<T extends Mob & AnimatedAttacker<T, A>, A exte
         float getAttackKnockback();
 
         default void executeAttackPoint(T attacker, int attackTicker){
-            EntityHelper.hitTargetsWithAOEAttack(attacker, this.getAttackSize(), this.getAttackDamage(), this.getAttackKnockback(), true);
+            AABB attackBounds = HitboxHelper.createHitboxRelativeToFront(attacker, this.getAttackSize().x(), this.getAttackSize().y(), this.getAttackSize().z());
+            EntityHelper.hitTargetsWithAOEAttack(attacker, attackBounds, this.getAttackDamage(), this.getAttackKnockback(), true);
         }
 
         default boolean isTargetCloseEnoughToStart(T attacker, LivingEntity target) {
@@ -73,32 +74,36 @@ public interface AnimatedAttacker<T extends Mob & AnimatedAttacker<T, A>, A exte
 
     class AttackTicker<T extends Mob & AnimatedAttacker<T, A>, A extends AnimatedAttacker.AttackType<T, A>>{
         private final T attacker;
-        private int attackTicker;
+        private int tick;
 
         public AttackTicker(T attacker) {
             this.attacker = attacker;
         }
 
         public void reset(){
-            this.attackTicker = 0;
+            this.tick = 0;
         }
 
         public void tick(){
             A activeAttackType = this.attacker.getActiveAttackType();
             if(activeAttackType != null){
-                if(activeAttackType.hasAttackPointAt(this.attackTicker)){
-                    activeAttackType.executeAttackPoint(this.attacker, this.attackTicker);
+                if(activeAttackType.hasAttackPointAt(this.tick)){
+                    activeAttackType.executeAttackPoint(this.attacker, this.tick);
                 }
-                if(!this.attacker.level().isClientSide && activeAttackType.isFinished(this.attacker, this.attackTicker)) {
+                if(!this.attacker.level().isClientSide && activeAttackType.isFinished(this.attacker, this.tick)) {
                     if(DebugFlags.DEBUG_ANIMATED_ATTACK)
                         BlastFromThePast.LOGGER.info("Finished attack {} for {}", activeAttackType, this.attacker);
                     this.attacker.setActiveAttackType(null);
                 }
             }
             activeAttackType = this.attacker.getActiveAttackType();
-            if(activeAttackType != null && !activeAttackType.isFinished(this.attacker, this.attackTicker)){
-                this.attackTicker++;
+            if(activeAttackType != null && !activeAttackType.isFinished(this.attacker, this.tick)){
+                this.tick++;
             }
+        }
+
+        public int get() {
+            return this.tick;
         }
     }
 
