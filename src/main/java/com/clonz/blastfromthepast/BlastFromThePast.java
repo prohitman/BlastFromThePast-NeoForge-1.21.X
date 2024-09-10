@@ -3,11 +3,15 @@ package com.clonz.blastfromthepast;
 import com.clonz.blastfromthepast.client.models.GlacerosModel;
 import com.clonz.blastfromthepast.client.models.SnowdoModel;
 import com.clonz.blastfromthepast.client.models.FrostomperModel;
+import com.clonz.blastfromthepast.client.models.boats.BFTPBoatModel;
+import com.clonz.blastfromthepast.client.models.boats.BFTPChestBoatModel;
 import com.clonz.blastfromthepast.client.renderers.GlacerosRenderer;
 import com.clonz.blastfromthepast.client.renderers.SnowdoRenderer;
 import com.clonz.blastfromthepast.client.renderers.FrostomperRenderer;
+import com.clonz.blastfromthepast.client.renderers.boat.BFTPBoatRenderer;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
+import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
 import com.clonz.blastfromthepast.entity.pack.EntityPacks;
 import com.clonz.blastfromthepast.init.*;
 import io.github.itskillerluc.duclib.client.model.BaseDucModel;
@@ -106,6 +110,9 @@ public class BlastFromThePast {
             EntityRenderers.register(ModEntities.GLACEROS.get(), GlacerosRenderer::new);
             EntityRenderers.register(ModEntities.SNOWDO.get(), SnowdoRenderer::new);
             EntityRenderers.register(ModEntities.FROSTOMPER.get(), FrostomperRenderer::new);
+            EntityRenderers.register(ModEntities.BFTPBOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, false)));
+            EntityRenderers.register(ModEntities.BFTPCHEST_BOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, true)));
+
             ItemBlockRenderTypes.setRenderLayer(ModBlocks.CEDAR_DOOR.get(), RenderType.CUTOUT);
 
         }
@@ -115,6 +122,10 @@ public class BlastFromThePast {
             event.registerLayerDefinition(SnowdoModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(SnowdoEntity.LOCATION));
             event.registerLayerDefinition(FrostomperModel.ADULT_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.FROSTOMPER.getId()));
             event.registerLayerDefinition(FrostomperModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.FROSTOMPER.getId().withPrefix("baby_")));
+            for (BFTPBoat.BoatType boat$type : BFTPBoat.BoatType.values()) {
+                event.registerLayerDefinition(BFTPBoatRenderer.createBoatModelName(boat$type), BFTPBoatModel::createBodyModel);
+                event.registerLayerDefinition(BFTPBoatRenderer.createChestBoatModelName(boat$type), BFTPChestBoatModel::createBodyModel);
+            }
         }
     }
 }

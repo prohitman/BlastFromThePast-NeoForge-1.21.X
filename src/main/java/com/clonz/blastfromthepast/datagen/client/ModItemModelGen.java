@@ -24,6 +24,8 @@ public class ModItemModelGen extends ItemModelProvider {
         withExistingParent(ModItems.SNOWDO_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.GLACEROS_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.FROSTOMPER_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
+        basicItem(ModItems.CEDAR_BOAT.get());
+        basicItem(ModItems.CEDAR_CHEST_BOAT.get());
 
         //Blocks
         createWithParent(ModBlocks.CEDAR_LEAVES);
