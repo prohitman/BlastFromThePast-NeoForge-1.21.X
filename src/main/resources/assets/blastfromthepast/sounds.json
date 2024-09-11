@@ -5,7 +5,7 @@
       "blastfromthepast:glaceros_death_0",
       "blastfromthepast:glaceros_death_1"
     ]
-},
+  },
   "glaceros_hurt": {
   "subtitle": "sounds.blastfromthepast.glaceros_hurt",
     "sounds": [
@@ -43,14 +43,55 @@
       "blastfromthepast:snowdo_idle_2"
     ]
   },
-  "snowdo_trip": {
-    "subtitle": "sounds.blastfromthepast.snowdo_trip",
+  "frostomper_charge": {
+    "subtitle": "sounds.blastfromthepast.frostomper_charge",
     "sounds": [
-      "blastfromthepast:snowdo_trip"
+      "blastfromthepast:frostomper_charge"
+
+    ]
+  },
+  "frostomper_death": {
+    "subtitle": "sounds.blastfromthepast.frostomper_death",
+    "sounds": [
+      "blastfromthepast:frostomper_death"
+
+    ]
+  },
+  "frostomper_hurt": {
+    "subtitle": "sounds.blastfromthepast.frostomper_hurt",
+    "sounds": [
+      "blastfromthepast:frostomper_hurt_0",
+      "blastfromthepast:frostomper_hurt_2"
+
+    ]
+  },
+  "frostomper_idle": {
+    "subtitle": "sounds.blastfromthepast.frostomper_idle",
+    "sounds": [
+      "blastfromthepast:frostomper_idle_0",
+      "blastfromthepast:frostomper_idle_2"
+
+    ]
+  },
+  "frostomper_stomp": {
+    "subtitle": "sounds.blastfromthepast.frostomper_stomp",
+    "sounds": [
+      "blastfromthepast:frostomper_stomp_0",
+      "blastfromthepast:frostomper_stomp_2"
+
+    ]
+  },
+  "frostomper_trumpet": {
+    "subtitle": "sounds.blastfromthepast.frostomper_trumpet",
+    "sounds": [
+      "blastfromthepast:frostomper_trumpet_0",
+      "blastfromthepast:frostomper_trumpet_1",
+      "blastfromthepast:frostomper_trumpet_2",
+      "blastfromthepast:frostomper_trumpet_3"
 
     ]
   }
-  }
+}
 
 
 

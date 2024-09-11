@@ -4,6 +4,8 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -55,4 +57,20 @@ public class ModSounds {
             () -> SoundEvent.createVariableRangeEvent(ResourceLocation.
                     fromNamespaceAndPath("blastfromthepast", "snowdo_trip"))
     );
+
+    // FROSTOMPER
+    public static final DeferredHolder<SoundEvent, SoundEvent> FROSTOMPER_CHARGE = registerSoundEventForEntityType(ModEntities.FROSTOMPER, "_charge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FROSTOMPER_DEATH = registerSoundEventForEntityType(ModEntities.FROSTOMPER, "_death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FROSTOMPER_HURT = registerSoundEventForEntityType(ModEntities.FROSTOMPER, "_hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FROSTOMPER_IDLE = registerSoundEventForEntityType(ModEntities.FROSTOMPER, "_idle");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FROSTOMPER_STOMP = registerSoundEventForEntityType(ModEntities.FROSTOMPER, "_stomp");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FROSTOMPER_TRUMPET = registerSoundEventForEntityType(ModEntities.FROSTOMPER, "_trumpet");
+
+    private static <T extends Entity> DeferredHolder<SoundEvent, SoundEvent> registerSoundEventForEntityType(DeferredHolder<EntityType<?>, EntityType<T>> entityTypeHolder, String suffix) {
+        ResourceLocation soundEventLocation = entityTypeHolder.getId().withSuffix(suffix);
+        return SOUND_EVENTS.register(
+                soundEventLocation.getPath(),
+                () -> SoundEvent.createVariableRangeEvent(soundEventLocation)
+        );
+    }
 }

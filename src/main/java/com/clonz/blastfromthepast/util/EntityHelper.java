@@ -7,10 +7,8 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -22,12 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EntityHelper {
-    public static boolean haveSameOwners(Entity entity1, Entity entity2) {
-        if(entity1 instanceof OwnableEntity ownable1 && entity2 instanceof OwnableEntity ownable2){
-            return ownable1.getOwner() == ownable2.getOwner();
-        }
-        return false;
-    }
 
     public static void spawnSmashAttackParticles(LevelAccessor level, AABB attackBounds, int power) {
         Vec3 boundsBottomCenter = attackBounds.getBottomCenter();

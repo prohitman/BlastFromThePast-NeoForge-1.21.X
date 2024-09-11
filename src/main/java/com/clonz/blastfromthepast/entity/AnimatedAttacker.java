@@ -31,12 +31,13 @@ public interface AnimatedAttacker<T extends Mob & AnimatedAttacker<T, A>, A exte
         float getAttackKnockback();
 
         default void executeAttackPoint(T attacker, int attackTicker){
-            AABB attackBounds = HitboxHelper.createHitboxRelativeToFront(attacker, this.getAttackSize().x(), this.getAttackSize().y(), this.getAttackSize().z());
+            Vec3 attackSize = this.getAttackSize().scale(attacker.getScale());
+            AABB attackBounds = HitboxHelper.createHitboxRelativeToFront(attacker, attackSize.x(), attackSize.y(), attackSize.z());
             EntityHelper.hitTargetsWithAOEAttack(attacker, attackBounds, this.getAttackDamage(), this.getAttackKnockback(), true);
         }
 
         default boolean isTargetCloseEnoughToStart(T attacker, LivingEntity target) {
-            Vec3 startAttackSize = this.getAttackSize().multiply(1, 1, 0.5D);
+            Vec3 startAttackSize = this.getAttackSize().scale(attacker.getScale()).multiply(1, 1, 0.5D);
             AABB startAttackBounds = HitboxHelper.createHitboxRelativeToFront(attacker, startAttackSize.x(), startAttackSize.y(), startAttackSize.z());
             return startAttackBounds.intersects(target.getHitbox());
         }

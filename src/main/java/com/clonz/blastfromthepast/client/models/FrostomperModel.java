@@ -19,7 +19,7 @@ public class FrostomperModel extends AnimatableDucModel<FrostomperEntity> {
 
     @Override
     protected Set<String> excludeAnimations() {
-        return Set.of("animation.frostomper.walk", "animation.baby_frostomper.walk");
+        return Set.of("animation.frostomper.walk");
     }
 
     @Override
@@ -29,7 +29,7 @@ public class FrostomperModel extends AnimatableDucModel<FrostomperEntity> {
         if(attackType == null || !attackType.blocksWalkAnimation()){
             this.animateWalk(pEntity.getAnimation().getAnimations().get(pEntity.getAnimationKey("walk")).animation(), pLimbSwing, pLimbSwingAmount, 1, 2);
         }
-        if(attackType == null || !attackType.blocksLookAnimation()){
+        if(attackType == null || !attackType.blocksLookAnimation() || !pEntity.isTrumpeting()){
             this.animateLook(pNetHeadYaw, pHeadPitch);
         }
     }
