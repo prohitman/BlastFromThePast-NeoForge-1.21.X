@@ -821,8 +821,10 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 attacker.playSound(ModSounds.FROSTOMPER_STOMP.get(), attacker.getSoundVolume() * 2, attacker.getVoicePitch());
                 List<LivingEntity> hitTargets = EntityHelper.hitTargetsWithAOEAttack(attacker, attackBounds, this.getAttackDamage(), this.getAttackKnockback(), true);
                 for(LivingEntity hitTarget : hitTargets){
-                    // desired freeze time is 15 seconds aka 300 ticks, but vanilla will decrease the freeze timer at a rate of 2 ticks for every tick outside powdered snow, so we double it
-                    hitTarget.setTicksFrozen(hitTarget.getTicksFrozen() + 300 * 2);
+                    if(hitTarget.canFreeze()){
+                        // desired freeze time is 15 seconds aka 300 ticks, but vanilla will decrease the freeze timer at a rate of 2 ticks for every tick outside powdered snow, so we double it
+                        hitTarget.setTicksFrozen(hitTarget.getTicksFrozen() + 300 * 2);
+                    }
                 }
             } else{
                 EntityHelper.hitTargetsWithAOEAttack(attacker, attackBounds, this.getAttackDamage(), this.getAttackKnockback(), true);
