@@ -26,9 +26,9 @@ public class ModItemTagsGen extends ItemTagsProvider {
         tag(ItemTags.MEAT)
                 .add(ModItems.COOKED_VENISON.get())
                 .add(ModItems.RAW_VENISON.get());
-        copy(BlockTags.LOGS_THAT_BURN, ItemTags.LOGS_THAT_BURN);
-        copy(BlockTags.PLANKS, ItemTags.PLANKS);
-        copy(BlockTags.LEAVES, ItemTags.LEAVES);
+        //copy(BlockTags.LOGS_THAT_BURN, ItemTags.LOGS_THAT_BURN);
+        //copy(BlockTags.PLANKS, ItemTags.PLANKS);
+        //copy(BlockTags.LEAVES, ItemTags.LEAVES);
         tag(ModTags.Items.FROSTOMPER_FOOD)
                 .add(ModItems.SAP_BALL.get());
         tag(ModTags.Items.FROSTOMPER_TEMPT_ITEMS)

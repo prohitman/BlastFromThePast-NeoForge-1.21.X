@@ -1,9 +1,11 @@
 package com.clonz.blastfromthepast.datagen.client;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
+import it.unimi.dsi.fastutil.doubles.AbstractDouble2DoubleFunction;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -34,12 +36,8 @@ public class ModLangGen extends LanguageProvider {
         addItem(ModItems.CEDAR_CHEST_BOAT);
 
         //Blocks
-        addBlock(ModBlocks.CEDAR_DOOR);
-        addBlock(ModBlocks.CEDAR_LOG);
         addBlock(ModBlocks.SAPPY_CEDAR_LOG);
-        addBlock(ModBlocks.STRIPPED_CEDAR_LOG);
-        addBlock(ModBlocks.CEDAR_LEAVES);
-        addBlock(ModBlocks.CEDAR_PLANKS);
+        registerWoodGroup(ModBlocks.CEDAR);
 
         //Entities
         addEntity(ModEntities.GLACEROS);
@@ -53,12 +51,35 @@ public class ModLangGen extends LanguageProvider {
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
     }
 
+    private void addBlockWithSuffix(DeferredBlock<? extends Block> key, String suffix) {
+        add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")).concat(suffix));
+    }
+
     private void addItem(DeferredItem<? extends Item> key){
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
     }
 
     private <T extends Entity> void addEntity(DeferredHolder<EntityType<?>, EntityType<T>> key){
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
+    }
+
+    private void registerWoodGroup(BFTPWoodGroup woodGroup){
+        addBlockWithSuffix(woodGroup.BLOCK, " Planks");
+        addBlock(woodGroup.LOG);
+        addBlock(woodGroup.STRIPPED_LOG);
+        addBlock(woodGroup.WOOD);
+        addBlock(woodGroup.STRIPPED_WOOD);
+        addBlock(woodGroup.SLAB);
+        addBlock(woodGroup.STAIRS);
+        addBlock(woodGroup.LEAVES);
+        addBlock(woodGroup.FENCE);
+        addBlock(woodGroup.FENCE_GATE);
+        addBlock(woodGroup.PRESSURE_PLATE);
+        addBlock(woodGroup.BUTTON);
+        addBlock(woodGroup.TRAPDOOR);
+        addBlock(woodGroup.DOOR);
+        addBlock(woodGroup.SIGN);
+        addBlock(woodGroup.HANGING_SIGN);
     }
 
 }

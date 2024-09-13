@@ -28,31 +28,10 @@ import java.util.function.Supplier;
 
 public class CustomLogBlock extends RotatedPillarBlock {
     private final @Nullable Supplier<? extends RotatedPillarBlock> stripped;
-    private final boolean isFlammable;
-    private final int flammability;
-    private final int fireSpreadSpeed;
 
-    public CustomLogBlock(Properties properties, @Nullable Supplier<? extends RotatedPillarBlock> stripped, boolean isFlammable, int flammability, int fireSpreadSpeed) {
+    public CustomLogBlock(Properties properties, @Nullable Supplier<? extends RotatedPillarBlock> stripped) {
         super(properties);
         this.stripped = stripped;
-        this.isFlammable = isFlammable;
-        this.flammability = flammability;
-        this.fireSpreadSpeed = fireSpreadSpeed;
-    }
-
-    @Override
-    public boolean isFlammable(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return isFlammable;
-    }
-
-    @Override
-    public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return flammability;
-    }
-
-    @Override
-    public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return fireSpreadSpeed;
     }
 
     @Override

@@ -19,14 +19,14 @@ public class ModBlockTagsGen extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        tag(BlockTags.LOGS_THAT_BURN)
+/*        tag(BlockTags.LOGS_THAT_BURN)
                 .add(ModBlocks.CEDAR_LOG.get())
                 .add(ModBlocks.SAPPY_CEDAR_LOG.get())
                 .add(ModBlocks.STRIPPED_CEDAR_LOG.get());
         tag(BlockTags.PLANKS)
                 .add(ModBlocks.CEDAR_PLANKS.get());
         tag(BlockTags.LEAVES)
-                .add(ModBlocks.CEDAR_LEAVES.get());
+                .add(ModBlocks.CEDAR.LEAVES.get());*/
         tag(ModTags.Blocks.FROSTOMPER_CAN_BREAK)
                 .addTag(BlockTags.LEAVES);
     }

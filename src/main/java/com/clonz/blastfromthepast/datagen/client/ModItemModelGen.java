@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.datagen.client;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModItems;
 import net.minecraft.data.PackOutput;
@@ -28,13 +29,29 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.CEDAR_CHEST_BOAT.get());
 
         //Blocks
-        createWithParent(ModBlocks.CEDAR_LEAVES);
-        createWithParent(ModBlocks.CEDAR_PLANKS);
-        createWithParent(ModBlocks.CEDAR_LOG);
-        createWithParent(ModBlocks.STRIPPED_CEDAR_LOG);
+        registerWoodGroup(ModBlocks.CEDAR);
         createWithParent(ModBlocks.SAPPY_CEDAR_LOG);
-        createWithParent(ModBlocks.CEDAR_LEAVES);
-        singleTextureBlock(ModBlocks.CEDAR_DOOR);
+
+    }
+
+    private void registerWoodGroup(BFTPWoodGroup woodGroup){
+        createWithParent(woodGroup.BLOCK);
+        createWithParent(woodGroup.LOG);
+        createWithParent(woodGroup.STRIPPED_LOG);
+        createWithParent(woodGroup.WOOD);
+        createWithParent(woodGroup.STRIPPED_WOOD);
+        createWithParent(woodGroup.SLAB);
+        createWithParent(woodGroup.STAIRS);
+        createWithParent(woodGroup.LEAVES);
+        createSuffixedParent(woodGroup.FENCE, "_inventory");
+        createWithParent(woodGroup.FENCE_GATE);
+        createWithParent(woodGroup.PRESSURE_PLATE);
+        createSuffixedParent(woodGroup.BUTTON, "_inventory");
+        withExistingParent(woodGroup.TRAPDOOR.getId().getPath(),
+                modLoc("block/" + woodGroup.BLOCK.getId().getPath() + "_trapdoor_bottom"));
+        singleTextureBlock(woodGroup.DOOR);
+        basicItem(woodGroup.SIGN_ITEM.get());
+        basicItem(woodGroup.HANGING_SIGN_ITEM.get());
     }
 
     private void createWithParent(DeferredBlock<? extends Block> key) {
@@ -44,6 +61,10 @@ public class ModItemModelGen extends ItemModelProvider {
     private void singleTextureBlock(DeferredBlock<? extends Block> key){
         singleTexture(key.getId().getPath(), mcLoc("item/generated"), "layer0",
                 modLoc("item/" + key.getId().getPath())).renderType("cutout_mipped");
+    }
+
+    private void createSuffixedParent(DeferredBlock<? extends Block> handler, String suffix) {
+        withExistingParent(handler.getId().getPath(), modLoc( "block/" + handler.getId().getPath() + suffix));
     }
 }
 

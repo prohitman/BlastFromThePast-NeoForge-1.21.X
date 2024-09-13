@@ -1,5 +1,6 @@
 package com.clonz.blastfromthepast.init;
 
+import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -21,12 +22,8 @@ public class ModTabs {
                         output.accept(ModItems.GLACEROS_SPAWN_EGG.get());
                         output.accept(ModItems.SNOWDO_SPAWN_EGG.get());
                         output.accept(ModItems.FROSTOMPER_SPAWN_EGG.get());
-                        output.accept(ModBlocks.CEDAR_LOG.get());
-                        output.accept(ModBlocks.STRIPPED_CEDAR_LOG.get());
                         output.accept(ModBlocks.SAPPY_CEDAR_LOG.get());
-                        output.accept(ModBlocks.CEDAR_PLANKS.get());
-                        output.accept(ModBlocks.CEDAR_LEAVES.get());
-                        output.accept(ModBlocks.CEDAR_DOOR.get());
+                        addWoodGroupToTab(output, ModBlocks.CEDAR);
                         output.accept(ModItems.RAW_VENISON.get());
                         output.accept(ModItems.COOKED_VENISON.get());
                         output.accept(ModItems.SAP_BALL.get());
@@ -34,4 +31,20 @@ public class ModTabs {
                         output.accept(ModItems.CEDAR_CHEST_BOAT.get());
                     }).build());
 
+    private static void addWoodGroupToTab(CreativeModeTab.Output output, BFTPWoodGroup woodGroup){
+        output.accept(woodGroup.LOG);
+        output.accept(woodGroup.WOOD);
+        output.accept(woodGroup.STRIPPED_LOG);
+        output.accept(woodGroup.STRIPPED_WOOD);
+        output.accept(woodGroup.BLOCK);
+        output.accept(woodGroup.STAIRS);
+        output.accept(woodGroup.SLAB);
+        output.accept(woodGroup.FENCE);
+        output.accept(woodGroup.FENCE_GATE);
+        output.accept(woodGroup.DOOR);
+        output.accept(woodGroup.TRAPDOOR);
+        output.accept(woodGroup.PRESSURE_PLATE);
+        output.accept(woodGroup.BUTTON);
+        output.accept(woodGroup.LEAVES);
+    }
 }

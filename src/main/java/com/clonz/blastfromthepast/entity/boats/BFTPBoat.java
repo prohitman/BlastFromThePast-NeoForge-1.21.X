@@ -118,7 +118,7 @@ public class BFTPBoat extends Boat{
 
     public enum BoatType implements StringRepresentable {
 
-        CEDAR(ModBlocks.CEDAR_PLANKS.get(), "cedar");
+        CEDAR(ModBlocks.CEDAR.BLOCK.get(), "cedar");
 
         private final String name;
         private final Block planks;
