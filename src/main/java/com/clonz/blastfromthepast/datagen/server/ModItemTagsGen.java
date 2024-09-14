@@ -29,6 +29,7 @@ public class ModItemTagsGen extends ItemTagsProvider {
         copy(BlockTags.LOGS_THAT_BURN, ItemTags.LOGS_THAT_BURN);
         copy(BlockTags.PLANKS, ItemTags.PLANKS);
         copy(BlockTags.LEAVES, ItemTags.LEAVES);
+        copy(BlockTags.TALL_FLOWERS, ItemTags.TALL_FLOWERS);
         tag(ModTags.Items.FROSTOMPER_FOOD)
                 .add(ModItems.SAP_BALL.get());
         tag(ModTags.Items.FROSTOMPER_TEMPT_ITEMS)

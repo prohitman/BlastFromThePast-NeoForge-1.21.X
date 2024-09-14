@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "blastfromthepast:block/pink_delphinium_bottom",
+      "uvlock": true
+    },
+    "half=upper": {
+      "model": "blastfromthepast:block/pink_delphinium_top",
+      "uvlock": true
+    }
+  }
+}

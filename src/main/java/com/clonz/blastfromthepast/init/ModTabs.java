@@ -29,6 +29,10 @@ public class ModTabs {
                         output.accept(ModItems.SAP_BALL.get());
                         output.accept(ModItems.CEDAR_BOAT.get());
                         output.accept(ModItems.CEDAR_CHEST_BOAT.get());
+                        output.accept(ModBlocks.VIOLET_DELPHINIUM);
+                        output.accept(ModBlocks.WHITE_DELPHINIUM);
+                        output.accept(ModBlocks.BLUE_DELPHINIUM);
+                        output.accept(ModBlocks.PINK_DELPHINIUM);
                     }).build());
 
     private static void addWoodGroupToTab(CreativeModeTab.Output output, BFTPWoodGroup woodGroup){

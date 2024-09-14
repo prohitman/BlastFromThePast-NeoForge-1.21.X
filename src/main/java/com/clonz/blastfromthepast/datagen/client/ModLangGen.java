@@ -38,6 +38,10 @@ public class ModLangGen extends LanguageProvider {
         //Blocks
         addBlock(ModBlocks.SAPPY_CEDAR_LOG);
         registerWoodGroup(ModBlocks.CEDAR);
+        addBlock(ModBlocks.WHITE_DELPHINIUM);
+        addBlock(ModBlocks.PINK_DELPHINIUM);
+        addBlock(ModBlocks.VIOLET_DELPHINIUM);
+        addBlock(ModBlocks.BLUE_DELPHINIUM);
 
         //Entities
         addEntity(ModEntities.GLACEROS);

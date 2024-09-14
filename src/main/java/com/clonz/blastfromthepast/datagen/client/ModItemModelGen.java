@@ -31,7 +31,10 @@ public class ModItemModelGen extends ItemModelProvider {
         //Blocks
         registerWoodGroup(ModBlocks.CEDAR);
         createWithParent(ModBlocks.SAPPY_CEDAR_LOG);
-
+        singleTextureDoublePlantBlock(ModBlocks.WHITE_DELPHINIUM, true);
+        singleTextureDoublePlantBlock(ModBlocks.BLUE_DELPHINIUM, true);
+        singleTextureDoublePlantBlock(ModBlocks.VIOLET_DELPHINIUM, true);
+        singleTextureDoublePlantBlock(ModBlocks.PINK_DELPHINIUM, true);
     }
 
     private void registerWoodGroup(BFTPWoodGroup woodGroup){
@@ -65,6 +68,12 @@ public class ModItemModelGen extends ItemModelProvider {
 
     private void createSuffixedParent(DeferredBlock<? extends Block> handler, String suffix) {
         withExistingParent(handler.getId().getPath(), modLoc( "block/" + handler.getId().getPath() + suffix));
+    }
+
+    private void singleTextureDoublePlantBlock(DeferredBlock<Block> block, boolean isTop){
+        singleTexture((block.getId().getPath()),
+                mcLoc("item/generated"),
+                "layer0", modLoc("block/" + block.getId().getPath() + (isTop ? "_top" : "_bottom")));
     }
 }
 

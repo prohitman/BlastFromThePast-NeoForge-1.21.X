@@ -28,6 +28,12 @@ public class ModBlockTagsGen extends BlockTagsProvider {
                 .addTag(BlockTags.LEAVES);
 
         loadWoodGroupBlockTags(ModBlocks.CEDAR);
+
+        tag(BlockTags.TALL_FLOWERS)
+                .add(ModBlocks.WHITE_DELPHINIUM.get())
+                .add(ModBlocks.BLUE_DELPHINIUM.get())
+                .add(ModBlocks.PINK_DELPHINIUM.get())
+                .add(ModBlocks.VIOLET_DELPHINIUM.get());
     }
 
     private void loadWoodGroupBlockTags(BFTPWoodGroup woodGroup){

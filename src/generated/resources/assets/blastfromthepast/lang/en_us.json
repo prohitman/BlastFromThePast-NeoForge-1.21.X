@@ -1,4 +1,5 @@
 {
+  "block.blastfromthepast.blue_delphinium": "Blue Delphinium",
   "block.blastfromthepast.cedar": "Cedar Planks",
   "block.blastfromthepast.cedar_button": "Cedar Button",
   "block.blastfromthepast.cedar_door": "Cedar Door",
@@ -13,9 +14,12 @@
   "block.blastfromthepast.cedar_stairs": "Cedar Stairs",
   "block.blastfromthepast.cedar_trapdoor": "Cedar Trapdoor",
   "block.blastfromthepast.cedar_wood": "Cedar Wood",
+  "block.blastfromthepast.pink_delphinium": "Pink Delphinium",
   "block.blastfromthepast.sappy_cedar_log": "Sappy Cedar Log",
   "block.blastfromthepast.stripped_cedar_log": "Stripped Cedar Log",
   "block.blastfromthepast.stripped_cedar_wood": "Stripped Cedar Wood",
+  "block.blastfromthepast.violet_delphinium": "Violet Delphinium",
+  "block.blastfromthepast.white_delphinium": "White Delphinium",
   "entity.blastfromthepast.frostomper": "Frostomper",
   "entity.blastfromthepast.glaceros": "Glaceros",
   "entity.blastfromthepast.snowdo": "Snowdo",

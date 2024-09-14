@@ -7,6 +7,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
@@ -23,6 +24,10 @@ public class ModBlockStateGen extends BlockStateProvider {
     protected void registerStatesAndModels() {
         logBlock(ModBlocks.SAPPY_CEDAR_LOG.get());
         registerWoodGroup(ModBlocks.CEDAR);
+        createDoublePlantBlock(ModBlocks.WHITE_DELPHINIUM);
+        createDoublePlantBlock(ModBlocks.BLUE_DELPHINIUM);
+        createDoublePlantBlock(ModBlocks.PINK_DELPHINIUM);
+        createDoublePlantBlock(ModBlocks.VIOLET_DELPHINIUM);
     }
 
     public void registerWoodGroup(BFTPWoodGroup group){
@@ -58,5 +63,26 @@ public class ModBlockStateGen extends BlockStateProvider {
 
     private String name(net.minecraft.world.level.block.Block block) {
         return BuiltInRegistries.BLOCK.getKey(block).getPath();
+    }
+
+    private void createDoublePlantBlock(DeferredBlock<Block> block) {
+        createDoublePlantBlock(block,
+                models().cross(block.getId().getPath() + "_top",
+                        modLoc("block/" + block.getId().getPath() + "_top")).renderType("cutout_mipped"),
+                models().cross(block.getId().getPath() + "_bottom",
+                        modLoc("block/" + block.getId().getPath() + "_bottom")).renderType("cutout_mipped"));
+    }
+
+    private void createDoublePlantBlock(DeferredBlock<Block> block, ModelFile upper, ModelFile bottom) {
+        getVariantBuilder(block.get()).forAllStatesExcept(state -> {
+            ModelFile model = bottom;
+            if (state.getValue(DoublePlantBlock.HALF) == DoubleBlockHalf.UPPER) {
+                model = upper;
+            }
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .uvLock(true)
+                    .build();
+        });
     }
 }
