@@ -31,7 +31,6 @@ public class BFTPWoodGroup {
     public final DeferredBlock<RotatedPillarBlock> WOOD;
     public final DeferredBlock<RotatedPillarBlock> STRIPPED_WOOD;
     public final DeferredBlock<RotatedPillarBlock> STRIPPED_LOG;
-
     public final DeferredBlock<DoorBlock> DOOR;
     public final DeferredBlock<ButtonBlock> BUTTON;
     public final DeferredBlock<PressurePlateBlock> PRESSURE_PLATE;

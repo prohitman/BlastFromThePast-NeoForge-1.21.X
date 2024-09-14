@@ -36,7 +36,6 @@ public class CustomLogBlock extends RotatedPillarBlock {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        System.out.println(this.getDescriptionId());
         if(stripped != null && stack.is(ItemTags.AXES) && state.is(ModBlocks.SAPPY_CEDAR_LOG)){
             popResource(level, pos, new ItemStack(ModItems.SAP_BALL.asItem(), 1 + level.random.nextInt(1)));
             level.playSound(null, pos, SoundEvents.HONEY_BLOCK_BREAK, SoundSource.BLOCKS);
