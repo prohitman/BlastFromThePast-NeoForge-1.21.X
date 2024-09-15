@@ -1,5 +1,9 @@
 {
   "values": [
-    "blastfromthepast:cedar_stairs"
+    "blastfromthepast:cedar_stairs",
+    "blastfromthepast:permafrost_stairs",
+    "blastfromthepast:permafrost_bricks_stairs",
+    "blastfromthepast:polished_permafrost_stairs",
+    "blastfromthepast:permafrost_cobblestone_stairs"
   ]
 }

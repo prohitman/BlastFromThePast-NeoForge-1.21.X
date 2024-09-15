@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.datagen.server;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.block.BFTPStoneGroup;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModTags;
@@ -8,6 +9,9 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.WallBlock;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -28,12 +32,37 @@ public class ModBlockTagsGen extends BlockTagsProvider {
                 .addTag(BlockTags.LEAVES);
 
         loadWoodGroupBlockTags(ModBlocks.CEDAR);
+        loadStoneGroupBlockTags(ModBlocks.PERMAFROST);
 
         tag(BlockTags.TALL_FLOWERS)
                 .add(ModBlocks.WHITE_DELPHINIUM.get())
                 .add(ModBlocks.BLUE_DELPHINIUM.get())
                 .add(ModBlocks.PINK_DELPHINIUM.get())
                 .add(ModBlocks.VIOLET_DELPHINIUM.get());
+    }
+
+    private void loadStoneGroupBlockTags(BFTPStoneGroup stoneGroup){
+        for(DeferredBlock<?> deferredBlock : stoneGroup.blocks){
+            tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                    .add(deferredBlock.get());
+            tag(BlockTags.NEEDS_STONE_TOOL)
+                    .add(deferredBlock.get());
+        }
+
+        for(DeferredBlock<StairBlock> deferredBlock : stoneGroup.getStairs()){
+            tag(BlockTags.STAIRS)
+                    .add(deferredBlock.get());
+        }
+
+        for(DeferredBlock<WallBlock> deferredBlock : stoneGroup.getWall()){
+            tag(BlockTags.WALLS)
+                    .add(deferredBlock.get());
+        }
+
+        for(DeferredBlock<SlabBlock> deferredBlock : stoneGroup.getSlab()){
+            tag(BlockTags.SLABS)
+                    .add(deferredBlock.get());
+        }
     }
 
     private void loadWoodGroupBlockTags(BFTPWoodGroup woodGroup){

@@ -17,6 +17,9 @@ import com.clonz.blastfromthepast.init.*;
 import io.github.itskillerluc.duclib.client.model.BaseDucModel;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
+import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -113,6 +116,8 @@ public class BlastFromThePast {
             EntityRenderers.register(ModEntities.FROSTOMPER.get(), FrostomperRenderer::new);
             EntityRenderers.register(ModEntities.BFTPBOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, false)));
             EntityRenderers.register(ModEntities.BFTPCHEST_BOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, true)));
+            BlockEntityRenderers.register(ModBlockEntities.SIGN.get(), SignRenderer::new);
+            BlockEntityRenderers.register(ModBlockEntities.HANGING_SIGN.get(), HangingSignRenderer::new);
         }
         @SubscribeEvent
         public static void registerLayers(final EntityRenderersEvent.RegisterLayerDefinitions event) {

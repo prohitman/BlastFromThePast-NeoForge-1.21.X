@@ -1,22 +1,20 @@
 package com.clonz.blastfromthepast.init;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.block.BFTPWoodGroup;
-import com.clonz.blastfromthepast.block.CustomLeavesBlock;
-import com.clonz.blastfromthepast.block.CustomLogBlock;
-import com.clonz.blastfromthepast.block.CustomPlanksBlock;
+import com.clonz.blastfromthepast.block.*;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DoorBlock;
-import net.minecraft.world.level.block.DoublePlantBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class ModBlocks {
@@ -24,6 +22,8 @@ public class ModBlocks {
             DeferredRegister.createBlocks(BlastFromThePast.MODID);
 
     public static final BFTPWoodGroup CEDAR = new BFTPWoodGroup("cedar",  MapColor.COLOR_BROWN, new Item.Properties(), BLOCKS);
+    public static final BFTPStoneGroup PERMAFROST = new BFTPStoneGroup("permafrost",  MapColor.STONE, new Item.Properties());
+
     public static final DeferredBlock<CustomLogBlock> SAPPY_CEDAR_LOG = createRegistry("sappy_cedar_log",
             () -> new CustomLogBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_LOG), CEDAR.LOG), new Item.Properties());
 

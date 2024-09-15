@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "blastfromthepast:block/permafrost_cobblestone",
+    "side": "blastfromthepast:block/permafrost_cobblestone",
+    "top": "blastfromthepast:block/permafrost_cobblestone"
+  }
+}

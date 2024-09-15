@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.datagen.client;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.block.BFTPStoneGroup;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModItems;
@@ -30,12 +31,42 @@ public class ModItemModelGen extends ItemModelProvider {
 
         //Blocks
         registerWoodGroup(ModBlocks.CEDAR);
+        registerStoneGroup(ModBlocks.PERMAFROST);
         createWithParent(ModBlocks.SAPPY_CEDAR_LOG);
         singleTextureDoublePlantBlock(ModBlocks.WHITE_DELPHINIUM, true);
         singleTextureDoublePlantBlock(ModBlocks.BLUE_DELPHINIUM, true);
         singleTextureDoublePlantBlock(ModBlocks.VIOLET_DELPHINIUM, true);
         singleTextureDoublePlantBlock(ModBlocks.PINK_DELPHINIUM, true);
     }
+
+    private void registerStoneGroup(BFTPStoneGroup stoneGroup){
+        createWithParent(stoneGroup.BLOCK);
+        createWithParent(stoneGroup.STAIRS);
+        createWithParent(stoneGroup.SLAB);
+        withExistingParent(stoneGroup.WALL.getId().getPath(), mcLoc("block/wall_inventory"))
+                .texture("wall", modLoc("block/" + stoneGroup.WALL.getId().getPath().replaceAll("_wall", "")));
+
+        createWithParent(stoneGroup.CHISELED_BRICKS);
+        createWithParent(stoneGroup.BRICKS);
+        createWithParent(stoneGroup.BRICKS_STAIRS);
+        createWithParent(stoneGroup.BRICKS_SLAB);
+        withExistingParent(stoneGroup.BRICKS_WALL.getId().getPath(), mcLoc("block/wall_inventory"))
+                .texture("wall", modLoc("block/" + stoneGroup.BRICKS_WALL.getId().getPath().replaceAll("_wall", "")));
+
+        createWithParent(stoneGroup.POLISHED);
+        createWithParent(stoneGroup.POLISHED_STAIRS);
+        createWithParent(stoneGroup.POLISHED_SLAB);
+        withExistingParent(stoneGroup.POLISHED_WALL.getId().getPath(), mcLoc("block/wall_inventory"))
+                .texture("wall", modLoc("block/" + stoneGroup.POLISHED_WALL.getId().getPath().replaceAll("_wall", "")));
+
+        createWithParent(stoneGroup.COBBLESTONE);
+        createWithParent(stoneGroup.COBBLESTONE_STAIRS);
+        createWithParent(stoneGroup.COBBLESTONE_SLAB);
+        withExistingParent(stoneGroup.COBBLESTONE_WALL.getId().getPath(), mcLoc("block/wall_inventory"))
+                .texture("wall", modLoc("block/" + stoneGroup.COBBLESTONE_WALL.getId().getPath().replaceAll("_wall", "")));
+
+    }
+
 
     private void registerWoodGroup(BFTPWoodGroup woodGroup){
         createWithParent(woodGroup.BLOCK);

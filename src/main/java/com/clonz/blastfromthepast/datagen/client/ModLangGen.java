@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.datagen.client;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.block.BFTPStoneGroup;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
@@ -42,6 +43,7 @@ public class ModLangGen extends LanguageProvider {
         addBlock(ModBlocks.PINK_DELPHINIUM);
         addBlock(ModBlocks.VIOLET_DELPHINIUM);
         addBlock(ModBlocks.BLUE_DELPHINIUM);
+        registerStoneGroup(ModBlocks.PERMAFROST);
 
         //Entities
         addEntity(ModEntities.GLACEROS);
@@ -65,6 +67,26 @@ public class ModLangGen extends LanguageProvider {
 
     private <T extends Entity> void addEntity(DeferredHolder<EntityType<?>, EntityType<T>> key){
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
+    }
+
+    private void registerStoneGroup(BFTPStoneGroup stoneGroup){
+        addBlock(stoneGroup.BLOCK);
+        addBlock(stoneGroup.COBBLESTONE);
+        addBlock(stoneGroup.POLISHED);
+        addBlock(stoneGroup.CHISELED_BRICKS);
+        addBlock(stoneGroup.BRICKS);
+        addBlock(stoneGroup.WALL);
+        addBlock(stoneGroup.STAIRS);
+        addBlock(stoneGroup.SLAB);
+        addBlock(stoneGroup.POLISHED_SLAB);
+        addBlock(stoneGroup.POLISHED_STAIRS);
+        addBlock(stoneGroup.POLISHED_WALL);
+        addBlock(stoneGroup.BRICKS_SLAB);
+        addBlock(stoneGroup.BRICKS_STAIRS);
+        addBlock(stoneGroup.BRICKS_WALL);
+        addBlock(stoneGroup.COBBLESTONE_SLAB);
+        addBlock(stoneGroup.COBBLESTONE_STAIRS);
+        addBlock(stoneGroup.COBBLESTONE_WALL);
     }
 
     private void registerWoodGroup(BFTPWoodGroup woodGroup){

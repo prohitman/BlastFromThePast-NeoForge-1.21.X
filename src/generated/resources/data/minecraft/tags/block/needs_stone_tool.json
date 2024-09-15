@@ -1,0 +1,21 @@
+{
+  "values": [
+    "blastfromthepast:permafrost",
+    "blastfromthepast:permafrost_stairs",
+    "blastfromthepast:permafrost_slab",
+    "blastfromthepast:permafrost_wall",
+    "blastfromthepast:permafrost_bricks",
+    "blastfromthepast:permafrost_bricks_stairs",
+    "blastfromthepast:permafrost_bricks_slab",
+    "blastfromthepast:permafrost_bricks_wall",
+    "blastfromthepast:permafrost_cobblestone",
+    "blastfromthepast:permafrost_cobblestone_stairs",
+    "blastfromthepast:permafrost_cobblestone_slab",
+    "blastfromthepast:permafrost_cobblestone_wall",
+    "blastfromthepast:polished_permafrost",
+    "blastfromthepast:polished_permafrost_stairs",
+    "blastfromthepast:polished_permafrost_slab",
+    "blastfromthepast:polished_permafrost_wall",
+    "blastfromthepast:permafrost_chiseled_bricks"
+  ]
+}

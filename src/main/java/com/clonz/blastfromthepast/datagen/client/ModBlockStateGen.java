@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.datagen.client;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.block.BFTPStoneGroup;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -24,13 +25,34 @@ public class ModBlockStateGen extends BlockStateProvider {
     protected void registerStatesAndModels() {
         logBlock(ModBlocks.SAPPY_CEDAR_LOG.get());
         registerWoodGroup(ModBlocks.CEDAR);
+        registerStoneGroup(ModBlocks.PERMAFROST);
         createDoublePlantBlock(ModBlocks.WHITE_DELPHINIUM);
         createDoublePlantBlock(ModBlocks.BLUE_DELPHINIUM);
         createDoublePlantBlock(ModBlocks.PINK_DELPHINIUM);
         createDoublePlantBlock(ModBlocks.VIOLET_DELPHINIUM);
     }
 
-    public void registerWoodGroup(BFTPWoodGroup group){
+    private void registerStoneGroup(BFTPStoneGroup stoneGroup){
+        simpleBlock(stoneGroup.BLOCK.get());
+        stairsBlock(stoneGroup.STAIRS.get(), this.blockTexture(stoneGroup.BLOCK.get()));
+        slabBlock(stoneGroup.SLAB.get(), this.blockTexture(stoneGroup.BLOCK.get()), this.blockTexture(stoneGroup.BLOCK.get()));
+        wallBlock(stoneGroup.WALL.get(), this.blockTexture(stoneGroup.BLOCK.get()));
+        simpleBlock(stoneGroup.BRICKS.get());
+        stairsBlock(stoneGroup.BRICKS_STAIRS.get(), this.blockTexture(stoneGroup.BRICKS.get()));
+        slabBlock(stoneGroup.BRICKS_SLAB.get(), this.blockTexture(stoneGroup.BRICKS.get()), this.blockTexture(stoneGroup.BRICKS.get()));
+        wallBlock(stoneGroup.BRICKS_WALL.get(), this.blockTexture(stoneGroup.BRICKS.get()));
+        simpleBlock(stoneGroup.COBBLESTONE.get());
+        stairsBlock(stoneGroup.COBBLESTONE_STAIRS.get(), this.blockTexture(stoneGroup.COBBLESTONE.get()));
+        slabBlock(stoneGroup.COBBLESTONE_SLAB.get(), this.blockTexture(stoneGroup.COBBLESTONE.get()), this.blockTexture(stoneGroup.COBBLESTONE.get()));
+        wallBlock(stoneGroup.COBBLESTONE_WALL.get(), this.blockTexture(stoneGroup.COBBLESTONE.get()));
+        simpleBlock(stoneGroup.POLISHED.get());
+        stairsBlock(stoneGroup.POLISHED_STAIRS.get(), this.blockTexture(stoneGroup.POLISHED.get()));
+        slabBlock(stoneGroup.POLISHED_SLAB.get(), this.blockTexture(stoneGroup.POLISHED.get()), this.blockTexture(stoneGroup.POLISHED.get()));
+        wallBlock(stoneGroup.POLISHED_WALL.get(), this.blockTexture(stoneGroup.POLISHED.get()));
+        simpleBlock(stoneGroup.CHISELED_BRICKS.get());
+    }
+
+    private void registerWoodGroup(BFTPWoodGroup group){
         simpleBlock(group.BLOCK.get());
         simpleBlock(group.LEAVES.get());
         logBlock(group.LOG.get());
