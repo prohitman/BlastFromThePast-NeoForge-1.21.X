@@ -66,7 +66,7 @@ public class BFTPStoneGroup {
 
         blocks = new ArrayList<>(Arrays.asList(BLOCK, STAIRS, SLAB, WALL, BRICKS, BRICKS_STAIRS, BRICKS_SLAB, BRICKS_WALL, COBBLESTONE, COBBLESTONE_STAIRS, COBBLESTONE_SLAB, COBBLESTONE_WALL, POLISHED, POLISHED_STAIRS, POLISHED_SLAB, POLISHED_WALL, CHISELED_BRICKS));
     }
-    
+
     public List<DeferredBlock<StairBlock>> getStairs(){
         return new ArrayList<>(Arrays.asList(STAIRS, BRICKS_STAIRS, POLISHED_STAIRS, COBBLESTONE_STAIRS));
     }
