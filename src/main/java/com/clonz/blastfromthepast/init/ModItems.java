@@ -38,6 +38,18 @@ public class ModItems {
     public static final DeferredItem<Item> CEDAR_BOAT = register("cedar_boat", () -> new BFTPBoatItem(false, BFTPBoat.BoatType.CEDAR, (new Item.Properties()).stacksTo(1)));
     public static final DeferredItem<Item> CEDAR_CHEST_BOAT = register("cedar_chest_boat", () -> new BFTPBoatItem(true, BFTPBoat.BoatType.CEDAR, (new Item.Properties()).stacksTo(1)));
 
+    public static final DeferredItem<Item> PSYCHO_BERRY = register("psycho_berry",
+            () -> new Item(new Item.Properties().food(ModFoods.PSYCHO_BERRY)));
+
+    public static final DeferredItem<Item> SAP_ICE_CREAM = registerIceCream("sap_ice_cream");
+
+    public static final DeferredItem<Item> PSYCHO_BERRY_ICE_CREAM = registerIceCream("psycho_berry_ice_cream");
+
+    public static final DeferredItem<Item> MELON_ICE_CREAM = registerIceCream("melon_ice_cream");
+
+    private static DeferredItem<Item> registerIceCream(String name) {
+        return register(name, () -> new Item(new Item.Properties().stacksTo(16).food(ModFoods.BOWL_ICE_CREAM)));
+    }
 
 /*    public static final DeferredItem<BlockItem> FROZEN_PINE_LOG =
             ITEMS.registerSimpleBlockItem("cedar_log", ModBlocks.CEDAR_LOG);

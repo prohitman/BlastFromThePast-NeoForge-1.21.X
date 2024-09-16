@@ -31,11 +31,11 @@ public class ModItemTagsGen extends ItemTagsProvider {
         copy(BlockTags.LEAVES, ItemTags.LEAVES);
         copy(BlockTags.TALL_FLOWERS, ItemTags.TALL_FLOWERS);
         tag(ModTags.Items.FROSTOMPER_FOOD)
-                .add(ModItems.SAP_BALL.get());
+                .add(ModItems.MELON_ICE_CREAM.get());
         tag(ModTags.Items.FROSTOMPER_TEMPT_ITEMS)
                 .addTag(ModTags.Items.FROSTOMPER_FOOD);
         tag(ModTags.Items.BABY_FROSTOMPER_FOOD)
-                .add(ModItems.SAP_BALL.get());
+                .add(ModItems.SAP_ICE_CREAM.get());
         tag(ModTags.Items.BABY_FROSTOMPER_TEMPT_ITEMS)
                 .addTag(ModTags.Items.BABY_FROSTOMPER_FOOD);
     }

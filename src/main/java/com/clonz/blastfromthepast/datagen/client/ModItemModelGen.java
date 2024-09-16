@@ -29,6 +29,11 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.CEDAR_BOAT.get());
         basicItem(ModItems.CEDAR_CHEST_BOAT.get());
 
+        basicItem(ModItems.PSYCHO_BERRY.get());
+        basicItem(ModItems.SAP_ICE_CREAM.get());
+        basicItem(ModItems.PSYCHO_BERRY_ICE_CREAM.get());
+        basicItem(ModItems.MELON_ICE_CREAM.get());
+
         //Blocks
         registerWoodGroup(ModBlocks.CEDAR);
         registerStoneGroup(ModBlocks.PERMAFROST);

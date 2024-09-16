@@ -6,7 +6,6 @@ import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
-import it.unimi.dsi.fastutil.doubles.AbstractDouble2DoubleFunction;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -35,6 +34,12 @@ public class ModLangGen extends LanguageProvider {
         addItem(ModItems.FROSTOMPER_SPAWN_EGG);
         addItem(ModItems.CEDAR_BOAT);
         addItem(ModItems.CEDAR_CHEST_BOAT);
+
+
+        addItem(ModItems.PSYCHO_BERRY);
+        addItem(ModItems.SAP_ICE_CREAM);
+        addItem(ModItems.PSYCHO_BERRY_ICE_CREAM);
+        addItem(ModItems.MELON_ICE_CREAM);
 
         //Blocks
         addBlock(ModBlocks.SAPPY_CEDAR_LOG);
