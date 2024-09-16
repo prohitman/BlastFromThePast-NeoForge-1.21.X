@@ -1,5 +1,6 @@
 package com.clonz.blastfromthepast.block;
 
+import com.clonz.blastfromthepast.block.signs.SnowyStoneBlock;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
@@ -38,7 +39,7 @@ public class BFTPStoneGroup {
 
 
     public BFTPStoneGroup(String name, MapColor mapColor, Item.Properties empty){
-        BLOCK = ModBlocks.createRegistry(name, () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).mapColor(mapColor)), empty);
+        BLOCK = ModBlocks.createRegistry(name, () -> new SnowyStoneBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).mapColor(mapColor)), empty);
 
         STAIRS = ModBlocks.createRegistry(name + "_stairs", () -> new StairBlock(BLOCK.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(BLOCK.get()).mapColor(mapColor)), empty);
         SLAB = ModBlocks.createRegistry(name + "_slab", () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(BLOCK.get()).mapColor(mapColor)), empty);

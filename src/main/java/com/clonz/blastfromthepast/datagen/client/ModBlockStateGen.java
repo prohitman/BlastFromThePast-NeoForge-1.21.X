@@ -3,11 +3,13 @@ package com.clonz.blastfromthepast.datagen.client;
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.block.BFTPStoneGroup;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
+import com.clonz.blastfromthepast.block.signs.SnowyStoneBlock;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
@@ -33,7 +35,13 @@ public class ModBlockStateGen extends BlockStateProvider {
     }
 
     private void registerStoneGroup(BFTPStoneGroup stoneGroup){
-        simpleBlock(stoneGroup.BLOCK.get());
+        createSnowyBlock(stoneGroup.BLOCK,
+                models().cubeAll(this.name(stoneGroup.BLOCK.get()),
+                this.blockTexture(stoneGroup.BLOCK.get())),
+                models().cubeBottomTop("snowy_" + this.name(stoneGroup.BLOCK.get()),
+                modLoc("block/" + "snowy_" + stoneGroup.BLOCK.getId().getPath()),
+                this.blockTexture(stoneGroup.BLOCK.get()),
+                this.blockTexture(Blocks.SNOW)));
         stairsBlock(stoneGroup.STAIRS.get(), this.blockTexture(stoneGroup.BLOCK.get()));
         slabBlock(stoneGroup.SLAB.get(), this.blockTexture(stoneGroup.BLOCK.get()), this.blockTexture(stoneGroup.BLOCK.get()));
         wallBlock(stoneGroup.WALL.get(), this.blockTexture(stoneGroup.BLOCK.get()));
@@ -106,5 +114,22 @@ public class ModBlockStateGen extends BlockStateProvider {
                     .uvLock(true)
                     .build();
         });
+    }
+
+    private void createSnowyBlock(DeferredBlock<Block> block, ModelFile stone, ModelFile snowy){
+        getVariantBuilder(block.get()).forAllStatesExcept(state -> {
+           ModelFile model = stone;
+           if(state.getValue(SnowyStoneBlock.SNOWY)){
+               model = snowy;
+           }
+           return ConfiguredModel.builder()
+                   .modelFile(model)
+                   .uvLock(true)
+                   .build();
+        });
+    }
+
+    private ResourceLocation key(Block block) {
+        return BuiltInRegistries.BLOCK.getKey(block);
     }
 }
