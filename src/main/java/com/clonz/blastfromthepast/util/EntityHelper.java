@@ -23,6 +23,8 @@ public class EntityHelper {
 
     public static void spawnSmashAttackParticles(LevelAccessor level, AABB attackBounds, int power) {
         Vec3 boundsBottomCenter = attackBounds.getBottomCenter();
+        double radius = getXZSize(attackBounds);
+        double halfRadius = radius * 0.5D;
         BlockPos pos = BlockPos.containing(boundsBottomCenter.subtract(0, 1.0E-5F, 0));
         Vec3 particleCenter = boundsBottomCenter.add(0.0, 0.5, 0.0);
         BlockParticleOption dustPillar = new BlockParticleOption(ParticleTypes.DUST_PILLAR, level.getBlockState(pos));
@@ -34,7 +36,7 @@ public class EntityHelper {
         double z;
         double xSpeed;
         double ySpeed;
-        for(index = 0; (float)index < (float)power / 3.0F; ++index) {
+        for(index = 0; (float)index < (float)power / radius; ++index) {
             x = particleCenter.x + level.getRandom().nextGaussian() / 2.0;
             y = particleCenter.y;
             z = particleCenter.z + level.getRandom().nextGaussian() / 2.0;
@@ -44,7 +46,7 @@ public class EntityHelper {
             level.addParticle(dustPillar, x, y, z, xSpeed, ySpeed, zSpeed);
         }
 
-        for(index = 0; (float)index < (float)power / 1.5F; ++index) {
+        for(index = 0; (float)index < (float)power / halfRadius; ++index) {
             x = particleCenter.x + attackBounds.getXsize() * Math.cos(index) + level.getRandom().nextGaussian() / 2.0;
             y = particleCenter.y;
             z = particleCenter.z + attackBounds.getZsize() * Math.sin(index) + level.getRandom().nextGaussian() / 2.0;
@@ -54,6 +56,12 @@ public class EntityHelper {
             level.addParticle(dustPillar, x, y, z, xSpeed, ySpeed, zSpeed);
         }
 
+    }
+
+    public static double getXZSize(AABB bounds){
+        double xSize = bounds.getXsize();
+        double zSize = bounds.getZsize();
+        return (xSize + zSize) / 2.0;
     }
 
     public static <T extends Mob & AnimatedAttacker<T, A>, A extends AnimatedAttacker.AttackType<T, A>> List<LivingEntity> hitTargetsWithAOEAttack(T attacker, AABB attackBounds, float attackDamage, float attackKnockback, boolean spawnParticles) {

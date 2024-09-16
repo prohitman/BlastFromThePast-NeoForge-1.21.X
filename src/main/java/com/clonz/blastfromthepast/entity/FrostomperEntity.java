@@ -755,22 +755,22 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
         @Override
         public boolean blocksMovementInput() {
-            return this == DOUBLE_STOMP;
+            return this == DOUBLE_STOMP || this == SINGLE_STOMP;
         }
 
         @Override
         public boolean blocksWalkAnimation() {
-            return this == DOUBLE_STOMP || this == CHARGE;
+            return this == DOUBLE_STOMP || this == SINGLE_STOMP || this == CHARGE;
         }
 
         @Override
         public boolean blocksRotationInput() {
-            return this == DOUBLE_STOMP;
+            return this == DOUBLE_STOMP || this == SINGLE_STOMP;
         }
 
         @Override
         public boolean blocksBodyRotation() {
-            return this == DOUBLE_STOMP;
+            return this == DOUBLE_STOMP || this == SINGLE_STOMP;
         }
 
         @Override
