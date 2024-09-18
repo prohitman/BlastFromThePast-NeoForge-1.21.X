@@ -1,4 +1,4 @@
-package com.clonz.blastfromthepast.entity.ai;
+package com.clonz.blastfromthepast.entity.ai.goal;
 
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;

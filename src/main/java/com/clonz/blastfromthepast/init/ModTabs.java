@@ -24,6 +24,7 @@ public class ModTabs {
                         output.accept(ModItems.GLACEROS_SPAWN_EGG.get());
                         output.accept(ModItems.SNOWDO_SPAWN_EGG.get());
                         output.accept(ModItems.FROSTOMPER_SPAWN_EGG.get());
+                        output.accept(ModItems.PSYCHO_BEAR_SPAWN_EGG.get());
                         output.accept(ModBlocks.SAPPY_CEDAR_LOG.get());
                         addWoodGroupToTab(output, ModBlocks.CEDAR);
                         output.accept(ModItems.CEDAR_BOAT.get());
@@ -31,6 +32,11 @@ public class ModTabs {
                         output.accept(ModItems.RAW_VENISON.get());
                         output.accept(ModItems.COOKED_VENISON.get());
                         output.accept(ModItems.SAP_BALL.get());
+                        output.accept(ModItems.PSYCHO_BERRY.get());
+                        output.accept(ModItems.SAP_ICE_CREAM.get());
+                        output.accept(ModItems.PSYCHO_BERRY_ICE_CREAM.get());
+                        output.accept(ModItems.MELON_ICE_CREAM.get());
+                        output.accept(ModItems.BEAR_CLAW.get());
                         output.accept(ModBlocks.VIOLET_DELPHINIUM);
                         output.accept(ModBlocks.WHITE_DELPHINIUM);
                         output.accept(ModBlocks.BLUE_DELPHINIUM);

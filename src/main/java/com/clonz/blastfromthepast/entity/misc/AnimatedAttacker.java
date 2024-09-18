@@ -1,4 +1,4 @@
-package com.clonz.blastfromthepast.entity;
+package com.clonz.blastfromthepast.entity.misc;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.util.DebugFlags;
@@ -42,7 +42,9 @@ public interface AnimatedAttacker<T extends Mob & AnimatedAttacker<T, A>, A exte
             return startAttackBounds.intersects(target.getHitbox());
         }
 
-        boolean hasAttackPointAt(int attackTicker);
+        default boolean hasAttackPointAt(int attackTicker){
+            return this.getAttackPoint() == attackTicker;
+        }
 
         default boolean blocksMovementInput(){
             return true;

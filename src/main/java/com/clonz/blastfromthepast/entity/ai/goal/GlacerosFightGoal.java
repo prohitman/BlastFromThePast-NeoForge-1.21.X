@@ -1,8 +1,7 @@
-package com.clonz.blastfromthepast.entity.ai;
+package com.clonz.blastfromthepast.entity.ai.goal;
 
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 
 public class GlacerosFightGoal extends NearestAttackableTargetGoal {

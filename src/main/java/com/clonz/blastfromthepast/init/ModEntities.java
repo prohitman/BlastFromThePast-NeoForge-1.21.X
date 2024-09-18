@@ -2,6 +2,7 @@ package com.clonz.blastfromthepast.init;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
+import com.clonz.blastfromthepast.entity.PsychoBearEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import com.clonz.blastfromthepast.entity.FrostomperEntity;
 import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
@@ -51,11 +52,17 @@ public class ModEntities {
             .clientTrackingRange(10)
             .build(getName("chest_boat")));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<PsychoBearEntity>> PSYCHO_BEAR = registerMob("psycho_bear", PsychoBearEntity::new,
+            HitboxHelper.pixelsToBlocks(53.0F), HitboxHelper.pixelsToBlocks(33.0F), 0x302219, 0xACACAC);
+
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> GlacerosEntity.init());
-        event.enqueueWork(() -> SnowdoEntity.init());
-        event.enqueueWork(() -> FrostomperEntity.init());
+        event.enqueueWork(() -> {
+            GlacerosEntity.init();
+            SnowdoEntity.init();
+            FrostomperEntity.init();
+            PsychoBearEntity.init();
+        });
     }
 
     @SubscribeEvent
@@ -63,6 +70,7 @@ public class ModEntities {
         event.put(ModEntities.GLACEROS.get(), GlacerosEntity.createAttributes().build());
         event.put(ModEntities.SNOWDO.get(), SnowdoEntity.createAttributes().build());
         event.put(ModEntities.FROSTOMPER.get(), FrostomperEntity.createAttributes().build());
+        event.put(ModEntities.PSYCHO_BEAR.get(), PsychoBearEntity.createAttributes().build());
     }
 
     private static String getName(String name) {

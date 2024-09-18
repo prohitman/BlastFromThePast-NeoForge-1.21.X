@@ -47,4 +47,22 @@ public class HitboxHelper {
         Vec3 centerPos = mob.position().add(baseOffset).add(radiusOffset);
         return AABB.ofSize(centerPos, xSize, ySize, zSize);
     }
+
+    /**
+     * This returns the minimum width of an attack hitbox such that:
+     * <ul>
+     * <li>When offset by 50% of the attacker's hitbox width plus 50% of its own width,
+     * its center point can be dynamically positioned directly on the corner of the attacker's hitbox
+     * <li>When centered on a corner of the attacker's hitbox, it can intersect with the hitboxes of targets within 50% of its width away from said corner
+     * </ul>
+     * The calculation is based on determining the distance from the center to a corner of the attacker's hitbox,
+     * then subtracting 50% of the attacker's hitbox width from it.
+     * Then it is then doubled to return the entire width of the attack hitbox.
+     * @param hitboxWidth The width of the attacker's hitbox
+     * @return The minimum width of a hitbox that can hit targets located near a corner of the attacker's hitbox
+     */
+    public static double calculateMinimumAttackHitboxWidth(double hitboxWidth){
+        double halfWidth = hitboxWidth * 0.5D;
+        return 2 * (Math.hypot(halfWidth, halfWidth) - halfWidth);
+    }
 }

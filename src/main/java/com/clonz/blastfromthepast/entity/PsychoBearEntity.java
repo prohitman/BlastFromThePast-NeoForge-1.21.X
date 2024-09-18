@@ -1,0 +1,611 @@
+package com.clonz.blastfromthepast.entity;
+
+import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.client.models.PsychoBearModel;
+import com.clonz.blastfromthepast.entity.ai.goal.AgeableHurtByTargetGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.HitboxAdjustedBreedGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.HitboxAdjustedFollowParentGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.PredicatedGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.attacker.AnimatedMeleeAttackGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.bear.BearPickUpAndSitWithItemGoal;
+import com.clonz.blastfromthepast.entity.ai.controller.OverridableBodyRotationControl;
+import com.clonz.blastfromthepast.entity.ai.controller.OverridableLookControl;
+import com.clonz.blastfromthepast.entity.ai.controller.OverridableMoveControl;
+import com.clonz.blastfromthepast.entity.ai.navigation.BFTPGroundPathNavigation;
+import com.clonz.blastfromthepast.entity.misc.AnimatedAttacker;
+import com.clonz.blastfromthepast.entity.misc.Bear;
+import com.clonz.blastfromthepast.entity.misc.OverrideAnimatedAttacker;
+import com.clonz.blastfromthepast.init.ModEntities;
+import com.clonz.blastfromthepast.init.ModSounds;
+import com.clonz.blastfromthepast.init.ModTags;
+import com.clonz.blastfromthepast.util.DebugFlags;
+import com.clonz.blastfromthepast.util.EntityHelper;
+import com.clonz.blastfromthepast.util.HitboxHelper;
+import io.github.itskillerluc.duclib.client.animation.DucAnimation;
+import io.github.itskillerluc.duclib.entity.Animatable;
+import net.minecraft.core.particles.ItemParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.BodyRotationControl;
+import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.util.Lazy;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.function.Predicate;
+
+public class PsychoBearEntity extends Animal implements Animatable<PsychoBearModel>, OverrideAnimatedAttacker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType>, Bear, Pacifiable {
+    public static final DucAnimation ADULT_ANIMATION = DucAnimation.create(ModEntities.PSYCHO_BEAR.getId());
+    public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.PSYCHO_BEAR.getId().withPrefix("baby_"));
+    public static final EntityDimensions PSYCHO_BEAR_BABY_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(18.0F), HitboxHelper.pixelsToBlocks(13.0F));
+    private static final EntityDataAccessor<OptionalInt> DATA_ACTIVE_ATTACK_TYPE = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.OPTIONAL_UNSIGNED_INT);
+    private static final EntityDataAccessor<Byte> DATA_FLAGS = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BYTE);
+    private static final EntityDataAccessor<Boolean> DATA_PACIFIED = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_EATING = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final byte SITTING_FLAG = 1;
+    private static final int MAX_EAT_TIME = Mth.floor(2F * 20);
+    public static final int FINISH_CHEWING_ACTION_POINT = Mth.floor(1.75F * 20);
+    public static final int START_CHEWING_ACTION_POINT = Mth.floor(0.25F * 20);
+    private final Lazy<Map<String, AnimationState>> babyAnimations = Lazy.of(() -> PsychoBearModel.createStateMap(BABY_ANIMATION));
+    private final Lazy<Map<String, AnimationState>> adultAnimations = Lazy.of(() -> PsychoBearModel.createStateMap(ADULT_ANIMATION));
+    private final AttackTicker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType> attackTicker = new AttackTicker<>(this);
+    private int pacifiedTicks = 0;
+    private int eatCounter = 0;
+
+    public PsychoBearEntity(EntityType<? extends PsychoBearEntity> entityType, Level level) {
+        super(entityType, level);
+        this.lookControl = new OverridableLookControl<>(this);
+        this.moveControl = new OverridableMoveControl<>(this);
+        this.setCanPickUpLoot(true);
+    }
+
+    public static void init() {
+    }
+
+    public static AttributeSupplier.Builder createAttributes(){
+        return Mob.createMobAttributes()
+                .add(Attributes.MOVEMENT_SPEED, 0.3D)
+                .add(Attributes.ATTACK_DAMAGE, 8.0D)
+                .add(Attributes.MAX_HEALTH, 70.0D);
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_ACTIVE_ATTACK_TYPE, OptionalInt.empty());
+        builder.define(DATA_FLAGS, (byte)0);
+        builder.define(DATA_PACIFIED, false);
+        builder.define(DATA_EATING, false);
+    }
+
+    protected boolean getFlag(int flag) {
+        return (this.entityData.get(DATA_FLAGS) & flag) != 0;
+    }
+
+    protected void setFlag(int flagId, boolean value) {
+        byte flags = this.entityData.get(DATA_FLAGS);
+        if (value) {
+            this.entityData.set(DATA_FLAGS, (byte)(flags | flagId));
+        } else {
+            this.entityData.set(DATA_FLAGS, (byte)(flags & ~flagId));
+        }
+
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> pKey) {
+        super.onSyncedDataUpdated(pKey);
+        if(DATA_ACTIVE_ATTACK_TYPE.equals(pKey)){
+            this.attackTicker.reset();
+        }
+        if (!this.firstTick && DATA_EATING.equals(pKey)) {
+            this.eatCounter = 0;
+        }
+    }
+
+    @Override
+    protected BodyRotationControl createBodyControl() {
+        return new OverridableBodyRotationControl<>(this);
+    }
+
+    @Override
+    protected PathNavigation createNavigation(Level level) {
+        return new BFTPGroundPathNavigation(this, level);
+    }
+
+    @Override
+    protected EntityDimensions getDefaultDimensions(Pose pose) {
+        return this.isBaby() ? PSYCHO_BEAR_BABY_DIMENSIONS : super.getDefaultDimensions(pose);
+    }
+
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new PredicatedGoal<>(new AnimatedMeleeAttackGoal<>(this, 1.0F, true), this, Predicate.not(OverrideAnimatedAttacker::isAllActionBlocked)));
+        this.goalSelector.addGoal(1, new PanicGoal(this, 2.0F, EntityHelper::getPanicInducingDamageTypes));
+        this.goalSelector.addGoal(2, new HitboxAdjustedBreedGoal(this, 1.0));
+        this.goalSelector.addGoal(3, new TemptGoal(this, 1.25F, this::isTemptItem, false));
+        this.goalSelector.addGoal(4, new BearPickUpAndSitWithItemGoal<>(this, this::isWantedItem, 1.0F));
+        this.goalSelector.addGoal(5, new HitboxAdjustedFollowParentGoal(this, 1.25F));
+        this.goalSelector.addGoal(6, new RandomStrollGoal(this, 1.0F));
+        this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(1, new AgeableHurtByTargetGoal<>(this));
+        this.targetSelector.addGoal(3, new PredicatedGoal<>(
+                new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, null),
+                this, Predicate.not(PsychoBearEntity::canBeAggressive), true));
+        this.targetSelector.addGoal(4, new PredicatedGoal<>(
+                new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, true, this::canTarget),
+                this, Predicate.not(PsychoBearEntity::canBeAggressive), true));
+    }
+
+    protected boolean canBeAggressive(){
+        return !this.isPacified() && !this.isBaby();
+    }
+
+    protected boolean canTarget(LivingEntity target) {
+        return target.attackable() && !target.getType().is(ModTags.EntityTypes.PSYCHO_BEAR_IGNORES);
+    }
+
+    private boolean isTemptItem(ItemStack stack) {
+        return stack.is(this.isBaby() ? ModTags.Items.BABY_PSYCHO_BEAR_TEMPT_ITEMS : ModTags.Items.PSYCHO_BEAR_TEMPT_ITEMS);
+    }
+
+    @Override
+    public boolean isFood(ItemStack itemStack) {
+        return this.isBaby() ? itemStack.is(ModTags.Items.BABY_PSYCHO_BEAR_FOOD) : itemStack.is(ModTags.Items.PSYCHO_BEAR_FOOD);
+    }
+
+    public boolean isPacifier(ItemStack stack){
+        return stack.is(ModTags.Items.PSYCHO_BEAR_PACIFIER);
+    }
+
+    @Override
+    public InteractionResult mobInteract(Player player, InteractionHand hand) {
+        ItemStack playerItemInHand = player.getItemInHand(hand);
+        boolean canEat = false;
+        if (this.isPacifier(playerItemInHand) && !this.isBaby() && !this.isPacified()) {
+            canEat = true;
+        } else if (this.isFood(playerItemInHand)) {
+            if (this.isBaby()) {
+                this.usePlayerItem(player, hand, playerItemInHand);
+                this.ageUp(getSpeedUpSecondsWhenFeeding(-this.getAge()), true);
+                return InteractionResult.sidedSuccess(this.level().isClientSide);
+            } else if (!this.level().isClientSide && this.getAge() == 0 && this.canFallInLove()) {
+                this.usePlayerItem(player, hand, playerItemInHand);
+                this.setInLove(player);
+                return InteractionResult.SUCCESS;
+            } else{
+                canEat = true;
+            }
+        }
+        
+        if(canEat){
+            if (this.isSitting() || this.isInWater() || this.isBaby()) { // TODO: Babies may be able to eat
+                return InteractionResult.PASS;
+            }
+
+            if(!this.level().isClientSide){
+                this.tryToSit();
+                this.eat(true);
+                ItemStack mainHandItem = this.getItemInMouth();
+                if (!mainHandItem.isEmpty() && !player.hasInfiniteMaterials()) {
+                    this.spawnAtLocation(mainHandItem);
+                }
+
+                this.putItemInMouth(new ItemStack(playerItemInHand.getItem(), 1), false);
+                this.usePlayerItem(player, hand, playerItemInHand);
+            }
+            return InteractionResult.sidedSuccess(this.level().isClientSide);
+        }
+        return InteractionResult.PASS;
+    }
+
+    @Nullable
+    @Override
+    public AgeableMob getBreedOffspring(ServerLevel serverLevel, AgeableMob ageableMob) {
+        return ModEntities.PSYCHO_BEAR.get().create(serverLevel);
+    }
+
+    @Override
+    public void setActiveAttackType(@Nullable PsychoBearAttackType attackType) {
+        this.entityData.set(DATA_ACTIVE_ATTACK_TYPE, attackType == null ? OptionalInt.empty() : OptionalInt.of(attackType.ordinal()));
+    }
+
+    @Override
+    @Nullable
+    public PsychoBearEntity.PsychoBearAttackType getActiveAttackType() {
+        OptionalInt ordinal = this.entityData.get(DATA_ACTIVE_ATTACK_TYPE);
+        return ordinal.isEmpty() ? null : PsychoBearEntity.PsychoBearAttackType.byOrdinal(ordinal.getAsInt());
+    }
+
+    @Override
+    public PsychoBearAttackType selectAttackTypeForTarget(@Nullable LivingEntity target) {
+        return PsychoBearAttackType.SLASH;
+    }
+
+    @Override
+    public ResourceLocation getModelLocation() {
+        return null;
+    }
+
+    @Override
+    public DucAnimation getAnimation() {
+        return this.isBaby() ? BABY_ANIMATION : ADULT_ANIMATION;
+    }
+
+    @Override
+    public Lazy<Map<String, AnimationState>> getAnimations() {
+        return this.isBaby() ? this.babyAnimations : this.adultAnimations;
+    }
+
+    @Override
+    public Optional<AnimationState> getAnimationState(String animation) {
+        return Optional.ofNullable(this.getAnimations().get().get(this.getAnimationKey(animation)));
+    }
+
+    public String getAnimationKey(String animation) {
+        return "animation.psycho_bear." + animation;
+    }
+
+    @Override
+    public int tickCount() {
+        return this.tickCount;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        PsychoBearEntity.PsychoBearAttackType activeAttackType = this.getActiveAttackType();
+        if (this.level().isClientSide()) {
+            this.animateWhen("idle", !this.isMoving(this) && this.onGround() && activeAttackType == null);
+            if(!this.isBaby()){
+                this.animateWhen("attack_flipped", activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && !this.isLeftHanded());
+                this.animateWhen("attack", activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && this.isLeftHanded());
+                this.animateWhen("eat", activeAttackType == null && this.isEating());
+            }
+        }
+        if (!this.canRotateHead()) {
+            this.clampHeadRotationToBody();
+        }
+        if (this.isSitting()) {
+            this.setXRot(0.0F);
+        }
+        this.attackTicker.tick();
+        // tick pacification
+        if (this.pacifiedTicks > 0) {
+            --this.pacifiedTicks;
+            if (this.pacifiedTicks == 0 && !this.level().isClientSide) {
+                this.setPacified(false);
+            }
+        }
+        // tick eating
+        this.handleEating();
+    }
+
+    @Override
+    public void tryToSit() {
+        if (!this.isInWater()) {
+            this.setZza(0.0F);
+            this.getNavigation().stop();
+            this.sit(true);
+        }
+
+    }
+
+    @Override
+    public boolean isSitting() {
+        return this.getFlag(SITTING_FLAG);
+    }
+
+    @Override
+    public void sit(boolean sitting) {
+        this.setFlag(SITTING_FLAG, sitting);
+    }
+
+    @Override
+    public boolean canPerformAction() {
+        return !this.isEating() && !this.isSitting();
+    }
+
+    @Override
+    public boolean isEating() {
+        return this.entityData.get(DATA_EATING);
+    }
+
+    @Override
+    public void eat(boolean eating) {
+        this.entityData.set(DATA_EATING, eating);
+    }
+
+    @Override
+    public ItemStack getItemInMouth() {
+        return this.getItemBySlot(EquipmentSlot.MAINHAND);
+    }
+
+    private void handleEating() {
+        ItemStack eatItem = this.getItemInMouth();
+        if (!this.isEating() && this.isSitting() && !eatItem.isEmpty() && !this.level().isClientSide) {
+            if(DebugFlags.DEBUG_BEAR_EAT)
+                BlastFromThePast.LOGGER.info("Started eating animation for {}", this);
+            this.eat(true);
+        } else if (this.isEating() && ((eatItem.isEmpty() && !this.isAboutToFinishEating()) || !this.isSitting()) && !this.level().isClientSide) {
+            if(DebugFlags.DEBUG_BEAR_EAT)
+                BlastFromThePast.LOGGER.info("Stopped eating animation for {}", this);
+            this.eat(false);
+        }
+
+        if (this.isEating()) {
+            if(this.isChewing()){
+                this.addEatingParticles();
+            }
+            if (!this.level().isClientSide) {
+                if (this.eatCounter >= MAX_EAT_TIME && this.isFoodOrPacifier(eatItem)) {
+                    if (!this.level().isClientSide) {
+                        if(this.isPacifier(eatItem)){
+                            this.setPacified(true);
+                            this.setTarget(null);
+                        }
+                        this.putItemInMouth(ItemStack.EMPTY, false);
+                        this.gameEvent(GameEvent.EAT);
+
+                        this.sit(false);
+                        this.eat(false);
+                        if(DebugFlags.DEBUG_BEAR_EAT)
+                            BlastFromThePast.LOGGER.info("Finished eating animation for {}", this);
+                    }
+                }
+            }
+
+            this.eatCounter++;
+        }
+
+    }
+
+    private boolean isChewing() {
+        return this.startedChewing() && !this.finishedChewing();
+    }
+
+    private boolean isAboutToFinishEating() {
+        return this.finishedChewing() && this.eatCounter <= MAX_EAT_TIME;
+    }
+
+    private boolean finishedChewing() {
+        return this.eatCounter >= FINISH_CHEWING_ACTION_POINT;
+    }
+
+    private boolean startedChewing() {
+        return this.eatCounter >= START_CHEWING_ACTION_POINT;
+    }
+
+    public boolean isFoodOrPacifier(ItemStack stack){
+        return this.isFood(stack) || this.isPacifier(stack);
+    }
+    
+    protected boolean isWantedItem(ItemEntity itemEntity){
+        return itemEntity.isAlive() && !itemEntity.hasPickUpDelay() && this.isFoodOrPacifier(itemEntity.getItem());
+    }
+
+    @Override
+    public boolean canTakeItem(ItemStack itemstack) {
+        EquipmentSlot slotForItem = this.getEquipmentSlotForItem(itemstack);
+        return this.getItemBySlot(slotForItem).isEmpty() && slotForItem == EquipmentSlot.MAINHAND && super.canTakeItem(itemstack);
+    }
+
+    @Override
+    protected void pickUpItem(ItemEntity itemEntity) {
+        if (this.getItemInMouth().isEmpty() && this.isWantedItem(itemEntity)) {
+            this.onItemPickup(itemEntity);
+            ItemStack item = itemEntity.getItem();
+            this.putItemInMouth(item, true);
+            this.take(itemEntity, item.getCount());
+            itemEntity.discard();
+        }
+    }
+
+    @Override
+    public void putItemInMouth(ItemStack item, boolean guaranteeDrop) {
+        this.setItemSlot(EquipmentSlot.MAINHAND, item);
+        if(guaranteeDrop){
+            this.setGuaranteedDrop(EquipmentSlot.MAINHAND);
+            this.setPersistenceRequired();
+        }
+
+    }
+
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        if (!this.level().isClientSide) {
+            this.sit(false);
+        }
+        return super.hurt(source, amount);
+    }
+
+    private void addEatingParticles() {
+        if (this.eatCounter % 5 == 0) {
+            this.playSound(ModSounds.PSYCHO_BEAR_EAT.get(), 0.5F + 0.5F * (float)this.random.nextInt(2), (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
+
+            for(int i = 0; i < 6; ++i) {
+                Vec3 particleSpeedVec = new Vec3(((double)this.random.nextFloat() - 0.5) * 0.1, Math.random() * 0.1 + 0.1, ((double)this.random.nextFloat() - 0.5) * 0.1);
+                particleSpeedVec = particleSpeedVec.xRot(-this.getXRot() * Mth.DEG_TO_RAD);
+                particleSpeedVec = particleSpeedVec.yRot(-this.getYRot() * Mth.DEG_TO_RAD);
+                double randomYOffset = (double)(-this.random.nextFloat()) * 0.6 - 0.3;
+                Vec3 particlePosVec = new Vec3(((double)this.random.nextFloat() - 0.5) * 0.8, randomYOffset, 1.0 + ((double)this.random.nextFloat() - 0.5) * 0.4);
+                particlePosVec = particlePosVec.yRot(-this.yBodyRot * Mth.DEG_TO_RAD);
+                particlePosVec = particlePosVec.add(this.getX(), this.getEyeY() + 1.0, this.getZ());
+                this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, this.getItemInMouth()), particlePosVec.x, particlePosVec.y, particlePosVec.z, particleSpeedVec.x, particleSpeedVec.y + 0.05, particleSpeedVec.z);
+            }
+        }
+
+    }
+
+    @Override
+    public void travel(Vec3 travelVector) {
+        if (!this.canMove() && this.onGround()) {
+            this.setDeltaMovement(this.getDeltaMovement().multiply(0.0D, 1.0D, 0.0D));
+            travelVector = travelVector.multiply(0.0D, 1.0D, 0.0D);
+        }
+        super.travel(travelVector);
+    }
+
+    @Override
+    public boolean isAlliedTo(Entity other) {
+        if(other == null){
+            return false;
+        }
+
+        if (super.isAlliedTo(other)) {
+            return true;
+        } else if (this.isAlliedToDefault(other)) {
+           return this.getTeam() == null && other.getTeam() == null;
+        } else {
+            return false;
+        }
+    }
+
+    protected boolean isAlliedToDefault(Entity other) {
+        return other.getType().equals(this.getType());
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return ModSounds.PSYCHO_BEAR_IDLE.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.PSYCHO_BEAR_DEATH.get();
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSource) {
+        return ModSounds.PSYCHO_BEAR_HURT.get();
+    }
+
+    @Override
+    public boolean isAllActionBlocked() {
+        return !this.canPerformAction();
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag compound) {
+        super.readAdditionalSaveData(compound);
+        this.readPacifiedData(compound);
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag compound) {
+        super.addAdditionalSaveData(compound);
+        this.writePacifiedData(compound);
+    }
+
+    @Override
+    public void setPacifiedTicks(int pacifiedTicks) {
+        int previousPacifiedTicks = this.getPacifiedTicks();
+        this.pacifiedTicks = pacifiedTicks;
+        if (previousPacifiedTicks > 0 && pacifiedTicks <= 0 || previousPacifiedTicks <= 0 && pacifiedTicks > 0) {
+            this.entityData.set(PsychoBearEntity.DATA_PACIFIED, pacifiedTicks > 0);
+        }
+    }
+
+    @Override
+    public int getPacifiedTicks() {
+        if (this.level().isClientSide) {
+            return this.entityData.get(PsychoBearEntity.DATA_PACIFIED) ? 1 : -1;
+        } else {
+            return this.pacifiedTicks;
+        }
+    }
+
+    // 1.37208242536
+    private static final double MINIMUM_ATTACK_SIZE = HitboxHelper.calculateMinimumAttackHitboxWidth(ModEntities.PSYCHO_BEAR.get().getWidth());
+    // Adding 1 to the minimum attack size allows targets whose hitboxes are up to 0.5F blocks away from one of the attackers hitbox's corners to be hit
+    private static final Vec3 DEFAULT_ATTACK_SIZE = new Vec3(MINIMUM_ATTACK_SIZE + 1, MINIMUM_ATTACK_SIZE + 1, MINIMUM_ATTACK_SIZE + 1);
+
+    public enum PsychoBearAttackType implements AnimatedAttacker.AttackType<PsychoBearEntity, PsychoBearAttackType> {
+        BITE(Mth.floor(0.38F * 20), 20, DEFAULT_ATTACK_SIZE, 8F, 0F),
+        SLASH(Mth.floor(0.38F * 20), 20, DEFAULT_ATTACK_SIZE, 8F, 0F);
+        private final int attackPoint;
+        private final int attackDuration;
+        private final Vec3 attackSize;
+        private final float attackDamage;
+        private final float attackKnockback;
+
+        PsychoBearAttackType(int attackPoint, int attackDuration, Vec3 attackSize, float attackDamage, float attackKnockback) {
+            this.attackPoint = attackPoint;
+            this.attackDuration = attackDuration;
+            this.attackSize = attackSize;
+            this.attackDamage = attackDamage;
+            this.attackKnockback = attackKnockback;
+        }
+
+        @Override
+        public void executeAttackPoint(PsychoBearEntity attacker, int attackTicker) {
+            Vec3 attackSize = this.getAttackSize().scale(attacker.getScale());
+            AABB attackBounds = HitboxHelper.createHitboxRelativeToFront(attacker, attackSize.x(), attackSize.y(), attackSize.z());
+            if(this == SLASH){
+                attacker.makeSound(ModSounds.PSYCHO_BEAR_SCRATCH.get());
+                EntityHelper.hitTargetsWithAOEAttack(attacker, attackBounds, this.getAttackDamage(), this.getAttackKnockback(), false);
+            }
+        }
+
+        @Override
+        public int getAttackPoint() {
+            return this.attackPoint;
+        }
+
+        @Override
+        public int getAttackDuration() {
+            return this.attackDuration;
+        }
+
+        @Override
+        public Vec3 getAttackSize() {
+            return this.attackSize;
+        }
+
+        @Override
+        public float getAttackDamage() {
+            return this.attackDamage;
+        }
+
+        @Override
+        public float getAttackKnockback() {
+            return this.attackKnockback;
+        }
+
+        public static PsychoBearAttackType byOrdinal(int pOrdinal) {
+            if (pOrdinal < 0 || pOrdinal > values().length) {
+                pOrdinal = 0;
+            }
+
+            return values()[pOrdinal];
+        }
+    }
+}

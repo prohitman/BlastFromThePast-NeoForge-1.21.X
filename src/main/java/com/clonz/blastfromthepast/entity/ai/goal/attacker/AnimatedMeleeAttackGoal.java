@@ -1,7 +1,7 @@
-package com.clonz.blastfromthepast.entity.ai.attacker;
+package com.clonz.blastfromthepast.entity.ai.goal.attacker;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.entity.AnimatedAttacker;
+import com.clonz.blastfromthepast.entity.misc.AnimatedAttacker;
 import com.clonz.blastfromthepast.mixin.MeleeAttackGoalAccessor;
 import com.clonz.blastfromthepast.util.DebugFlags;
 import net.minecraft.world.entity.LivingEntity;

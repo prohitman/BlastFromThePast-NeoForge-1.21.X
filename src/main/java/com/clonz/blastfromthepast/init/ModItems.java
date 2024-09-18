@@ -47,6 +47,12 @@ public class ModItems {
 
     public static final DeferredItem<Item> MELON_ICE_CREAM = registerIceCream("melon_ice_cream");
 
+    public static final DeferredItem<Item> BEAR_CLAW = register("bear_claw",
+            () -> new Item(new Item.Properties()));
+
+    public static final DeferredItem<Item> PSYCHO_BEAR_SPAWN_EGG = register("psycho_bear_spawn_egg",
+            () -> new DeferredSpawnEggItem(ModEntities.PSYCHO_BEAR, 0x74a3af, 0xcdc9df, new Item.Properties()));
+
     private static DeferredItem<Item> registerIceCream(String name) {
         return register(name, () -> new Item(new Item.Properties().stacksTo(16).food(ModFoods.BOWL_ICE_CREAM)));
     }

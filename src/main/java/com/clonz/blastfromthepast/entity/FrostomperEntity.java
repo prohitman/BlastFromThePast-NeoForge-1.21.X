@@ -2,9 +2,18 @@ package com.clonz.blastfromthepast.entity;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.client.models.FrostomperModel;
-import com.clonz.blastfromthepast.entity.ai.*;
-import com.clonz.blastfromthepast.entity.ai.attacker.AnimatedMeleeAttackGoal;
-import com.clonz.blastfromthepast.entity.ai.attacker.AttackerBodyRotationControl;
+import com.clonz.blastfromthepast.entity.ai.goal.CustomPanicGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.HitboxAdjustedBreedGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.HitboxAdjustedFollowParentGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.attacker.AnimatedMeleeAttackGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.charge.ChargeForwardAttackGoal;
+import com.clonz.blastfromthepast.entity.ai.controller.OverridableBodyRotationControl;
+import com.clonz.blastfromthepast.entity.ai.controller.OverridableLookControl;
+import com.clonz.blastfromthepast.entity.ai.controller.OverridableMoveControl;
+import com.clonz.blastfromthepast.entity.ai.goal.pack.PackHurtByTargetGoal;
+import com.clonz.blastfromthepast.entity.misc.AnimatedAttacker;
+import com.clonz.blastfromthepast.entity.misc.ChargeForward;
+import com.clonz.blastfromthepast.entity.misc.OverrideAnimatedAttacker;
 import com.clonz.blastfromthepast.entity.pack.EntityPack;
 import com.clonz.blastfromthepast.entity.ai.navigation.BFTPGroundPathNavigation;
 import com.clonz.blastfromthepast.entity.pack.EntityPackAgeableMobData;
@@ -63,7 +72,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel>, EntityPackHolder<FrostomperEntity>, AnimatedAttacker<FrostomperEntity, FrostomperEntity.FrostomperAttackType>, ChargeForward {
+public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel>, EntityPackHolder<FrostomperEntity>, OverrideAnimatedAttacker<FrostomperEntity, FrostomperEntity.FrostomperAttackType>, ChargeForward {
     public static final DucAnimation ADULT_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId());
     public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId().withPrefix("baby_"));
     public static final EntityDimensions BABY_FROSTOMPER_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(28.0F), HitboxHelper.pixelsToBlocks(22.0F));
@@ -88,6 +97,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     public FrostomperEntity(EntityType<? extends FrostomperEntity> entityType, Level level) {
         super(entityType, level);
+        this.lookControl = new OverridableLookControl<>(this);
+        this.moveControl = new OverridableMoveControl<>(this);
         this.setPathfindingMalus(PathType.LEAVES, 0.0F);
         this.parentTargeting = PARENT_TARGETING.copy().selector(entity -> HitboxHelper.isCloseEnoughForTargeting(this, entity, true, PARENT_TARGETING_DISTANCE));
         ((AbstractChestedHorseAccessor)this).setBabyDimensions(BABY_FROSTOMPER_DIMENSIONS);
@@ -109,7 +120,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(1, new CustomPanicGoal<>(this, FrostomperEntity::shouldPanic, 1.2));
+        this.goalSelector.addGoal(1, new CustomPanicGoal<>(this, FrostomperEntity::shouldPanic, 1.2, EntityHelper::getPanicInducingDamageTypes));
         //this.goalSelector.addGoal(1, new RunAroundLikeCrazyGoal(this, 1.2));
         this.goalSelector.addGoal(2, new HitboxAdjustedBreedGoal(this, 1.0));
         this.goalSelector.addGoal(3, new HitboxAdjustedFollowParentGoal(this, 1.0));
@@ -415,7 +426,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     @Override
     protected BodyRotationControl createBodyControl() {
-        return new AttackerBodyRotationControl<>(this);
+        return new OverridableBodyRotationControl<>(this);
     }
 
     @Override
@@ -458,7 +469,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 this.animateWhen("charge", activeAttackType == FrostomperAttackType.CHARGE);
             }
         }
-        if (activeAttackType != null && activeAttackType.blocksHeadRotation()) {
+        if (!this.canRotateHead()) {
             this.clampHeadRotationToBody();
         }
         this.attackTicker.tick();
@@ -551,8 +562,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     @Override
     public void travel(Vec3 travelVector) {
-        FrostomperAttackType attackType = this.getActiveAttackType();
-        if (attackType != null && attackType.blocksMovementInput() && this.onGround()) {
+        if (!this.canMove() && this.onGround()) {
             this.setDeltaMovement(this.getDeltaMovement().multiply(0.0D, 1.0D, 0.0D));
             travelVector = travelVector.multiply(0.0D, 1.0D, 0.0D);
         }
@@ -642,15 +652,13 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     @Override
     protected Vec2 getRiddenRotation(LivingEntity entity) {
-        FrostomperAttackType activeAttackType = this.getActiveAttackType();
-        boolean rotationBlocked = activeAttackType != null && activeAttackType.blocksRotationInput();
+        boolean rotationBlocked = !this.canRotate();
         return rotationBlocked ? new Vec2(this.getXRot(), this.getYRot()) : super.getRiddenRotation(entity);
     }
 
     @Override
     protected Vec3 getRiddenInput(Player player, Vec3 travelVector) {
-        FrostomperAttackType activeAttackType = this.getActiveAttackType();
-        boolean movementBlocked = activeAttackType != null && activeAttackType.blocksMovementInput();
+        boolean movementBlocked = !this.canMove();
         return movementBlocked ? Vec3.ZERO : super.getRiddenInput(player, travelVector);
     }
 
@@ -698,15 +706,23 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         return !this.isVehicle() && !this.isPassenger() && !this.isBaby() && this.getHealth() >= this.getMaxHealth() && this.isInLove();
     }
 
+    @Override
+    public boolean canAnimateLook() {
+        if(this.isTrumpeting()){
+            return false;
+        }
+        return OverrideAnimatedAttacker.super.canAnimateLook();
+    }
+
     protected static class FrostomperGroupData extends EntityPackAgeableMobData<FrostomperEntity> {
         public FrostomperGroupData(EntityPack<FrostomperEntity> entityPack, boolean shouldSpawnBaby) {
             super(entityPack, shouldSpawnBaby);
         }
     }
 
-    // Calculated from doubling (the center-to_corner distance of the Frostomper's hitbox (2.8938345), minus half of the Frostomper's hitbox width (2.04625))
-    private static final double MINIMUM_ATTACK_SIZE = 1.695169D;
-    // Adding 1 to the minimum attack size allows the Frostomper to attack targets whose hitboxes are up to 0.5F blocks away from one of its hitbox's corners
+    // 1.99340277
+    private static final double MINIMUM_ATTACK_SIZE = HitboxHelper.calculateMinimumAttackHitboxWidth(ModEntities.FROSTOMPER.get().getWidth());
+    // Adding 1 to the minimum attack size allows targets whose hitboxes are up to 0.5F blocks away from one of the attackers hitbox's corners to be hit
     private static final Vec3 DEFAULT_ATTACK_SIZE = new Vec3(MINIMUM_ATTACK_SIZE + 1, MINIMUM_ATTACK_SIZE + 1, MINIMUM_ATTACK_SIZE + 1);
     public enum FrostomperAttackType implements AttackType<FrostomperEntity, FrostomperAttackType>{
         FLING(Mth.floor(0.38F * 20), Mth.floor(0.75F * 20), DEFAULT_ATTACK_SIZE, 8, 1.5F),
@@ -783,7 +799,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             if(this == CHARGE){
                 return true;
             }
-            return attackTicker == this.getAttackPoint();
+            return this.getAttackPoint() == attackTicker;
         }
 
         @Override

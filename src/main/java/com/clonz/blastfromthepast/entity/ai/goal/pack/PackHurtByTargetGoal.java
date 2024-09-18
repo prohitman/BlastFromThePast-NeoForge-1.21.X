@@ -1,4 +1,4 @@
-package com.clonz.blastfromthepast.entity.ai;
+package com.clonz.blastfromthepast.entity.ai.goal.pack;
 
 import com.clonz.blastfromthepast.entity.pack.EntityPack;
 import com.clonz.blastfromthepast.entity.pack.EntityPackHolder;

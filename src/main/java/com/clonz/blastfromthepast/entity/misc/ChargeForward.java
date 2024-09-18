@@ -1,4 +1,4 @@
-package com.clonz.blastfromthepast.entity;
+package com.clonz.blastfromthepast.entity.misc;
 
 public interface ChargeForward {
 

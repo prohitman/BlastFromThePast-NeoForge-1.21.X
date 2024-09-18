@@ -30,6 +30,7 @@ public class ModItemTagsGen extends ItemTagsProvider {
         copy(BlockTags.PLANKS, ItemTags.PLANKS);
         copy(BlockTags.LEAVES, ItemTags.LEAVES);
         copy(BlockTags.TALL_FLOWERS, ItemTags.TALL_FLOWERS);
+
         tag(ModTags.Items.FROSTOMPER_FOOD)
                 .add(ModItems.MELON_ICE_CREAM.get());
         tag(ModTags.Items.FROSTOMPER_TEMPT_ITEMS)
@@ -38,5 +39,16 @@ public class ModItemTagsGen extends ItemTagsProvider {
                 .add(ModItems.SAP_ICE_CREAM.get());
         tag(ModTags.Items.BABY_FROSTOMPER_TEMPT_ITEMS)
                 .addTag(ModTags.Items.BABY_FROSTOMPER_FOOD);
+
+        tag(ModTags.Items.PSYCHO_BEAR_FOOD)
+                .add(ModItems.PSYCHO_BERRY_ICE_CREAM.get()); // TODO: Change to beast chops
+        tag(ModTags.Items.PSYCHO_BEAR_TEMPT_ITEMS)
+                .addTag(ModTags.Items.PSYCHO_BEAR_FOOD);
+        tag(ModTags.Items.BABY_PSYCHO_BEAR_FOOD)
+                .add(ModItems.PSYCHO_BERRY.get());
+        tag(ModTags.Items.BABY_PSYCHO_BEAR_TEMPT_ITEMS)
+                .addTag(ModTags.Items.BABY_PSYCHO_BEAR_FOOD);
+        tag(ModTags.Items.PSYCHO_BEAR_PACIFIER)
+                .add(ModItems.PSYCHO_BERRY_ICE_CREAM.get());
     }
 }

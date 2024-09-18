@@ -66,6 +66,15 @@ public class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> FROSTOMPER_STOMP = registerSoundEventForEntityType(ModEntities.FROSTOMPER, "_stomp");
     public static final DeferredHolder<SoundEvent, SoundEvent> FROSTOMPER_TRUMPET = registerSoundEventForEntityType(ModEntities.FROSTOMPER, "_trumpet");
 
+    // PSYCHO BEAR
+    public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_DEATH = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_EAT = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_eat");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_HURT = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_IDLE = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_idle");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_ROAR = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_roar");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_SCRATCH = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_scratch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_SNORE = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_snore");
+
     private static <T extends Entity> DeferredHolder<SoundEvent, SoundEvent> registerSoundEventForEntityType(DeferredHolder<EntityType<?>, EntityType<T>> entityTypeHolder, String suffix) {
         ResourceLocation soundEventLocation = entityTypeHolder.getId().withSuffix(suffix);
         return SOUND_EVENTS.register(

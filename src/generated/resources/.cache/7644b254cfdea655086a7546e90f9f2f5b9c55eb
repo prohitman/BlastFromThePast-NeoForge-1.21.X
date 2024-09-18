@@ -1,4 +1,5 @@
-// 1.21	2024-09-16T14:13:35.9163244	Item Models: blastfromthepast
+// 1.21	2024-09-17T12:38:06.5449884	Item Models: blastfromthepast
+bcbfa5ec18f5b276bd6804a15978cd2afb375a80 assets/blastfromthepast/models/item/bear_claw.json
 1fea25b88046c1c15b38aa4d59ebbf927e90b284 assets/blastfromthepast/models/item/blue_delphinium.json
 bc7c12945aea1cd433924e31d48237f4eb29d1e1 assets/blastfromthepast/models/item/cedar.json
 73ace7cded52235ac49b6018b842be75bb36f7c4 assets/blastfromthepast/models/item/cedar_boat.json
@@ -38,6 +39,7 @@ cce4624a0b9bd40ba2e398bd395b7fb068d48984 assets/blastfromthepast/models/item/pin
 2975ab071a3485c14017142c71dbb723f98e1abb assets/blastfromthepast/models/item/polished_permafrost_slab.json
 3a65fcbfd97772a46dcd69c1bbd4e8bf7eb0d564 assets/blastfromthepast/models/item/polished_permafrost_stairs.json
 eb2aa931be3e0d838650c7eb2fd2a28184e3253b assets/blastfromthepast/models/item/polished_permafrost_wall.json
+63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/blastfromthepast/models/item/psycho_bear_spawn_egg.json
 253b486d50e6a36b116c281ae62905918a8861da assets/blastfromthepast/models/item/psycho_berry.json
 0d78155f8e4ecc54c8e15cb2b663425976021b65 assets/blastfromthepast/models/item/psycho_berry_ice_cream.json
 3cdfe541fec8705ce661aec83138548b12b1daa9 assets/blastfromthepast/models/item/raw_venison.json

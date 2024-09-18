@@ -1,4 +1,4 @@
-package com.clonz.blastfromthepast.entity.ai;
+package com.clonz.blastfromthepast.entity.ai.goal;
 
 import com.clonz.blastfromthepast.mixin.FollowParentGoalAccessor;
 import com.clonz.blastfromthepast.util.HitboxHelper;

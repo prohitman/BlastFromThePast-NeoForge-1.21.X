@@ -32,6 +32,7 @@ public class ModLangGen extends LanguageProvider {
         addItem(ModItems.GLACEROS_SPAWN_EGG);
         addItem(ModItems.SNOWDO_SPAWN_EGG);
         addItem(ModItems.FROSTOMPER_SPAWN_EGG);
+        addItem(ModItems.PSYCHO_BEAR_SPAWN_EGG);
         addItem(ModItems.CEDAR_BOAT);
         addItem(ModItems.CEDAR_CHEST_BOAT);
 
@@ -40,6 +41,8 @@ public class ModLangGen extends LanguageProvider {
         addItem(ModItems.SAP_ICE_CREAM);
         addItem(ModItems.PSYCHO_BERRY_ICE_CREAM);
         addItem(ModItems.MELON_ICE_CREAM);
+
+        addItem(ModItems.BEAR_CLAW);
 
         //Blocks
         addBlock(ModBlocks.SAPPY_CEDAR_LOG);
@@ -54,6 +57,7 @@ public class ModLangGen extends LanguageProvider {
         addEntity(ModEntities.GLACEROS);
         addEntity(ModEntities.SNOWDO);
         addEntity(ModEntities.FROSTOMPER);
+        addEntity(ModEntities.PSYCHO_BEAR);
 
         add("itemGroup." + BlastFromThePast.MODID, "Blast From The Past");
     }

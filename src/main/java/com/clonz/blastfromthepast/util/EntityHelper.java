@@ -1,14 +1,18 @@
 package com.clonz.blastfromthepast.util;
 
-import com.clonz.blastfromthepast.entity.AnimatedAttacker;
+import com.clonz.blastfromthepast.entity.misc.AnimatedAttacker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -132,5 +136,9 @@ public class EntityHelper {
             target.push(knockbackVec.x, target.onGround() ? Math.min(0.4, effectiveKnockback) : 0, knockbackVec.z);
             target.hurtMarked = true;
         }
+    }
+
+    public static TagKey<DamageType> getPanicInducingDamageTypes(PathfinderMob mob) {
+        return mob.isBaby() ? DamageTypeTags.PANIC_CAUSES : DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES;
     }
 }

@@ -26,6 +26,7 @@ public class ModItemModelGen extends ItemModelProvider {
         withExistingParent(ModItems.SNOWDO_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.GLACEROS_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.FROSTOMPER_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
+        withExistingParent(ModItems.PSYCHO_BEAR_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         basicItem(ModItems.CEDAR_BOAT.get());
         basicItem(ModItems.CEDAR_CHEST_BOAT.get());
 
@@ -33,6 +34,7 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.SAP_ICE_CREAM.get());
         basicItem(ModItems.PSYCHO_BERRY_ICE_CREAM.get());
         basicItem(ModItems.MELON_ICE_CREAM.get());
+        basicItem(ModItems.BEAR_CLAW.get());
 
         //Blocks
         registerWoodGroup(ModBlocks.CEDAR);

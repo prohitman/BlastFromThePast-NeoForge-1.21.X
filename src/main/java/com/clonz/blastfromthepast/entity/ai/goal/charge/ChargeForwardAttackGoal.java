@@ -1,7 +1,7 @@
-package com.clonz.blastfromthepast.entity.ai;
+package com.clonz.blastfromthepast.entity.ai.goal.charge;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.entity.ChargeForward;
+import com.clonz.blastfromthepast.entity.misc.ChargeForward;
 import com.clonz.blastfromthepast.mixin.LivingEntityAccessor;
 import com.clonz.blastfromthepast.util.DebugFlags;
 import net.minecraft.util.valueproviders.UniformInt;

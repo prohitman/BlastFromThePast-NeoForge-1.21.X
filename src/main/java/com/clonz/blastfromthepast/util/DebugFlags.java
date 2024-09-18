@@ -6,4 +6,5 @@ public class DebugFlags {
     public static final boolean DEBUG_ANIMATED_ATTACK = !FMLEnvironment.production;
     public static final boolean DEBUG_ENTITY_PACK = !FMLEnvironment.production;
     public static final boolean DEBUG_CHARGE_FORWARD = false;
+    public static final boolean DEBUG_BEAR_EAT = !FMLEnvironment.production;
 }

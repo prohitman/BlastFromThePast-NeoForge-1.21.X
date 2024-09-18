@@ -115,8 +115,22 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                url "https://cursemaven.com"
+            }
+        }
+        filter {
+            includeGroup "curse.maven"
+        }
+    }
+}
+
 dependencies {
     implementation "io.github.itskillerluc.duclib:duclib-1.21-neoforge:1.2.0"
+    runtimeOnly "curse.maven:debug-utils-forge-783008:5607923"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
