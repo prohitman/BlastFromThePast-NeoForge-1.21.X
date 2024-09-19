@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.util;
 
 import com.clonz.blastfromthepast.entity.misc.AnimatedAttacker;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -19,11 +20,16 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.common.util.FakePlayerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class EntityHelper {
+
+    private static final GameProfile BLAST_FROM_THE_PAST = new GameProfile(UUID.fromString("cf41e056-477d-4afa-bcdb-39d84cb95f14"), "[Blast From The Past]");
 
     public static void spawnSmashAttackParticles(LevelAccessor level, AABB attackBounds, int power) {
         Vec3 boundsBottomCenter = attackBounds.getBottomCenter();
@@ -140,5 +146,9 @@ public class EntityHelper {
 
     public static TagKey<DamageType> getPanicInducingDamageTypes(PathfinderMob mob) {
         return mob.isBaby() ? DamageTypeTags.PANIC_CAUSES : DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES;
+    }
+
+    public static FakePlayer getFakePlayer(ServerLevel serverLevel) {
+        return FakePlayerFactory.get(serverLevel, BLAST_FROM_THE_PAST);
     }
 }

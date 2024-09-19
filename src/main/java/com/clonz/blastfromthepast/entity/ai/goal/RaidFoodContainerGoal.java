@@ -4,6 +4,7 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.misc.FoodRaider;
 import com.clonz.blastfromthepast.mixin.ServerPlayerAccessor;
 import com.clonz.blastfromthepast.util.DebugFlags;
+import com.clonz.blastfromthepast.util.EntityHelper;
 import com.clonz.blastfromthepast.util.HitboxHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -17,7 +18,6 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.common.util.FakePlayer;
-import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.event.EventHooks;
 
 import java.util.EnumSet;
@@ -162,8 +162,8 @@ public class RaidFoodContainerGoal<T extends PathfinderMob & FoodRaider> extends
         }
     }
 
-    private static FakePlayer getFakePlayer(ServerLevel level) {
-        return FakePlayerFactory.getMinecraft(level);
+    protected FakePlayer getFakePlayer(ServerLevel level) {
+        return EntityHelper.getFakePlayer(level);
     }
 
     @Override
