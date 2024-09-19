@@ -2,19 +2,14 @@ package com.clonz.blastfromthepast.entity;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.client.models.PsychoBearModel;
-import com.clonz.blastfromthepast.entity.ai.goal.AgeableHurtByTargetGoal;
-import com.clonz.blastfromthepast.entity.ai.goal.HitboxAdjustedBreedGoal;
-import com.clonz.blastfromthepast.entity.ai.goal.HitboxAdjustedFollowParentGoal;
-import com.clonz.blastfromthepast.entity.ai.goal.PredicatedGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.*;
 import com.clonz.blastfromthepast.entity.ai.goal.attacker.AnimatedMeleeAttackGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.bear.BearPickUpAndSitWithItemGoal;
 import com.clonz.blastfromthepast.entity.ai.controller.OverridableBodyRotationControl;
 import com.clonz.blastfromthepast.entity.ai.controller.OverridableLookControl;
 import com.clonz.blastfromthepast.entity.ai.controller.OverridableMoveControl;
 import com.clonz.blastfromthepast.entity.ai.navigation.BFTPGroundPathNavigation;
-import com.clonz.blastfromthepast.entity.misc.AnimatedAttacker;
-import com.clonz.blastfromthepast.entity.misc.Bear;
-import com.clonz.blastfromthepast.entity.misc.OverrideAnimatedAttacker;
+import com.clonz.blastfromthepast.entity.misc.*;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModSounds;
 import com.clonz.blastfromthepast.init.ModTags;
@@ -59,7 +54,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
 
-public class PsychoBearEntity extends Animal implements Animatable<PsychoBearModel>, OverrideAnimatedAttacker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType>, Bear, Pacifiable {
+public class PsychoBearEntity extends Animal implements Animatable<PsychoBearModel>, OverrideAnimatedAttacker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType>, Bear, Pacifiable, FoodRaider {
     public static final DucAnimation ADULT_ANIMATION = DucAnimation.create(ModEntities.PSYCHO_BEAR.getId());
     public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.PSYCHO_BEAR.getId().withPrefix("baby_"));
     public static final EntityDimensions PSYCHO_BEAR_BABY_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(18.0F), HitboxHelper.pixelsToBlocks(13.0F));
@@ -76,6 +71,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     private final AttackTicker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType> attackTicker = new AttackTicker<>(this);
     private int pacifiedTicks = 0;
     private int eatCounter = 0;
+    private int moreFoodTicks;
 
     public PsychoBearEntity(EntityType<? extends PsychoBearEntity> entityType, Level level) {
         super(entityType, level);
@@ -152,9 +148,10 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         this.goalSelector.addGoal(3, new TemptGoal(this, 1.25F, this::isTemptItem, false));
         this.goalSelector.addGoal(4, new BearPickUpAndSitWithItemGoal<>(this, this::isWantedItem, 1.0F));
         this.goalSelector.addGoal(5, new HitboxAdjustedFollowParentGoal(this, 1.25F));
-        this.goalSelector.addGoal(6, new RandomStrollGoal(this, 1.0F));
-        this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 6.0F));
-        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(6, new RaidFoodContainerGoal<>(this, 1.0F, 16, 1));
+        this.goalSelector.addGoal(7, new RandomStrollGoal(this, 1.0F));
+        this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(9, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(1, new AgeableHurtByTargetGoal<>(this));
         this.targetSelector.addGoal(3, new PredicatedGoal<>(
                 new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, null),
@@ -310,6 +307,14 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     }
 
     @Override
+    protected void customServerAiStep() {
+        super.customServerAiStep();
+        if (this.moreFoodTicks > 0) {
+            this.moreFoodTicks--;
+        }
+    }
+
+    @Override
     public void tryToSit() {
         if (!this.isInWater()) {
             this.setZza(0.0F);
@@ -357,7 +362,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
             this.eat(true);
         } else if (this.isEating() && ((eatItem.isEmpty() && !this.isAboutToFinishEating()) || !this.isSitting()) && !this.level().isClientSide) {
             if(DebugFlags.DEBUG_BEAR_EAT)
-                BlastFromThePast.LOGGER.info("Stopped eating animation for {}", this);
+                BlastFromThePast.LOGGER.info("Stopped in-progress {}/{} eating animation for {}", this.eatCounter, MAX_EAT_TIME, this);
             this.eat(false);
         }
 
@@ -366,26 +371,31 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
                 this.addEatingParticles();
             }
             if (!this.level().isClientSide) {
-                if (this.eatCounter >= MAX_EAT_TIME && this.isFoodOrPacifier(eatItem)) {
-                    if (!this.level().isClientSide) {
-                        if(this.isPacifier(eatItem)){
-                            this.setPacified(true);
-                            this.setTarget(null);
-                        }
-                        this.putItemInMouth(ItemStack.EMPTY, false);
-                        this.gameEvent(GameEvent.EAT);
-
-                        this.sit(false);
-                        this.eat(false);
-                        if(DebugFlags.DEBUG_BEAR_EAT)
-                            BlastFromThePast.LOGGER.info("Finished eating animation for {}", this);
+                if(this.finishedChewing() && this.isFoodOrPacifier(eatItem)){
+                    if (this.isPacifier(eatItem)) {
+                        this.setPacified(true);
+                        this.setTarget(null);
                     }
+                    this.putItemInMouth(ItemStack.EMPTY, false);
+                    this.gameEvent(GameEvent.EAT);
+                    this.gotFood(40);
+                    if(DebugFlags.DEBUG_BEAR_EAT)
+                        BlastFromThePast.LOGGER.info("Finished chewing part of eating animation for {}", this);
+                } else if (this.finishedEating()) {
+                    this.sit(false);
+                    this.eat(false);
+                    if(DebugFlags.DEBUG_BEAR_EAT)
+                        BlastFromThePast.LOGGER.info("Finished eating animation for {}", this);
                 }
             }
 
             this.eatCounter++;
         }
 
+    }
+
+    private boolean finishedEating(){
+        return this.eatCounter >= MAX_EAT_TIME;
     }
 
     private boolean isChewing() {
@@ -543,6 +553,26 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         }
     }
 
+    @Override
+    public boolean wantsMoreFood() {
+        return this.moreFoodTicks <= 0 && !this.isWantedFood(this.getItemInMouth()) && !this.isEating();
+    }
+
+    @Override
+    public void gotFood(int ticks) {
+        this.moreFoodTicks = ticks;
+    }
+
+    @Override
+    public boolean isWantedFood(ItemStack stack) {
+        return this.isFoodOrPacifier(stack);
+    }
+
+    @Override
+    public void takeFood(ItemStack stack) {
+        this.putItemInMouth(stack, true);
+    }
+
     // 1.37208242536
     private static final double MINIMUM_ATTACK_SIZE = HitboxHelper.calculateMinimumAttackHitboxWidth(ModEntities.PSYCHO_BEAR.get().getWidth());
     // Adding 1 to the minimum attack size allows targets whose hitboxes are up to 0.5F blocks away from one of the attackers hitbox's corners to be hit
@@ -570,7 +600,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
             Vec3 attackSize = this.getAttackSize().scale(attacker.getScale());
             AABB attackBounds = HitboxHelper.createHitboxRelativeToFront(attacker, attackSize.x(), attackSize.y(), attackSize.z());
             if(this == SLASH){
-                attacker.makeSound(ModSounds.PSYCHO_BEAR_SCRATCH.get());
+                attacker.makeSound(ModSounds.PSYCHO_BEAR_SLASH.get());
                 EntityHelper.hitTargetsWithAOEAttack(attacker, attackBounds, this.getAttackDamage(), this.getAttackKnockback(), false);
             }
         }

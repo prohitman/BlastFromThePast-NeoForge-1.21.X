@@ -24,7 +24,7 @@ public class PsychoBearRenderer extends MobRenderer<PsychoBearEntity, PsychoBear
 
     public PsychoBearRenderer(EntityRendererProvider.Context pContext) {
         super(pContext, new PsychoBearModel((Ducling) pContext.bakeLayer(PsychoBearModel.ADULT_LAYER_LOCATION)), 0.8F);
-        this.addLayer(new BearHoldsItemLayer<>(this, pContext.getItemInHandRenderer()));
+        //this.addLayer(new BearHoldsItemLayer<>(this, pContext.getItemInHandRenderer()));
         this.adult = this.getModel();
         this.baby = new PsychoBearModel((Ducling) pContext.bakeLayer(PsychoBearModel.BABY_LAYER_LOCATION));
     }

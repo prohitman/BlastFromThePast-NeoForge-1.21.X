@@ -73,6 +73,7 @@ public class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_IDLE = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_idle");
     public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_ROAR = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_roar");
     public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_SCRATCH = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_scratch");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_SLASH = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_slash");
     public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_SNORE = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_snore");
 
     private static <T extends Entity> DeferredHolder<SoundEvent, SoundEvent> registerSoundEventForEntityType(DeferredHolder<EntityType<?>, EntityType<T>> entityTypeHolder, String suffix) {

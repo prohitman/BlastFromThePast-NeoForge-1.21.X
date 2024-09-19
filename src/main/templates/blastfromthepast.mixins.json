@@ -10,11 +10,13 @@
   "mixins": [
     "AbstractChestedHorseAccessor",
     "BreedGoalAccessor",
+    "ContainerOpenersCounterMixin",
     "FollowParentGoalAccessor",
     "GoalAccessor",
     "LivingEntityAccessor",
     "MeleeAttackGoalAccessor",
     "PathAccessor",
+    "ServerPlayerAccessor",
     "WalkNodeEvaluatorAccess"
   ],
   "client": [

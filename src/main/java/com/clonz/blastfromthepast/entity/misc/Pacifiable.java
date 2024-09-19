@@ -1,4 +1,4 @@
-package com.clonz.blastfromthepast.entity;
+package com.clonz.blastfromthepast.entity.misc;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;

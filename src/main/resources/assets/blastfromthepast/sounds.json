@@ -134,6 +134,14 @@
       "blastfromthepast:psycho_bear_scratch_2"
     ]
   },
+  "psycho_bear_slash": {
+    "subtitle": "sounds.blastfromthepast.psycho_bear_slash",
+    "sounds": [
+      "blastfromthepast:psycho_bear_slash_0",
+      "blastfromthepast:psycho_bear_slash_1",
+      "blastfromthepast:psycho_bear_slash_2"
+    ]
+  },
   "psycho_bear_snore": {
     "subtitle": "sounds.blastfromthepast.psycho_bear_snore",
     "sounds": [

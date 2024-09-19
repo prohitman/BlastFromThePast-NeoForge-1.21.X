@@ -65,4 +65,8 @@ public class HitboxHelper {
         double halfWidth = hitboxWidth * 0.5D;
         return 2 * (Math.hypot(halfWidth, halfWidth) - halfWidth);
     }
+
+    public static double getHitboxAdjustedDistance(LivingEntity mob, double distance) {
+        return mob.getBbWidth() * 0.5 + distance;
+    }
 }

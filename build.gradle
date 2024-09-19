@@ -46,6 +46,12 @@ neoForge {
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
     runs {
+        configureEach {
+            gameDirectory = project.file('run')
+            logLevel = org.slf4j.event.Level.DEBUG
+            jvmArgument "-Dmixin.debug.export=true"
+            jvmArgument "-Dmixin.debug.verbose=true"
+        }
         client {
             client()
 
