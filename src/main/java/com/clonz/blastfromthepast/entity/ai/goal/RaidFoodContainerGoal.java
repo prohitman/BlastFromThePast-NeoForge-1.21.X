@@ -1,7 +1,7 @@
 package com.clonz.blastfromthepast.entity.ai.goal;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.entity.misc.FoodRaider;
+import com.clonz.blastfromthepast.entity.misc.ComplexAnimal;
 import com.clonz.blastfromthepast.mixin.ServerPlayerAccessor;
 import com.clonz.blastfromthepast.util.DebugFlags;
 import com.clonz.blastfromthepast.util.EntityHelper;
@@ -22,7 +22,7 @@ import net.neoforged.neoforge.event.EventHooks;
 
 import java.util.EnumSet;
 
-public class RaidFoodContainerGoal<T extends PathfinderMob & FoodRaider> extends MoveToBlockGoal {
+public class RaidFoodContainerGoal<T extends PathfinderMob & ComplexAnimal> extends MoveToBlockGoal {
     private static final int SATURATION_TICKS = 40;
     private static final int CHEST_CLOSE_DELAY = 40;
     private final T foodRaider;

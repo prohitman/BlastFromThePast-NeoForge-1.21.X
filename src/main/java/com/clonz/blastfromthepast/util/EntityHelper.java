@@ -18,6 +18,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.FakePlayer;
@@ -150,5 +151,13 @@ public class EntityHelper {
 
     public static FakePlayer getFakePlayer(ServerLevel serverLevel) {
         return FakePlayerFactory.get(serverLevel, BLAST_FROM_THE_PAST);
+    }
+
+    public static double getFollowRange(Mob mob){
+        return mob.getAttributeValue(Attributes.FOLLOW_RANGE);
+    }
+
+    public static boolean hasBlocksAbove(PathfinderMob mob, BlockPos targetPos) {
+        return !mob.level().canSeeSky(targetPos) && (double) mob.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, targetPos).getY() > mob.getY();
     }
 }

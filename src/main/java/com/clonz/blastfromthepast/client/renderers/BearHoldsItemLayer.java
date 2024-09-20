@@ -1,6 +1,6 @@
 package com.clonz.blastfromthepast.client.renderers;
 
-import com.clonz.blastfromthepast.entity.misc.Bear;
+import com.clonz.blastfromthepast.entity.misc.ComplexAnimal;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.ItemInHandRenderer;
@@ -12,7 +12,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
-public class BearHoldsItemLayer<T extends LivingEntity & Bear, M extends EntityModel<T>> extends RenderLayer<T, M> {
+public class BearHoldsItemLayer<T extends LivingEntity & ComplexAnimal, M extends EntityModel<T>> extends RenderLayer<T, M> {
     private final ItemInHandRenderer itemInHandRenderer;
 
     public BearHoldsItemLayer(RenderLayerParent<T, M> renderer, ItemInHandRenderer itemInHandRenderer) {

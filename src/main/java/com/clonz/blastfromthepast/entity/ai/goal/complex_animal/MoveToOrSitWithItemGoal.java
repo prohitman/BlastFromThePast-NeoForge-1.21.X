@@ -1,6 +1,6 @@
-package com.clonz.blastfromthepast.entity.ai.goal.bear;
+package com.clonz.blastfromthepast.entity.ai.goal.complex_animal;
 
-import com.clonz.blastfromthepast.entity.misc.Bear;
+import com.clonz.blastfromthepast.entity.misc.ComplexAnimal;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -10,13 +10,13 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class BearPickUpAndSitWithItemGoal<T extends Mob & Bear> extends Goal {
+public class MoveToOrSitWithItemGoal<T extends Mob & ComplexAnimal> extends Goal {
     private final T mob;
     private final Predicate<ItemEntity> wantedItems;
     private int cooldown;
     private final double speedModifier;
 
-    public BearPickUpAndSitWithItemGoal(T mob, Predicate<ItemEntity> wantedItems, double speedModifier) {
+    public MoveToOrSitWithItemGoal(T mob, Predicate<ItemEntity> wantedItems, double speedModifier) {
         this.mob = mob;
         this.wantedItems = wantedItems;
         this.speedModifier = speedModifier;
@@ -78,6 +78,6 @@ public class BearPickUpAndSitWithItemGoal<T extends Mob & Bear> extends Goal {
             int seconds = this.mob.getRandom().nextInt(150) + 10;
             this.cooldown = this.mob.tickCount + seconds * 20;
         }
-        this.mob.sit(false);
+        this.mob.setSitting(false);
     }
 }

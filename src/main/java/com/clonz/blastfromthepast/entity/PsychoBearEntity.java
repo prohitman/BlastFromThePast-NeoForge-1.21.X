@@ -2,12 +2,14 @@ package com.clonz.blastfromthepast.entity;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.client.models.PsychoBearModel;
+import com.clonz.blastfromthepast.entity.ai.goal.complex_animal.SeekShelterGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.*;
 import com.clonz.blastfromthepast.entity.ai.goal.attacker.AnimatedMeleeAttackGoal;
-import com.clonz.blastfromthepast.entity.ai.goal.bear.BearPickUpAndSitWithItemGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.complex_animal.MoveToOrSitWithItemGoal;
 import com.clonz.blastfromthepast.entity.ai.controller.OverridableBodyRotationControl;
 import com.clonz.blastfromthepast.entity.ai.controller.OverridableLookControl;
 import com.clonz.blastfromthepast.entity.ai.controller.OverridableMoveControl;
+import com.clonz.blastfromthepast.entity.ai.goal.complex_animal.SleepGoal;
 import com.clonz.blastfromthepast.entity.ai.navigation.BFTPGroundPathNavigation;
 import com.clonz.blastfromthepast.entity.misc.*;
 import com.clonz.blastfromthepast.init.ModEntities;
@@ -18,9 +20,11 @@ import com.clonz.blastfromthepast.util.EntityHelper;
 import com.clonz.blastfromthepast.util.HitboxHelper;
 import io.github.itskillerluc.duclib.client.animation.DucAnimation;
 import io.github.itskillerluc.duclib.entity.Animatable;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -38,10 +42,12 @@ import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
@@ -54,7 +60,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
 
-public class PsychoBearEntity extends Animal implements Animatable<PsychoBearModel>, OverrideAnimatedAttacker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType>, Bear, Pacifiable, FoodRaider {
+public class PsychoBearEntity extends Animal implements Animatable<PsychoBearModel>, OverrideAnimatedAttacker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType>, ComplexAnimal, Pacifiable {
     public static final DucAnimation ADULT_ANIMATION = DucAnimation.create(ModEntities.PSYCHO_BEAR.getId());
     public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.PSYCHO_BEAR.getId().withPrefix("baby_"));
     public static final EntityDimensions PSYCHO_BEAR_BABY_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(18.0F), HitboxHelper.pixelsToBlocks(13.0F));
@@ -63,9 +69,11 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     private static final EntityDataAccessor<Boolean> DATA_PACIFIED = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_EATING = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BOOLEAN);
     private static final byte SITTING_FLAG = 1;
+    private static final byte SLEEPING_FLAG = 2;
     private static final int MAX_EAT_TIME = Mth.floor(2F * 20);
     public static final int FINISH_CHEWING_ACTION_POINT = Mth.floor(1.75F * 20);
     public static final int START_CHEWING_ACTION_POINT = Mth.floor(0.25F * 20);
+    private static final TargetingConditions ALERT_CONDITIONS = TargetingConditions.forCombat().ignoreLineOfSight();
     private final Lazy<Map<String, AnimationState>> babyAnimations = Lazy.of(() -> PsychoBearModel.createStateMap(BABY_ANIMATION));
     private final Lazy<Map<String, AnimationState>> adultAnimations = Lazy.of(() -> PsychoBearModel.createStateMap(ADULT_ANIMATION));
     private final AttackTicker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType> attackTicker = new AttackTicker<>(this);
@@ -143,22 +151,25 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new PredicatedGoal<>(new AnimatedMeleeAttackGoal<>(this, 1.0F, true), this, Predicate.not(OverrideAnimatedAttacker::isAllActionBlocked)));
-        this.goalSelector.addGoal(1, new PanicGoal(this, 2.0F, EntityHelper::getPanicInducingDamageTypes));
-        this.goalSelector.addGoal(2, new HitboxAdjustedBreedGoal(this, 1.0));
-        this.goalSelector.addGoal(3, new TemptGoal(this, 1.25F, this::isTemptItem, false));
-        this.goalSelector.addGoal(4, new BearPickUpAndSitWithItemGoal<>(this, this::isWantedItem, 1.0F));
-        this.goalSelector.addGoal(5, new HitboxAdjustedFollowParentGoal(this, 1.25F));
-        this.goalSelector.addGoal(6, new RaidFoodContainerGoal<>(this, 1.0F, 16, 1));
-        this.goalSelector.addGoal(7, new RandomStrollGoal(this, 1.0F));
-        this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 6.0F));
-        this.goalSelector.addGoal(9, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(2, new PanicGoal(this, 2.0F, EntityHelper::getPanicInducingDamageTypes));
+        this.goalSelector.addGoal(3, new SeekShelterGoal<>(this, 1.0F));
+        this.goalSelector.addGoal(4, new SleepGoal<>(this));
+        this.goalSelector.addGoal(5, new HitboxAdjustedBreedGoal(this, 1.0));
+        this.goalSelector.addGoal(6, new TemptGoal(this, 1.25F, this::isTemptItem, false));
+        this.goalSelector.addGoal(7, new MoveToOrSitWithItemGoal<>(this, this::isWantedItem, 1.0F));
+        this.goalSelector.addGoal(8, new HitboxAdjustedFollowParentGoal(this, 1.25F));
+        this.goalSelector.addGoal(9, new RaidFoodContainerGoal<>(this, 1.0F, 16, 1));
+        this.goalSelector.addGoal(10, new RandomStrollGoal(this, 1.0F));
+        this.goalSelector.addGoal(11, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(12, new RandomLookAroundGoal(this));
+
         this.targetSelector.addGoal(1, new AgeableHurtByTargetGoal<>(this));
-        this.targetSelector.addGoal(3, new PredicatedGoal<>(
+        this.targetSelector.addGoal(2, new PredicatedGoal<>(
                 new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, null),
-                this, Predicate.not(PsychoBearEntity::canBeAggressive), true));
-        this.targetSelector.addGoal(4, new PredicatedGoal<>(
+                this, PsychoBearEntity::canBeAggressive, true));
+        this.targetSelector.addGoal(3, new PredicatedGoal<>(
                 new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, true, this::canTarget),
-                this, Predicate.not(PsychoBearEntity::canBeAggressive), true));
+                this, PsychoBearEntity::canBeAggressive, true));
     }
 
     protected boolean canBeAggressive(){
@@ -185,6 +196,13 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack playerItemInHand = player.getItemInHand(hand);
+        if(playerItemInHand.is(Items.DEBUG_STICK)){
+            player.displayClientMessage(Component.literal(
+                    String.format("%s %s states: Eating[%s], Sitting[%s], Sleeping[%s], Pacified[%s]",
+                            this.getDisplayName().getString(), this.level().isClientSide ? "Client" : "Server", this.isEating(), this.isSitting(), this.isSleeping(), this.isPacified())),
+                    false);
+            return InteractionResult.sidedSuccess(this.level().isClientSide);
+        }
         boolean canEat = false;
         if (this.isPacifier(playerItemInHand) && !this.isBaby() && !this.isPacified()) {
             canEat = true;
@@ -203,13 +221,13 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         }
         
         if(canEat){
-            if (this.isSitting() || this.isInWater() || this.isBaby()) { // TODO: Babies may be able to eat
+            if (this.isSitting() || this.isInWater() || this.isBaby() || this.isSleeping()) { // TODO: Babies may be able to eat
                 return InteractionResult.PASS;
             }
 
             if(!this.level().isClientSide){
                 this.tryToSit();
-                this.eat(true);
+                this.setEating(true);
                 ItemStack mainHandItem = this.getItemInMouth();
                 if (!mainHandItem.isEmpty() && !player.hasInfiniteMaterials()) {
                     this.spawnAtLocation(mainHandItem);
@@ -278,14 +296,26 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     @Override
     public void tick() {
         super.tick();
+        if (this.isEffectiveAi()) {
+            boolean inWater = this.isInWater();
+            if (inWater || this.getTarget() != null || this.level().isThundering()) {
+                this.setSleeping(false);
+            }
+
+            if (inWater || this.isSleeping()) {
+                this.setSitting(false);
+                this.setEating(false);
+            }
+        }
 
         PsychoBearEntity.PsychoBearAttackType activeAttackType = this.getActiveAttackType();
         if (this.level().isClientSide()) {
-            this.animateWhen("idle", !this.isMoving(this) && this.onGround() && activeAttackType == null);
+            this.animateWhen("idle", !this.isMoving(this) && !this.isAllActionBlocked() && this.onGround() && activeAttackType == null);
             if(!this.isBaby()){
                 this.animateWhen("attack_flipped", activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && !this.isLeftHanded());
                 this.animateWhen("attack", activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && this.isLeftHanded());
                 this.animateWhen("eat", activeAttackType == null && this.isEating());
+                this.animateWhen("sleep", activeAttackType == null && this.isSleeping());
             }
         }
         if (!this.canRotateHead()) {
@@ -307,6 +337,16 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     }
 
     @Override
+    public void aiStep() {
+        if (this.isSleeping() || this.isImmobile()) {
+            this.jumping = false;
+            this.xxa = 0.0F;
+            this.zza = 0.0F;
+        }
+        super.aiStep();
+    }
+
+    @Override
     protected void customServerAiStep() {
         super.customServerAiStep();
         if (this.moreFoodTicks > 0) {
@@ -319,7 +359,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         if (!this.isInWater()) {
             this.setZza(0.0F);
             this.getNavigation().stop();
-            this.sit(true);
+            this.setSitting(true);
         }
 
     }
@@ -330,13 +370,13 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     }
 
     @Override
-    public void sit(boolean sitting) {
+    public void setSitting(boolean sitting) {
         this.setFlag(SITTING_FLAG, sitting);
     }
 
     @Override
     public boolean canPerformAction() {
-        return !this.isEating() && !this.isSitting();
+        return !this.isEating() && !this.isSitting() && !this.isSleeping();
     }
 
     @Override
@@ -345,7 +385,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     }
 
     @Override
-    public void eat(boolean eating) {
+    public void setEating(boolean eating) {
         this.entityData.set(DATA_EATING, eating);
     }
 
@@ -359,11 +399,11 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         if (!this.isEating() && this.isSitting() && !eatItem.isEmpty() && !this.level().isClientSide) {
             if(DebugFlags.DEBUG_BEAR_EAT)
                 BlastFromThePast.LOGGER.info("Started eating animation for {}", this);
-            this.eat(true);
+            this.setEating(true);
         } else if (this.isEating() && ((eatItem.isEmpty() && !this.isAboutToFinishEating()) || !this.isSitting()) && !this.level().isClientSide) {
             if(DebugFlags.DEBUG_BEAR_EAT)
                 BlastFromThePast.LOGGER.info("Stopped in-progress {}/{} eating animation for {}", this.eatCounter, MAX_EAT_TIME, this);
-            this.eat(false);
+            this.setEating(false);
         }
 
         if (this.isEating()) {
@@ -382,8 +422,8 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
                     if(DebugFlags.DEBUG_BEAR_EAT)
                         BlastFromThePast.LOGGER.info("Finished chewing part of eating animation for {}", this);
                 } else if (this.finishedEating()) {
-                    this.sit(false);
-                    this.eat(false);
+                    this.setSitting(false);
+                    this.setEating(false);
                     if(DebugFlags.DEBUG_BEAR_EAT)
                         BlastFromThePast.LOGGER.info("Finished eating animation for {}", this);
                 }
@@ -452,7 +492,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     @Override
     public boolean hurt(DamageSource source, float amount) {
         if (!this.level().isClientSide) {
-            this.sit(false);
+            this.clearStates();
         }
         return super.hurt(source, amount);
     }
@@ -527,12 +567,14 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         this.readPacifiedData(compound);
+        this.readAnimalStates(compound);
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         this.writePacifiedData(compound);
+        this.writeAnimalStates(compound);
     }
 
     @Override
@@ -571,6 +613,67 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     @Override
     public void takeFood(ItemStack stack) {
         this.putItemInMouth(stack, true);
+    }
+
+    @Override
+    public void setSleeping(boolean sleeping) {
+        this.setFlag(SLEEPING_FLAG, sleeping);
+    }
+
+    @Override
+    public boolean isSleepingFlag() {
+        return this.getFlag(SLEEPING_FLAG);
+    }
+
+    // Needed so vanilla doesn't do its weird logic with sleeping positions and posing
+    @Override
+    public boolean isSleeping() {
+        return this.isSleepingFlag();
+    }
+
+    @Override
+    public void prepareToStartSleeping() {
+        this.setSitting(false);
+        this.setEating(false);
+        this.setJumping(false);
+    }
+
+    @Override
+    public boolean canSleep() {
+        return this.level().isNight() && this.hasShelter() && !this.alertable() && !this.isInPowderSnow;
+    }
+
+    @Override
+    public boolean shouldFindShelter(boolean urgent) {
+        if(urgent){
+            return this.level().isThundering() && this.level().canSeeSky(this.blockPosition());
+        }
+        return this.level().isNight() && this.level().canSeeSky(this.blockPosition()) && !((ServerLevel)this.level()).isVillage(this.blockPosition());
+    }
+
+    @Override
+    public void clearStates() {
+        this.setSitting(false);
+        this.setEating(false);
+        this.setSleeping(false);
+    }
+
+    protected boolean hasShelter() {
+        BlockPos topOfSelfPos = BlockPos.containing(this.getX(), this.getBoundingBox().maxY, this.getZ());
+        return EntityHelper.hasBlocksAbove(this, topOfSelfPos);
+    }
+
+    protected boolean alertable() {
+        return false;
+        /*
+        double followRange = EntityHelper.getFollowRange(this);
+        return !this.level().getNearbyEntities(
+                LivingEntity.class,
+                ALERT_CONDITIONS,
+                this,
+                this.getBoundingBox().inflate(followRange, followRange * 0.5D, followRange))
+                .isEmpty();
+         */
     }
 
     // 1.37208242536

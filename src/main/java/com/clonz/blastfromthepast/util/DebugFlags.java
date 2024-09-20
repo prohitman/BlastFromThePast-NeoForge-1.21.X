@@ -7,5 +7,6 @@ public class DebugFlags {
     public static final boolean DEBUG_ENTITY_PACK = !FMLEnvironment.production;
     public static final boolean DEBUG_CHARGE_FORWARD = false;
     public static final boolean DEBUG_BEAR_EAT = !FMLEnvironment.production;
-    public static final boolean DEBUG_RAID_FOOD_CONTAINER = !FMLEnvironment.production;
+    public static final boolean DEBUG_RAID_FOOD_CONTAINER = !FMLEnvironment.production && false;
+    public static final boolean DEBUG_SLEEP = !FMLEnvironment.production;
 }
