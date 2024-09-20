@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.init;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.block.BeastChopsBlock;
 import com.clonz.blastfromthepast.block.CustomLeavesBlock;
 import com.clonz.blastfromthepast.block.CustomLogBlock;
 import com.clonz.blastfromthepast.block.CustomPlanksBlock;
@@ -9,8 +10,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -37,6 +40,9 @@ public class ModBlocks {
 
     public static final DeferredBlock<Block> CEDAR_DOOR = createRegistry("cedar_door",
             () -> new DoorBlock(BlockSetType.OAK, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_DOOR)), new Item.Properties());
+
+    public static final DeferredBlock<Block> BEAST_CHOPS = createRegistry("beast_chops",
+            () -> new BeastChopsBlock(BlockBehaviour.Properties.of().forceSolidOn().strength(0.5F).sound(SoundType.WOOL).pushReaction(PushReaction.DESTROY)), new Item.Properties().stacksTo(1));
 
 
     public static <T extends Block> DeferredBlock<T> createRegistry(String name, Supplier<T> block, Item.Properties properties) {

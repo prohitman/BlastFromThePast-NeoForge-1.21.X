@@ -32,6 +32,7 @@ public class ModTabs {
                         output.accept(ModItems.SAP_BALL.get());
                         output.accept(ModItems.SPEARTOOTH.get());
                         output.accept(ModItems.ICE_SPEAR.get());
+                        output.accept(ModBlocks.BEAST_CHOPS.get());
                     }).build());
 
 }

@@ -5,10 +5,8 @@ import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
 import net.minecraft.data.PackOutput;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.LanguageProvider;
@@ -16,8 +14,6 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import org.codehaus.plexus.util.StringUtils;
-
-import java.util.function.Consumer;
 
 public class ModLangGen extends LanguageProvider {
 
@@ -41,6 +37,7 @@ public class ModLangGen extends LanguageProvider {
         addBlock(ModBlocks.STRIPPED_CEDAR_LOG);
         addBlock(ModBlocks.CEDAR_LEAVES);
         addBlock(ModBlocks.CEDAR_PLANKS);
+        addBlock(ModBlocks.BEAST_CHOPS);
 
         //Entities
         addEntity(ModEntities.GLACEROS);
@@ -53,11 +50,11 @@ public class ModLangGen extends LanguageProvider {
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
     }
 
-    private void addItem(DeferredItem<? extends Item> key){
+    private void addItem(DeferredItem<? extends Item> key) {
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
     }
 
-    private <T extends Entity> void addEntity(DeferredHolder<EntityType<?>, EntityType<T>> key){
+    private <T extends Entity> void addEntity(DeferredHolder<EntityType<?>, EntityType<T>> key) {
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
     }
 
