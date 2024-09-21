@@ -386,7 +386,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         if (this.canRoar() && !this.level().isClientSide) {
             this.roarCounter = 1;
             this.setRoaring(true);
-            this.makeSound(ModSounds.PSYCHO_BEAR_ROAR.get());
+            this.playSound(ModSounds.PSYCHO_BEAR_ROAR.get(), 4.0F, this.getVoicePitch());
         }
     }
 
