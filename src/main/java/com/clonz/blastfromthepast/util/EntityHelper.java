@@ -160,4 +160,19 @@ public class EntityHelper {
     public static boolean hasBlocksAbove(PathfinderMob mob, BlockPos targetPos) {
         return !mob.level().canSeeSky(targetPos) && (double) mob.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, targetPos).getY() > mob.getY();
     }
+
+    public static boolean isLookingAt(LivingEntity looker, LivingEntity target, double leniency, boolean requireLOS, boolean checkBody) {
+        Vec3 viewVector = looker.getViewVector(1.0F).normalize();
+        Vec3 vectorToTarget = looker.getEyePosition().vectorTo(target.getEyePosition());
+        double distanceToTarget = vectorToTarget.length();
+        vectorToTarget = vectorToTarget.normalize();
+        double dot = viewVector.dot(vectorToTarget);
+        return dot > 1.0 - leniency / distanceToTarget
+                && (!requireLOS || looker.hasLineOfSight(target))
+                && (!checkBody || getBodyViewVector(looker, 1.0F).normalize().dot(vectorToTarget) > 1.0 - leniency / distanceToTarget);
+    }
+
+    public static Vec3 getBodyViewVector(LivingEntity looker, float partialTicks){
+        return looker.calculateViewVector(looker.getViewXRot(partialTicks), partialTicks == 1.0F ? looker.yBodyRot : Mth.lerp(partialTicks, looker.yBodyRotO, looker.yBodyRot));
+    }
 }

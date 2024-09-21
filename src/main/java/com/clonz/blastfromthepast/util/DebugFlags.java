@@ -9,4 +9,5 @@ public class DebugFlags {
     public static final boolean DEBUG_BEAR_EAT = !FMLEnvironment.production;
     public static final boolean DEBUG_RAID_FOOD_CONTAINER = !FMLEnvironment.production && false;
     public static final boolean DEBUG_SLEEP = !FMLEnvironment.production;
+    public static final boolean DEBUG_ROAR = !FMLEnvironment.production;
 }

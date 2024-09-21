@@ -72,7 +72,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel>, EntityPackHolder<FrostomperEntity>, OverrideAnimatedAttacker<FrostomperEntity, FrostomperEntity.FrostomperAttackType>, ChargeForward {
+public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel>, EntityPackHolder<FrostomperEntity>, OverrideAnimatedAttacker<FrostomperEntity, FrostomperEntity.FrostomperAttackType>, ChargeForward, Roaring {
     public static final DucAnimation ADULT_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId());
     public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId().withPrefix("baby_"));
     public static final EntityDimensions BABY_FROSTOMPER_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(28.0F), HitboxHelper.pixelsToBlocks(22.0F));
@@ -80,7 +80,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     private static final EntityDataAccessor<Boolean> DATA_CHARGING_FORWARD = SynchedEntityData.defineId(FrostomperEntity.class, EntityDataSerializers.BOOLEAN);
     private static final double PARENT_TARGETING_DISTANCE = 16.0D;
     private static final int CHARGE_ATTACK_COOLDOWN = 900;
-    private static final int FLAG_TRUMPETING = 128;
+    private static final int FLAG_ROARING = 128;
     private static final UniformInt CHARGE_ATTACK_DURATION = UniformInt.of(Mth.floor(20 / 0.3F), Mth.floor(25 / 0.3F)); // Distances in blocks divided by Frostomper's base speed of 0.3 blocks/tick
     public static final int MAX_TRUMPET_TICKS = Mth.floor(0.4167F * 20);
     private final Lazy<Map<String, AnimationState>> babyAnimations = Lazy.of(() -> FrostomperModel.createStateMap(BABY_ANIMATION));
@@ -93,7 +93,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     private EntityPack<FrostomperEntity> pack;
     private final AnimatedAttacker.AttackTicker<FrostomperEntity, FrostomperAttackType> attackTicker = new AttackTicker<>(this);
     private int ticksUntilNextCharge;
-    private int trumpetCounter;
+    private int roarCounter;
 
     public FrostomperEntity(EntityType<? extends FrostomperEntity> entityType, Level level) {
         super(entityType, level);
@@ -181,7 +181,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         if(this.isTamed()){
             super.doPlayerRide(player);
             if(!this.level().isClientSide){
-                this.setTrumpeting(false);
+                this.setRoaring(false);
             }
         }
     }
@@ -434,8 +434,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         this.entityData.set(DATA_ACTIVE_ATTACK_TYPE, attackType == null ? OptionalInt.empty() : OptionalInt.of(attackType.ordinal()));
         // Make sure no other custom animations are running when the Frostomper is attacking
         if(attackType != null && !this.level().isClientSide){
-            if(this.isTrumpeting()){
-                this.setTrumpeting(false);
+            if(this.isRoaring()){
+                this.setRoaring(false);
             }
             if(this.isStanding()){
                 this.setStanding(false);
@@ -460,7 +460,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         FrostomperAttackType activeAttackType = this.getActiveAttackType();
         if (this.level().isClientSide()) {
             this.animateWhen("idle", !this.isMoving(this) && this.onGround() && activeAttackType == null);
-            this.animateWhen("noise", this.isTrumpeting());
+            this.animateWhen("noise", this.isRoaring());
             if(!this.isBaby()){
                 this.animateWhen("double_stomp", activeAttackType == FrostomperAttackType.DOUBLE_STOMP);
                 this.animateWhen("stomp", activeAttackType == FrostomperAttackType.SINGLE_STOMP && !this.isLeftHanded());
@@ -480,9 +480,9 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 this.level().playSound(null, this.blockPosition(), SoundEvents.CAMEL_DASH_READY, SoundSource.NEUTRAL, 1.0F, 1.0F);
             }
         }
-        if (!this.level().isClientSide && this.trumpetCounter > 0 && ++this.trumpetCounter > MAX_TRUMPET_TICKS) {
-            this.trumpetCounter = 0;
-            this.setTrumpeting(false);
+        if (!this.level().isClientSide && this.roarCounter > 0 && ++this.roarCounter > MAX_TRUMPET_TICKS) {
+            this.roarCounter = 0;
+            this.setRoaring(false);
         }
     }
 
@@ -535,29 +535,33 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     @Override
     public void makeMad() {
-        if(!this.isTrumpeting()){
-            this.trumpetIfPossible();
+        if(!this.isRoaring()){
+            this.roarIfPossible();
         }
     }
 
-    public void trumpetIfPossible() {
-        if (this.canTrumpet() && !this.level().isClientSide) {
-            this.trumpetCounter = 1;
-            this.setTrumpeting(true);
+    @Override
+    public void roarIfPossible() {
+        if (this.canRoar() && !this.level().isClientSide) {
+            this.roarCounter = 1;
+            this.setRoaring(true);
             this.makeSound(this.getAngrySound());
         }
     }
 
-    public boolean canTrumpet() {
+    @Override
+    public boolean canRoar() {
         return this.getActiveAttackType() == null;
     }
 
-    public boolean isTrumpeting() {
-        return this.getFlag(FLAG_TRUMPETING);
+    @Override
+    public boolean isRoaring() {
+        return this.getFlag(FLAG_ROARING);
     }
 
-    protected void setTrumpeting(boolean trumpeting) {
-        this.setFlag(FLAG_TRUMPETING, trumpeting);
+    @Override
+    public void setRoaring(boolean roaring) {
+        this.setFlag(FLAG_ROARING, roaring);
     }
 
     @Override
@@ -708,7 +712,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     @Override
     public boolean canAnimateLook() {
-        if(this.isTrumpeting()){
+        if(this.isRoaring()){
             return false;
         }
         return OverrideAnimatedAttacker.super.canAnimateLook();
