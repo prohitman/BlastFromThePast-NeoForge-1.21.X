@@ -21,7 +21,7 @@ public class SleepGoal<T extends Mob & ComplexAnimal> extends Goal {
 
     @Override
     public boolean canUse() {
-        return this.mob.xxa == 0.0F && this.mob.yya == 0.0F && this.mob.zza == 0.0F && (this.canSleep() || this.mob.isSleeping());
+        return this.mob.xxa == 0.0F && this.mob.yya == 0.0F && this.mob.zza == 0.0F && (this.canSleep() /*|| this.mob.isSleeping()*/);
     }
 
     @Override

@@ -25,6 +25,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -69,13 +70,15 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     private static final EntityDataAccessor<Byte> DATA_FLAGS = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Boolean> DATA_PACIFIED = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_EATING = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Byte> DATA_SLEEPING = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BYTE);
     private static final byte SITTING_FLAG = 1;
-    private static final byte SLEEPING_FLAG = 2;
-    private static final int ROARING_FLAG = 4;
+    private static final int ROARING_FLAG = 2;
     private static final int MAX_EAT_TIME = Mth.floor(2.5F * 20);
     public static final int FINISH_CHEWING_ACTION_POINT = Mth.floor(1.75F * 20);
     public static final int START_CHEWING_ACTION_POINT = Mth.floor(0.75F * 20);
     public static final int MAX_ROAR_TICKS = Mth.floor(2.5F * 20);
+    public static final int LIE_DOWN_DURATION = Mth.floor(1F * 20);
+    public static final int WAKE_UP_DURATION = Mth.floor(1F * 20);
     private static final TargetingConditions ALERT_CONDITIONS = TargetingConditions.forCombat().ignoreLineOfSight();
     private final Lazy<Map<String, AnimationState>> babyAnimations = Lazy.of(() -> PsychoBearModel.createStateMap(BABY_ANIMATION));
     private final Lazy<Map<String, AnimationState>> adultAnimations = Lazy.of(() -> PsychoBearModel.createStateMap(ADULT_ANIMATION));
@@ -84,6 +87,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     private int eatCounter = 0;
     private int moreFoodTicks;
     private int roarCounter;
+    private int sleepTransitionTicks;
 
     public PsychoBearEntity(EntityType<? extends PsychoBearEntity> entityType, Level level) {
         super(entityType, level);
@@ -110,6 +114,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         builder.define(DATA_FLAGS, (byte)0);
         builder.define(DATA_PACIFIED, false);
         builder.define(DATA_EATING, false);
+        builder.define(DATA_SLEEPING, (byte)SleepState.AWAKE.ordinal());
     }
 
     protected boolean getFlag(int flag) {
@@ -134,6 +139,19 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         }
         if (!this.firstTick && DATA_EATING.equals(pKey)) {
             this.eatCounter = 0;
+        }
+        if (DATA_SLEEPING.equals(pKey)) {
+            switch(this.getSleepState()){
+                case LIE_DOWN -> {
+                    this.sleepTransitionTicks = LIE_DOWN_DURATION;
+                }
+                case WAKE_UP -> {
+                    this.sleepTransitionTicks = WAKE_UP_DURATION;
+                }
+                default -> {
+                    this.sleepTransitionTicks = 0;
+                }
+            }
         }
     }
 
@@ -331,7 +349,9 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
                 this.animateWhen("attack_flipped", activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && !this.isLeftHanded());
                 this.animateWhen("attack", activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && this.isLeftHanded());
                 this.animateWhen("eat", activeAttackType == null && this.isEating());
-                this.animateWhen("sleep", activeAttackType == null && this.isSleeping());
+                this.animateWhen("sleep_start", activeAttackType == null && this.getSleepState() == SleepState.LIE_DOWN);
+                this.animateWhen("sleep", activeAttackType == null && this.getSleepState() == SleepState.SLEEP);
+                this.animateWhen("sleep_end", activeAttackType == null && this.getSleepState() == SleepState.WAKE_UP);
             }
         }
         if (!this.canRotateHead()) {
@@ -351,9 +371,24 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         // tick eating
         this.handleEating();
         // tick roar
-        if (!this.level().isClientSide && this.roarCounter > 0 && ++this.roarCounter > MAX_ROAR_TICKS) {
+        if (this.roarCounter > 0 && ++this.roarCounter > MAX_ROAR_TICKS) {
             this.roarCounter = 0;
-            this.setRoaring(false);
+            if(!this.level().isClientSide){
+                this.setRoaring(false);
+            }
+        }
+        // tick sleeping
+        if (this.sleepTransitionTicks > 0 && --this.sleepTransitionTicks <= 0) {
+            if(!this.level().isClientSide){
+                switch (this.getSleepState()){
+                    case LIE_DOWN -> {
+                        this.setSleepState(SleepState.SLEEP);
+                    }
+                    case WAKE_UP -> {
+                        this.setSleepState(SleepState.AWAKE);
+                    }
+                }
+            }
         }
     }
 
@@ -630,10 +665,25 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     }
 
     @Override
+    public void readAnimalStates(CompoundTag compound) {
+        if(compound.contains(SLEEPING_TAG_KEY, Tag.TAG_BYTE)){
+            this.setSleepState(SleepState.byOrdinal(compound.getByte(SLEEPING_TAG_KEY)));
+        }
+    }
+
+    @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         this.writePacifiedData(compound);
         this.writeAnimalStates(compound);
+    }
+
+    @Override
+    public void writeAnimalStates(CompoundTag compound) {
+        SleepState sleepState = this.getSleepState();
+        if(!sleepState.isTransitional()){
+            compound.putByte(SLEEPING_TAG_KEY, (byte) sleepState.ordinal());
+        }
     }
 
     @Override
@@ -676,12 +726,46 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
 
     @Override
     public void setSleeping(boolean sleeping) {
-        this.setFlag(SLEEPING_FLAG, sleeping);
+        SleepState lastSleepState = this.getSleepState();
+        // was awake -> lie down if sleeping
+        // was lying down -> awake if not sleeping
+        // was sleeping -> wake up if not sleeping
+        // was waking up -> sleep if sleeping
+        switch (lastSleepState){
+            case AWAKE -> {
+                if(sleeping){
+                    this.setSleepState(SleepState.LIE_DOWN);
+                }
+            }
+            case LIE_DOWN -> {
+                if(!sleeping){
+                    this.setSleepState(SleepState.AWAKE);
+                }
+            }
+            case SLEEP -> {
+                if(!sleeping){
+                    this.setSleepState(SleepState.WAKE_UP);
+                }
+            }
+            case WAKE_UP -> {
+                if(sleeping){
+                    this.setSleepState(SleepState.SLEEP);
+                }
+            }
+        }
+    }
+
+    private void setSleepState(SleepState sleepState) {
+        this.entityData.set(DATA_SLEEPING, (byte) sleepState.ordinal());
     }
 
     @Override
     public boolean isSleepingFlag() {
-        return this.getFlag(SLEEPING_FLAG);
+        return this.getSleepState() != SleepState.AWAKE;
+    }
+
+    private SleepState getSleepState() {
+        return SleepState.byOrdinal(this.entityData.get(DATA_SLEEPING));
     }
 
     // Needed so vanilla doesn't do its weird logic with sleeping positions and posing
@@ -699,7 +783,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
 
     @Override
     public boolean canSleep() {
-        return this.level().isNight() && this.hasShelter() && !this.alertable() && !this.isInPowderSnow && this.getTarget() == null;
+        return this.level().isNight() && this.hasShelter() && !this.alertable() && !this.isInPowderSnow && this.getTarget() == null && this.getLastDamageSource() == null;
     }
 
     @Override
