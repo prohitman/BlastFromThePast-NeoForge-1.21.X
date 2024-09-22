@@ -38,7 +38,8 @@ public class ModLangGen extends LanguageProvider {
         addBlock(ModBlocks.CEDAR_LEAVES);
         addBlock(ModBlocks.CEDAR_PLANKS);
         addBlock(ModBlocks.BEAST_CHOPS);
-
+        addBlock(ModBlocks.BEAST_CHOPS_COOKED);
+        addBlock(ModBlocks.BEAST_CHOPS_GLAZED);
         //Entities
         addEntity(ModEntities.GLACEROS);
         addEntity(ModEntities.SNOWDO);
