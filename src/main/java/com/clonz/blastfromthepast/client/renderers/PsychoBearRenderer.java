@@ -14,9 +14,11 @@ import net.minecraft.resources.ResourceLocation;
 public class PsychoBearRenderer extends MobRenderer<PsychoBearEntity, PsychoBearModel> {
 
     private static final ResourceLocation NORMAL_TEXTURE = ClientResourceHelper.entityTexLocWithTypeSubFolder(ModEntities.PSYCHO_BEAR.getId());
-    private static final ResourceLocation BERRY_TEXTURE = ClientResourceHelper.entityTecLocWithTypeSubFolderWithSuffix(ModEntities.PSYCHO_BEAR.getId(), "_berry");
     private static final ResourceLocation SLEEP_TEXTURE = ClientResourceHelper.entityTecLocWithTypeSubFolderWithSuffix(ModEntities.PSYCHO_BEAR.getId(), "_sleep");
+    private static final ResourceLocation BERRY_TEXTURE = ClientResourceHelper.entityTecLocWithTypeSubFolderWithSuffix(ModEntities.PSYCHO_BEAR.getId(), "_berry");
     private static final ResourceLocation BERRY_SLEEP_TEXTURE = ClientResourceHelper.entityTecLocWithTypeSubFolderWithSuffix(ModEntities.PSYCHO_BEAR.getId(), "_berry_sleep");
+    private static final ResourceLocation BERRY_PACIFIED_TEXTURE = ClientResourceHelper.entityTecLocWithTypeSubFolderWithSuffix(ModEntities.PSYCHO_BEAR.getId(), "_berry_pacified");
+    private static final ResourceLocation BERRY_PACIFIED_SLEEP_TEXTURE = ClientResourceHelper.entityTecLocWithTypeSubFolderWithSuffix(ModEntities.PSYCHO_BEAR.getId(), "_berry_pacified_sleep");
     private static final ResourceLocation BABY_TEXTURE = ClientResourceHelper.entityTexLocWithTypeSubFolderWithPrefix(ModEntities.PSYCHO_BEAR.getId(), "baby_");
 
     private final PsychoBearModel adult;
@@ -46,15 +48,15 @@ public class PsychoBearRenderer extends MobRenderer<PsychoBearEntity, PsychoBear
         } else{
             if(entity.isPacified()){
                 if(entity.isSleeping()){
-                    return BERRY_SLEEP_TEXTURE;
+                    return BERRY_PACIFIED_SLEEP_TEXTURE;
                 } else{
-                    return BERRY_TEXTURE;
+                    return BERRY_PACIFIED_TEXTURE;
                 }
             } else{
                 if(entity.isSleeping()){
-                    return SLEEP_TEXTURE;
+                    return BERRY_SLEEP_TEXTURE;
                 } else{
-                    return NORMAL_TEXTURE;
+                    return BERRY_TEXTURE;
                 }
             }
         }
