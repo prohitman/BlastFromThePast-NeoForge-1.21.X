@@ -1880,7 +1880,7 @@
 				}
 			}
 		},
-		"animation.psycho_bear.back_scratch_loop": {
+		"animation.psycho_bear.back_scratch": {
 			"loop": true,
 			"animation_length": 1,
 			"bones": {

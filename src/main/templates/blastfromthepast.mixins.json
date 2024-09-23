@@ -15,6 +15,7 @@
     "GoalAccessor",
     "LivingEntityAccessor",
     "MeleeAttackGoalAccessor",
+    "MoveToBlockGoalAccessor",
     "PathAccessor",
     "ServerPlayerAccessor",
     "WalkNodeEvaluatorAccess"

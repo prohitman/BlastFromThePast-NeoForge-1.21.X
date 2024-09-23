@@ -8,7 +8,6 @@ import com.clonz.blastfromthepast.init.ModTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallBlock;
@@ -30,6 +29,8 @@ public class ModBlockTagsGen extends BlockTagsProvider {
                 .add(ModBlocks.SAPPY_CEDAR_LOG.get());
         tag(ModTags.Blocks.FROSTOMPER_CAN_BREAK)
                 .addTag(BlockTags.LEAVES);
+        tag(ModTags.Blocks.PSYCHO_BEAR_SCRATCHES_BACK_ON)
+                .addTag(BlockTags.LOGS);
 
         loadWoodGroupBlockTags(ModBlocks.CEDAR);
         loadStoneGroupBlockTags(ModBlocks.PERMAFROST);

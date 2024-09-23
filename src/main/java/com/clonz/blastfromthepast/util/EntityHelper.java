@@ -161,18 +161,32 @@ public class EntityHelper {
         return !mob.level().canSeeSky(targetPos) && (double) mob.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, targetPos).getY() > mob.getY();
     }
 
-    public static boolean isLookingAt(LivingEntity looker, LivingEntity target, double leniency, boolean requireLOS, boolean checkBody) {
+    public static boolean isLookingAt(LivingEntity looker, LivingEntity target, double leniencyFactor, boolean requireLOS, boolean checkBody) {
         Vec3 viewVector = looker.getViewVector(1.0F).normalize();
         Vec3 vectorToTarget = looker.getEyePosition().vectorTo(target.getEyePosition());
         double distanceToTarget = vectorToTarget.length();
         vectorToTarget = vectorToTarget.normalize();
-        double dot = viewVector.dot(vectorToTarget);
-        return dot > 1.0 - leniency / distanceToTarget
+        double leniency = leniencyFactor / distanceToTarget;
+        return sameDirection(viewVector, vectorToTarget, leniency)
                 && (!requireLOS || looker.hasLineOfSight(target))
-                && (!checkBody || getBodyViewVector(looker, 1.0F).normalize().dot(vectorToTarget) > 1.0 - leniency / distanceToTarget);
+                && (!checkBody || sameDirection(getBodyViewVector(looker, 1.0F).normalize(), vectorToTarget, leniency));
+    }
+
+    private static boolean sameDirection(Vec3 a, Vec3 b, double leniency) {
+        return a.dot(b) >= 1.0 - leniency;
     }
 
     public static Vec3 getBodyViewVector(LivingEntity looker, float partialTicks){
         return looker.calculateViewVector(looker.getViewXRot(partialTicks), partialTicks == 1.0F ? looker.yBodyRot : Mth.lerp(partialTicks, looker.yBodyRotO, looker.yBodyRot));
+    }
+
+    public static boolean isLookingAwayFrom(LivingEntity looker, Vec3 target, double leniencyFactor, boolean checkBody, boolean checkY) {
+        Vec3 viewVector = looker.getViewVector(1.0F).multiply(1, checkY ? 1 : 0, 1).normalize();
+        Vec3 vectorAwayFromTarget = target.vectorTo(looker.getEyePosition()).multiply(1, checkY ? 1 : 0, 1);
+        double distanceAwayFromTarget = vectorAwayFromTarget.length();
+        vectorAwayFromTarget = vectorAwayFromTarget.normalize();
+        double leniency = leniencyFactor / distanceAwayFromTarget;
+        return sameDirection(viewVector, vectorAwayFromTarget, leniency)
+                && (!checkBody || sameDirection(getBodyViewVector(looker, 1.0F).multiply(1, checkY ? 1 : 0, 1).normalize(), vectorAwayFromTarget, leniency));
     }
 }

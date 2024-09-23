@@ -114,7 +114,8 @@ public class RaidFoodContainerGoal<T extends PathfinderMob & ComplexAnimal> exte
                 }
             }
             if(!raiding || close){
-                BlastFromThePast.LOGGER.info("{} is no longer raiding a food container at {}", this.foodRaider, above);
+                if(DebugFlags.DEBUG_RAID_FOOD_CONTAINER)
+                    BlastFromThePast.LOGGER.info("{} is no longer raiding a food container at {}", this.foodRaider, above);
                 this.canRaid = false;
             }
         }

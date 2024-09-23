@@ -30,6 +30,13 @@ public class HitboxHelper {
         return getDistSqrBetweenHitboxes(first.getBoundingBox(), second.getBoundingBox());
     }
 
+    public static double getDistSqrFromHitbox(Entity entity, Vec3 target){
+        return getDistSqrFromHitbox(entity.getBoundingBox(), target);
+    }
+    public static double getDistSqrFromHitbox(AABB box, Vec3 target){
+        return box.distanceToSqr(target);
+    }
+
     public static boolean isCloseEnoughForTargeting(LivingEntity attacker, LivingEntity target, boolean testInvisible, double range) {
         double visibilityPercent = testInvisible ? target.getVisibilityPercent(attacker) : 1.0;
         double maxDistance = Math.max(range * visibilityPercent, 2.0);
@@ -67,6 +74,11 @@ public class HitboxHelper {
     }
 
     public static double getHitboxAdjustedDistance(LivingEntity mob, double distance) {
-        return mob.getBbWidth() * 0.5 + distance;
+        return getHitboxAdjustedDistance(mob.getBbWidth(), distance);
+    }
+
+    public static double getHitboxAdjustedDistance(float width, double distance) {
+        double halfWidth = width * 0.5;
+        return Math.hypot(halfWidth, halfWidth) + distance;
     }
 }

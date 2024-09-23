@@ -20,6 +20,7 @@ public class ModTags {
     }
     public static class Blocks{
         public static final TagKey<Block> FROSTOMPER_CAN_BREAK = TagKey.create(Registries.BLOCK, ModEntities.FROSTOMPER.getId().withSuffix("_can_break"));
+        public static final TagKey<Block> PSYCHO_BEAR_SCRATCHES_BACK_ON = TagKey.create(Registries.BLOCK, ModEntities.PSYCHO_BEAR.getId().withSuffix("_scratches_back_on"));
     }
 
     public static class EntityTypes{

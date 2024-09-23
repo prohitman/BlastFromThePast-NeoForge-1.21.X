@@ -51,6 +51,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -62,7 +63,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
 
-public class PsychoBearEntity extends Animal implements Animatable<PsychoBearModel>, OverrideAnimatedAttacker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType>, ComplexAnimal, Pacifiable, Roaring {
+public class PsychoBearEntity extends Animal implements Animatable<PsychoBearModel>, OverrideAnimatedAttacker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType>, ComplexAnimal, Pacifiable, Roaring, BackScratcher {
     public static final DucAnimation ADULT_ANIMATION = DucAnimation.create(ModEntities.PSYCHO_BEAR.getId());
     public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.PSYCHO_BEAR.getId().withPrefix("baby_"));
     public static final EntityDimensions PSYCHO_BEAR_BABY_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(18.0F), HitboxHelper.pixelsToBlocks(13.0F));
@@ -70,24 +71,31 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     private static final EntityDataAccessor<Byte> DATA_FLAGS = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<Boolean> DATA_PACIFIED = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_EATING = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Byte> DATA_SLEEPING = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BYTE);
+    private static final EntityDataAccessor<Byte> DATA_SLEEP_STATE = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BYTE);
+    private static final EntityDataAccessor<Byte> DATA_BACK_SCRATCH_STATE = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BYTE);
+    private static final EntityDataAccessor<Boolean> DATA_PREPARING_TO_SCRATCH_BACK = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BOOLEAN);
     private static final byte SITTING_FLAG = 1;
     private static final int ROARING_FLAG = 2;
     private static final int MAX_EAT_TIME = Mth.floor(2.5F * 20);
     public static final int FINISH_CHEWING_ACTION_POINT = Mth.floor(1.75F * 20);
     public static final int START_CHEWING_ACTION_POINT = Mth.floor(0.75F * 20);
     public static final int MAX_ROAR_TICKS = Mth.floor(2.5F * 20);
-    public static final int LIE_DOWN_DURATION = Mth.floor(1F * 20);
-    public static final int WAKE_UP_DURATION = Mth.floor(1F * 20);
     private static final TargetingConditions ALERT_CONDITIONS = TargetingConditions.forCombat().ignoreLineOfSight();
+    public static final float ADULT_VERTICAL_WIDTH = HitboxHelper.pixelsToBlocks(21.0F);
     private final Lazy<Map<String, AnimationState>> babyAnimations = Lazy.of(() -> PsychoBearModel.createStateMap(BABY_ANIMATION));
     private final Lazy<Map<String, AnimationState>> adultAnimations = Lazy.of(() -> PsychoBearModel.createStateMap(ADULT_ANIMATION));
     private final AttackTicker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType> attackTicker = new AttackTicker<>(this);
     private int pacifiedTicks = 0;
     private int eatCounter = 0;
     private int moreFoodTicks;
+    private int itchReliefTicks;
     private int roarCounter;
-    private int sleepTransitionTicks;
+    private static final int LIE_DOWN_DURATION = Mth.floor(1F * 20);
+    private static final int WAKE_UP_DURATION = Mth.floor(1F * 20);
+    private static final int BACK_SCRATCH_START_DURATION = Mth.floor(0.5F * 20);
+    private static final int BACK_SCRATCH_END_DURATION = Mth.floor(0.5F * 20);
+    private final TransitioningState.TransitionTicker sleepTicker = new TransitioningState.TransitionTicker(this::getSleepState, this::setSleepState, LIE_DOWN_DURATION, WAKE_UP_DURATION);
+    private final TransitioningState.TransitionTicker backScratchTicker = new TransitioningState.TransitionTicker(this::getBackScratchState, this::setBackScratchState, BACK_SCRATCH_START_DURATION, BACK_SCRATCH_END_DURATION);
 
     public PsychoBearEntity(EntityType<? extends PsychoBearEntity> entityType, Level level) {
         super(entityType, level);
@@ -114,7 +122,9 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         builder.define(DATA_FLAGS, (byte)0);
         builder.define(DATA_PACIFIED, false);
         builder.define(DATA_EATING, false);
-        builder.define(DATA_SLEEPING, (byte)SleepState.AWAKE.ordinal());
+        builder.define(DATA_SLEEP_STATE, (byte) TransitioningState.INACTIVE.ordinal());
+        builder.define(DATA_BACK_SCRATCH_STATE, (byte) TransitioningState.INACTIVE.ordinal());
+        builder.define(DATA_PREPARING_TO_SCRATCH_BACK, false);
     }
 
     protected boolean getFlag(int flag) {
@@ -140,18 +150,15 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         if (!this.firstTick && DATA_EATING.equals(pKey)) {
             this.eatCounter = 0;
         }
-        if (DATA_SLEEPING.equals(pKey)) {
-            switch(this.getSleepState()){
-                case LIE_DOWN -> {
-                    this.sleepTransitionTicks = LIE_DOWN_DURATION;
-                }
-                case WAKE_UP -> {
-                    this.sleepTransitionTicks = WAKE_UP_DURATION;
-                }
-                default -> {
-                    this.sleepTransitionTicks = 0;
-                }
-            }
+        if (DATA_SLEEP_STATE.equals(pKey)) {
+            this.sleepTicker.triggerStateChange();
+        }
+        if (DATA_BACK_SCRATCH_STATE.equals(pKey)) {
+            this.refreshDimensions();
+            this.backScratchTicker.triggerStateChange();
+        }
+        if (DATA_PREPARING_TO_SCRATCH_BACK.equals(pKey)) {
+            this.refreshDimensions();
         }
     }
 
@@ -167,6 +174,10 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
 
     @Override
     protected EntityDimensions getDefaultDimensions(Pose pose) {
+        if(this.isBackScratching() || this.isPreparingToScratchBack()){
+            EntityDimensions normalDimensions = this.getType().getDimensions();
+            return EntityDimensions.scalable(ADULT_VERTICAL_WIDTH, normalDimensions.width());
+        }
         return this.isBaby() ? PSYCHO_BEAR_BABY_DIMENSIONS : super.getDefaultDimensions(pose);
     }
 
@@ -183,9 +194,10 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         this.goalSelector.addGoal(8, new MoveToOrSitWithItemGoal<>(this, this::isWantedItem, 1.0F));
         this.goalSelector.addGoal(9, new HitboxAdjustedFollowParentGoal(this, 1.25F));
         this.goalSelector.addGoal(10, new RaidFoodContainerGoal<>(this, 1.0F, 16, 1));
-        this.goalSelector.addGoal(11, new RandomStrollGoal(this, 1.0F));
-        this.goalSelector.addGoal(12, new LookAtPlayerGoal(this, Player.class, 6.0F));
-        this.goalSelector.addGoal(13, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(11, new ScratchBackOnTreeGoal<>(this, 1.0F, 16, 1, this::isBackScratchBlock));
+        this.goalSelector.addGoal(12, new RandomStrollGoal(this, 1.0F));
+        this.goalSelector.addGoal(13, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(14, new RandomLookAroundGoal(this));
 
         this.targetSelector.addGoal(1, new AgeableHurtByTargetGoal<>(this));
         this.targetSelector.addGoal(2, new PredicatedGoal<>(
@@ -194,6 +206,10 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         this.targetSelector.addGoal(3, new PredicatedGoal<>(
                 new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, true, this::canTarget),
                 this, PsychoBearEntity::canBeAggressive, true));
+    }
+
+    private boolean isBackScratchBlock(BlockState blockState) {
+        return blockState.is(ModTags.Blocks.PSYCHO_BEAR_SCRATCHES_BACK_ON);
     }
 
     protected boolean canBeAggressive(){
@@ -349,9 +365,12 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
                 this.animateWhen("attack_flipped", activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && !this.isLeftHanded());
                 this.animateWhen("attack", activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && this.isLeftHanded());
                 this.animateWhen("eat", activeAttackType == null && this.isEating());
-                this.animateWhen("sleep_start", activeAttackType == null && this.getSleepState() == SleepState.LIE_DOWN);
-                this.animateWhen("sleep", activeAttackType == null && this.getSleepState() == SleepState.SLEEP);
-                this.animateWhen("sleep_end", activeAttackType == null && this.getSleepState() == SleepState.WAKE_UP);
+                this.animateWhen("sleep_start", activeAttackType == null && this.getSleepState() == TransitioningState.INACTIVE_TO_ACTIVE);
+                this.animateWhen("sleep", activeAttackType == null && this.getSleepState() == TransitioningState.ACTIVE);
+                this.animateWhen("sleep_end", activeAttackType == null && this.getSleepState() == TransitioningState.ACTIVE_TO_INACTIVE);
+                this.animateWhen("back_scratch_start", activeAttackType == null && this.getBackScratchState() == TransitioningState.INACTIVE_TO_ACTIVE);
+                this.animateWhen("back_scratch", activeAttackType == null && this.getBackScratchState() == TransitioningState.ACTIVE);
+                this.animateWhen("back_scratch_stop", activeAttackType == null && this.getBackScratchState() == TransitioningState.ACTIVE_TO_INACTIVE);
             }
         }
         if (!this.canRotateHead()) {
@@ -378,18 +397,10 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
             }
         }
         // tick sleeping
-        if (this.sleepTransitionTicks > 0 && --this.sleepTransitionTicks <= 0) {
-            if(!this.level().isClientSide){
-                switch (this.getSleepState()){
-                    case LIE_DOWN -> {
-                        this.setSleepState(SleepState.SLEEP);
-                    }
-                    case WAKE_UP -> {
-                        this.setSleepState(SleepState.AWAKE);
-                    }
-                }
-            }
-        }
+        this.sleepTicker.tick(!this.level().isClientSide);
+
+        // tick back scratching
+        this.backScratchTicker.tick(!this.level().isClientSide);
     }
 
     /*
@@ -446,6 +457,9 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         if (this.moreFoodTicks > 0) {
             this.moreFoodTicks--;
         }
+        if (this.itchReliefTicks > 0) {
+            this.itchReliefTicks--;
+        }
     }
 
     @Override
@@ -470,7 +484,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
 
     @Override
     public boolean canPerformAction() {
-        return !this.isEating() && !this.isSitting() && !this.isSleeping();
+        return !this.isEating() && !this.isSitting() && !this.isSleeping() && !this.isBackScratching();
     }
 
     @Override
@@ -667,7 +681,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     @Override
     public void readAnimalStates(CompoundTag compound) {
         if(compound.contains(SLEEPING_TAG_KEY, Tag.TAG_BYTE)){
-            this.setSleepState(SleepState.byOrdinal(compound.getByte(SLEEPING_TAG_KEY)));
+            this.setSleepState(TransitioningState.byOrdinal(compound.getByte(SLEEPING_TAG_KEY)));
         }
     }
 
@@ -680,7 +694,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
 
     @Override
     public void writeAnimalStates(CompoundTag compound) {
-        SleepState sleepState = this.getSleepState();
+        TransitioningState sleepState = this.getSleepState();
         if(!sleepState.isTransitional()){
             compound.putByte(SLEEPING_TAG_KEY, (byte) sleepState.ordinal());
         }
@@ -726,46 +740,20 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
 
     @Override
     public void setSleeping(boolean sleeping) {
-        SleepState lastSleepState = this.getSleepState();
-        // was awake -> lie down if sleeping
-        // was lying down -> awake if not sleeping
-        // was sleeping -> wake up if not sleeping
-        // was waking up -> sleep if sleeping
-        switch (lastSleepState){
-            case AWAKE -> {
-                if(sleeping){
-                    this.setSleepState(SleepState.LIE_DOWN);
-                }
-            }
-            case LIE_DOWN -> {
-                if(!sleeping){
-                    this.setSleepState(SleepState.AWAKE);
-                }
-            }
-            case SLEEP -> {
-                if(!sleeping){
-                    this.setSleepState(SleepState.WAKE_UP);
-                }
-            }
-            case WAKE_UP -> {
-                if(sleeping){
-                    this.setSleepState(SleepState.SLEEP);
-                }
-            }
-        }
+        TransitioningState.transition(sleeping, this::getSleepState, this::setSleepState);
     }
 
-    private void setSleepState(SleepState sleepState) {
-        this.entityData.set(DATA_SLEEPING, (byte) sleepState.ordinal());
+    private void setSleepState(TransitioningState sleepState) {
+        this.entityData.set(DATA_SLEEP_STATE, (byte) sleepState.ordinal());
     }
 
     @Override
     public boolean isSleepingFlag() {
-        return this.getSleepState() != SleepState.AWAKE;
+        return this.getSleepState() != TransitioningState.INACTIVE;
     }
 
-    private SleepState getSleepState() {
-        return SleepState.byOrdinal(this.entityData.get(DATA_SLEEPING));
+    private TransitioningState getSleepState() {
+        return TransitioningState.byOrdinal(this.entityData.get(DATA_SLEEP_STATE));
     }
 
     // Needed so vanilla doesn't do its weird logic with sleeping positions and posing
@@ -799,11 +787,12 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
         this.setSitting(false);
         this.setEating(false);
         this.setSleeping(false);
+        this.setBackScratching(false);
     }
 
     @Override
     public boolean canAnimateWalk() {
-        if(this.isRoaring()){
+        if(this.isRoaring() || this.isBackScratching()){
             return false;
         }
         return OverrideAnimatedAttacker.super.canAnimateWalk();
@@ -811,7 +800,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
 
     @Override
     public boolean canAnimateLook() {
-        if(this.isRoaring()){
+        if(this.isRoaring() || this.isBackScratching()){
             return false;
         }
         return OverrideAnimatedAttacker.super.canAnimateLook();
@@ -833,6 +822,49 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
                 this.getBoundingBox().inflate(followRange, followRange * 0.5D, followRange))
                 .isEmpty();
          */
+    }
+
+    @Override
+    public boolean isBackScratching() {
+        return this.getBackScratchState() != TransitioningState.INACTIVE;
+    }
+    
+    private TransitioningState getBackScratchState(){
+        return TransitioningState.byOrdinal(this.entityData.get(DATA_BACK_SCRATCH_STATE));
+    }
+
+    @Override
+    public void setBackScratching(boolean backScratching) {
+        TransitioningState.transition(backScratching, this::getBackScratchState, this::setBackScratchState);
+    }
+
+    @Override
+    public boolean wantsToScratchBack() {
+        return this.itchReliefTicks <= 0;
+    }
+
+    @Override
+    public void scratchedBack() {
+        this.itchReliefTicks = 100;
+    }
+
+    @Override
+    public void playBackScratchSound() {
+        this.makeSound(ModSounds.PSYCHO_BEAR_SCRATCH.get());
+    }
+
+    @Override
+    public void setPreparingToScratchBack(boolean prepare) {
+        this.entityData.set(DATA_PREPARING_TO_SCRATCH_BACK, prepare);
+    }
+
+    @Override
+    public boolean isPreparingToScratchBack() {
+        return this.entityData.get(DATA_PREPARING_TO_SCRATCH_BACK);
+    }
+
+    private void setBackScratchState(TransitioningState backScratchState){
+        this.entityData.set(DATA_BACK_SCRATCH_STATE, (byte)backScratchState.ordinal());
     }
 
     // 1.37208242536
