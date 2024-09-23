@@ -1,4 +1,4 @@
-// 1.21	2024-09-03T17:23:03.5773005	Item Models: blastfromthepast
+// 1.21	2024-09-23T08:34:49.3171682	Item Models: blastfromthepast
 ef282fe501063065586f718b651a4b3c7ead1226 assets/blastfromthepast/models/item/cedar_door.json
 6ec2308f1b8d936d19fc41d0ccaa938249ba641f assets/blastfromthepast/models/item/cedar_leaves.json
 4c32e9d01f6d6374de35da0cb58481e11a63bbfd assets/blastfromthepast/models/item/cedar_log.json
@@ -8,5 +8,7 @@ ef282fe501063065586f718b651a4b3c7ead1226 assets/blastfromthepast/models/item/ced
 3cdfe541fec8705ce661aec83138548b12b1daa9 assets/blastfromthepast/models/item/raw_venison.json
 bf574dfb2afe26a4a22bf4734637430ef9cf682c assets/blastfromthepast/models/item/sappy_cedar_log.json
 a7697c580817cbe3a45be157a70176a75fc37a12 assets/blastfromthepast/models/item/sap_ball.json
+6db5b79e6afb4125471a065225d55fe65b8f1aa1 assets/blastfromthepast/models/item/shaggy_pelt.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/blastfromthepast/models/item/snowdo_spawn_egg.json
+63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/blastfromthepast/models/item/speartooth_tiger_spawn_egg.json
 0ebcf90c6ef7a80e3396e4c8478dbb1a158125f0 assets/blastfromthepast/models/item/stripped_cedar_log.json

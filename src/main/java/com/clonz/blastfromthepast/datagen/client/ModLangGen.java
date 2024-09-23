@@ -29,6 +29,8 @@ public class ModLangGen extends LanguageProvider {
         addItem(ModItems.COOKED_VENISON);
         addItem(ModItems.GLACEROS_SPAWN_EGG);
         addItem(ModItems.SNOWDO_SPAWN_EGG);
+        addItem(ModItems.SPEARTOOTH_SPAWN_EGG);
+        addItem(ModItems.SHAGGY_PELT);
 
         //Blocks
         addBlock(ModBlocks.CEDAR_DOOR);
@@ -40,9 +42,12 @@ public class ModLangGen extends LanguageProvider {
         addBlock(ModBlocks.BEAST_CHOPS);
         addBlock(ModBlocks.BEAST_CHOPS_COOKED);
         addBlock(ModBlocks.BEAST_CHOPS_GLAZED);
+        addBlock(ModBlocks.SHAGGY_BLOCK);
+
         //Entities
         addEntity(ModEntities.GLACEROS);
         addEntity(ModEntities.SNOWDO);
+        addEntity(ModEntities.SPEARTOOTH);
 
         add("itemGroup." + BlastFromThePast.MODID, "Blast From The Past");
     }

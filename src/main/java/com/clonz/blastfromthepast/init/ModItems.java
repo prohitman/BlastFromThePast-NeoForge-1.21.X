@@ -35,6 +35,8 @@ public class ModItems {
 
     public static final DeferredItem<Item> SPEARTOOTH = ITEMS.register("speartooth", () -> new Item(new Item.Properties()));
 
+    public static final DeferredItem<Item> SHAGGY_PELT = ITEMS.register("shaggy_pelt", () -> new Item(new Item.Properties()));
+
 
 
 /*    public static final DeferredItem<BlockItem> FROZEN_PINE_LOG =

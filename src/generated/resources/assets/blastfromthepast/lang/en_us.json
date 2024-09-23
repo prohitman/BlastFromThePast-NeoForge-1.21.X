@@ -7,13 +7,17 @@
   "block.blastfromthepast.cedar_log": "Cedar Log",
   "block.blastfromthepast.cedar_planks": "Cedar Planks",
   "block.blastfromthepast.sappy_cedar_log": "Sappy Cedar Log",
+  "block.blastfromthepast.shaggy_block": "Shaggy Block",
   "block.blastfromthepast.stripped_cedar_log": "Stripped Cedar Log",
   "entity.blastfromthepast.glaceros": "Glaceros",
   "entity.blastfromthepast.snowdo": "Snowdo",
+  "entity.blastfromthepast.speartooth_tiger": "Speartooth Tiger",
   "item.blastfromthepast.cooked_venison": "Cooked Venison",
   "item.blastfromthepast.glaceros_spawn_egg": "Glaceros Spawn Egg",
   "item.blastfromthepast.raw_venison": "Raw Venison",
   "item.blastfromthepast.sap_ball": "Sap Ball",
+  "item.blastfromthepast.shaggy_pelt": "Shaggy Pelt",
   "item.blastfromthepast.snowdo_spawn_egg": "Snowdo Spawn Egg",
+  "item.blastfromthepast.speartooth_tiger_spawn_egg": "Speartooth Tiger Spawn Egg",
   "itemGroup.blastfromthepast": "Blast From The Past"
 }

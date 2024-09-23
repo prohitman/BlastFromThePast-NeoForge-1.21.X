@@ -35,6 +35,8 @@ public class ModTabs {
                         output.accept(ModBlocks.BEAST_CHOPS.get());
                         output.accept(ModBlocks.BEAST_CHOPS_COOKED.get());
                         output.accept(ModBlocks.BEAST_CHOPS_GLAZED.get());
+                        output.accept(ModItems.SHAGGY_PELT.get());
+                        output.accept(ModBlocks.SHAGGY_BLOCK.get());
                     }).build());
 
 }
