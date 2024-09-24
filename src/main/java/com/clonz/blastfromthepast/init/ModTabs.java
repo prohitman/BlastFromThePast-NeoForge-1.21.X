@@ -37,6 +37,11 @@ public class ModTabs {
                         output.accept(ModBlocks.BEAST_CHOPS_GLAZED.get());
                         output.accept(ModItems.SHAGGY_PELT.get());
                         output.accept(ModBlocks.SHAGGY_BLOCK.get());
+                        output.accept(ModItems.FROST_BITE_HELMET);
+                        output.accept(ModItems.FROST_BITE_BOOTS);
+                        output.accept(ModItems.FROST_BITE_CHESTPLATE);
+                        output.accept(ModItems.FROST_BITE_LEGGINGS);
+
                     }).build());
 
 }

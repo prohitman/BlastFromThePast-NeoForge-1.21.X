@@ -22,6 +22,11 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.SAP_BALL.get());
         basicItem(ModItems.COOKED_VENISON.get());
         basicItem(ModItems.SHAGGY_PELT.get());
+
+        basicItem(ModItems.FROST_BITE_HELMET.get());
+        basicItem(ModItems.FROST_BITE_BOOTS.get());
+        basicItem(ModItems.FROST_BITE_CHESTPLATE.get());
+        basicItem(ModItems.FROST_BITE_LEGGINGS.get());
         withExistingParent(ModItems.SNOWDO_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.GLACEROS_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.SPEARTOOTH_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));

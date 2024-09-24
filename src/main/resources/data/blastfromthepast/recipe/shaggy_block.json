@@ -3,7 +3,7 @@
   "group": "boat",
   "key": {
     "#": {
-      "item": "blastfromthepast:shaggy_pelt"
+      "id": "blastfromthepast:shaggy_pelt"
     }
   },
   "pattern": [
@@ -11,6 +11,6 @@
     "##"
   ],
   "result": {
-    "item": "blastfromthepast:shaggy_block"
+    "id": "blastfromthepast:shaggy_block"
   }
 }

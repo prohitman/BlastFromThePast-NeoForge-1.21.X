@@ -10,15 +10,11 @@ import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
 import com.clonz.blastfromthepast.init.*;
+import com.mojang.logging.LogUtils;
 import io.github.itskillerluc.duclib.client.model.BaseDucModel;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import org.slf4j.Logger;
-
-import com.mojang.logging.LogUtils;
-
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -26,17 +22,19 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(BlastFromThePast.MODID)
 public class BlastFromThePast {
     public static final String MODID = "blastfromthepast";
     private static final Logger LOGGER = LogUtils.getLogger();
-    public BlastFromThePast(IEventBus modEventBus, ModContainer modContainer)
-    {
+
+    public BlastFromThePast(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
         //modEventBus.addListener(CommonNeoEvents::setup);
 
@@ -54,21 +52,22 @@ public class BlastFromThePast {
         ModTabs.CREATIVE_TABS.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
         ModSounds.SOUND_EVENTS.register(modEventBus);
+        ModArmorMaterials.ARMOR_MATERIAL.register(modEventBus);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
     }
 
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
-      //  if (event.getTabKey() == CreativeModeTabs.COMBAT) {
-     //       event.accept(ModItems.ICE_SPEAR);
-     //   }
+        //  if (event.getTabKey() == CreativeModeTabs.COMBAT) {
+        //       event.accept(ModItems.ICE_SPEAR);
+        //   }
 
 
-    //    if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
-    //    event.accept(ModBlocks.FROZEN_PINE_LOG);
-  //      event.accept(ModBlocks.STRIPPED_FROZEN_PINE_LOG);
-   //     }
+        //    if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+        //    event.accept(ModBlocks.FROZEN_PINE_LOG);
+        //      event.accept(ModBlocks.STRIPPED_FROZEN_PINE_LOG);
+        //     }
 
 
     }
@@ -86,10 +85,11 @@ public class BlastFromThePast {
         public static void onClientSetup(FMLClientSetupEvent event) {
             EntityRenderers.register(ModEntities.GLACEROS.get(), GlacerosRenderer::new);
             EntityRenderers.register(ModEntities.SNOWDO.get(), SnowdoRenderer::new);
-             EntityRenderers.register(ModEntities.SPEARTOOTH.get(), SpeartoothTigerRenderer::new);
+            EntityRenderers.register(ModEntities.SPEARTOOTH.get(), SpeartoothTigerRenderer::new);
             ItemBlockRenderTypes.setRenderLayer(ModBlocks.CEDAR_DOOR.get(), RenderType.CUTOUT);
 
         }
+
         @SubscribeEvent
         public static void registerLayers(final EntityRenderersEvent.RegisterLayerDefinitions event) {
             event.registerLayerDefinition(GlacerosModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(GlacerosEntity.LOCATION));

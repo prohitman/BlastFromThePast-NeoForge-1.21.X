@@ -32,6 +32,11 @@ public class ModLangGen extends LanguageProvider {
         addItem(ModItems.SPEARTOOTH_SPAWN_EGG);
         addItem(ModItems.SHAGGY_PELT);
 
+        addItem(ModItems.FROST_BITE_HELMET);
+        addItem(ModItems.FROST_BITE_CHESTPLATE);
+        addItem(ModItems.FROST_BITE_LEGGINGS);
+        addItem(ModItems.FROST_BITE_BOOTS);
+
         //Blocks
         addBlock(ModBlocks.CEDAR_DOOR);
         addBlock(ModBlocks.CEDAR_LOG);
