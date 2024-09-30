@@ -123,6 +123,7 @@ public class BlastFromThePast {
         @SubscribeEvent
         public static void registerLayers(final EntityRenderersEvent.RegisterLayerDefinitions event) {
             event.registerLayerDefinition(GlacerosModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(GlacerosEntity.LOCATION));
+            event.registerLayerDefinition(GlacerosModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.GLACEROS.getId().withPrefix("baby_")));
             event.registerLayerDefinition(SnowdoModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(SnowdoEntity.LOCATION));
             event.registerLayerDefinition(FrostomperModel.ADULT_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.FROSTOMPER.getId()));
             event.registerLayerDefinition(FrostomperModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.FROSTOMPER.getId().withPrefix("baby_")));

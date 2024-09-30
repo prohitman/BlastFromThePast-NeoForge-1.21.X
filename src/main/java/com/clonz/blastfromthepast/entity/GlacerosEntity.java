@@ -2,7 +2,9 @@ package com.clonz.blastfromthepast.entity;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.client.models.GlacerosModel;
+import com.clonz.blastfromthepast.entity.ai.goal.EatDelphiniumGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.GlacerosFightGoal;
+import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModSounds;
 import com.mojang.serialization.Codec;
@@ -30,13 +32,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.IntFunction;
-
 
 public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>, VariantHolder<GlacerosEntity.Variant> {
     private static final int MAX_STRENGTH = 5;
@@ -47,6 +49,7 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
     private static final EntityDataAccessor<Integer> DATA_STRENGTH_ID = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.INT);
     public  static final EntityDataAccessor<Boolean> PANICKING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
+    public  static final EntityDataAccessor<Boolean> EATING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
 
     public int a = 0;
     public boolean readytoPlay = false;
@@ -83,12 +86,14 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
              //   return false;
            // }
         });
-
+        this.goalSelector.addGoal(3, new FollowParentGoal(this, 1));
        // this.goalSelector.addGoal(2, new GlacerosAvoidEntityGoal<>(this, Player.class, 8.0f, 2,2, null , null));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 1.0));
+        this.goalSelector.addGoal(6, new EatDelphiniumGoal(this, 1, 15));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 5.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(0, new GlacerosFightGoal(this, GlacerosEntity.class, false));
+        this.targetSelector.addGoal(5, new AvoidEntityGoal<>(this, PsychoBearEntity.class, 20, 1.2f, 2.0f));
     }
 
     @Override
@@ -120,10 +125,11 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         super.tick();
         if (level().isClientSide()) {
             animateWhen("idle", !isMoving(this) && onGround());
+            animateWhen("eat", this.isEating());
         }
 
         if (!isMoving(this))
-        this.a ++;;
+            this.a ++;;
 
         if (!level().isClientSide() && this.a == this.random) {
             this.readytoPlay = true;
@@ -152,6 +158,15 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
     @Override
     public boolean isFood(ItemStack stack) {
         return false;
+    }
+
+    public Block getWantedDelphinium(Variant variant){
+        return switch (variant) {
+            case BROAD -> ModBlocks.BLUE_DELPHINIUM.get();
+            case CURLY -> ModBlocks.PINK_DELPHINIUM.get();
+            case SPIKEY -> ModBlocks.WHITE_DELPHINIUM.get();
+            default -> ModBlocks.VIOLET_DELPHINIUM.get();
+        };
     }
 
     @Nullable
@@ -194,6 +209,7 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         builder.define(DATA_VARIANT_ID, 0);
         builder.define(DATA_STRENGTH_ID, 0);
         builder.define(PANICKING, false);
+        builder.define(EATING, false);
     }
 
     @Override
@@ -205,16 +221,12 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         this.entityData.set(PANICKING, panicking);
     }
 
-    @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
-        compound.putInt("Variant", this.getVariant().id);
+    public boolean isEating() {
+        return this.entityData.get(EATING);
     }
 
-    @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
-        this.setVariant(GlacerosEntity.Variant.byId(compound.getInt("Variant")));
+    public void setEating(boolean panicking) {
+        this.entityData.set(EATING, panicking);
     }
 
     @Override
@@ -225,6 +237,22 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
     @Override
     public GlacerosEntity.Variant getVariant() {
         return GlacerosEntity.Variant.byId(this.entityData.get(DATA_VARIANT_ID));
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag compound) {
+        super.addAdditionalSaveData(compound);
+        compound.putInt("Variant", this.getVariant().id);
+        compound.putBoolean("Panicking", this.isPanicking());
+        compound.putBoolean("Eating", this.isEating());
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag compound) {
+        super.readAdditionalSaveData(compound);
+        this.setVariant(Variant.byId(compound.getInt("Variant")));
+        this.setPanicking(compound.getBoolean("Panicking"));
+        this.setEating(compound.getBoolean("Eating"));
     }
 
     @Override
@@ -244,12 +272,11 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
 
     //////////////////////////////// VARIANTSSSSSSSSSSS
 
-    public static enum Variant implements StringRepresentable {
-        NOMRAL(0,"normal"),
+    public enum Variant implements StringRepresentable {
+        STRAIGHT(0,"normal"),
         BROAD(1, "broad"),
         CURLY(2, "curly"),
-        CURVY(3, "curvy"),
-        SPIKEY(4, "spikey");
+        SPIKEY(3, "spikey");
 
         public static final Codec<GlacerosEntity.Variant> CODEC = StringRepresentable.fromEnum(GlacerosEntity.Variant::values);
         private static final IntFunction<GlacerosEntity.Variant> BY_ID = ByIdMap.continuous(GlacerosEntity.Variant::getId, values(), ByIdMap.OutOfBoundsStrategy.CLAMP);
