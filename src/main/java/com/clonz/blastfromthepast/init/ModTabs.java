@@ -31,6 +31,10 @@ public class ModTabs {
                         output.accept(ModItems.CEDAR_CHEST_BOAT.get());
                         output.accept(ModItems.RAW_VENISON.get());
                         output.accept(ModItems.COOKED_VENISON.get());
+                        output.accept(ModItems.STRAIGHT_GLACEROS_ANTLERS);
+                        output.accept(ModItems.BROAD_GLACEROS_ANTLERS);
+                        output.accept(ModItems.CURLY_GLACEROS_ANTLERS);
+                        output.accept(ModItems.SPIKEY_GLACEROS_ANTLERS);
                         output.accept(ModItems.SAP_BALL.get());
                         output.accept(ModItems.PSYCHO_BERRY.get());
                         output.accept(ModItems.SAP_ICE_CREAM.get());

@@ -26,6 +26,15 @@ public class ModItems {
     public static final DeferredItem<Item> SAP_BALL = register("sap_ball",
             () -> new Item(new Item.Properties()));
 
+    public static final DeferredItem<Item> STRAIGHT_GLACEROS_ANTLERS = register("straight_glaceros_antlers",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> BROAD_GLACEROS_ANTLERS = register("broad_glaceros_antlers",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> CURLY_GLACEROS_ANTLERS = register("curly_glaceros_antlers",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> SPIKEY_GLACEROS_ANTLERS = register("spikey_glaceros_antlers",
+            () -> new Item(new Item.Properties()));
+
     public static final DeferredItem<Item> GLACEROS_SPAWN_EGG = register("glaceros_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.GLACEROS, 0x7c908b, 0xffb122, new Item.Properties()));
 

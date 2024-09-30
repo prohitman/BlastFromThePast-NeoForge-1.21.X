@@ -29,6 +29,10 @@ public class ModLangGen extends LanguageProvider {
         addItem(ModItems.SAP_BALL);
         addItem(ModItems.RAW_VENISON);
         addItem(ModItems.COOKED_VENISON);
+        addItem(ModItems.STRAIGHT_GLACEROS_ANTLERS);
+        addItem(ModItems.SPIKEY_GLACEROS_ANTLERS);
+        addItem(ModItems.BROAD_GLACEROS_ANTLERS);
+        addItem(ModItems.CURLY_GLACEROS_ANTLERS);
         addItem(ModItems.GLACEROS_SPAWN_EGG);
         addItem(ModItems.SNOWDO_SPAWN_EGG);
         addItem(ModItems.FROSTOMPER_SPAWN_EGG);

@@ -3,6 +3,7 @@ package com.clonz.blastfromthepast.entity.ai.goal;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MoveToBlockGoal;
 import net.minecraft.world.entity.animal.Fox;
@@ -24,7 +25,7 @@ public class EatDelphiniumGoal extends MoveToBlockGoal {
 
     @Override
     public double acceptedDistance() {
-        return 2;
+        return 2.15;
     }
 
     @Override
@@ -69,6 +70,6 @@ public class EatDelphiniumGoal extends MoveToBlockGoal {
     @Override
     protected boolean isValidTarget(LevelReader levelReader, BlockPos blockPos) {
         Block delphinium = levelReader.getBlockState(blockPos).getBlock();
-        return delphinium == mob.getWantedDelphinium(mob.getVariant());
+        return delphinium == mob.getVariant().getDelphinium();
     }
 }

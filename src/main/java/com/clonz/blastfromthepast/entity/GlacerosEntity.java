@@ -6,6 +6,7 @@ import com.clonz.blastfromthepast.entity.ai.goal.EatDelphiniumGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.GlacerosFightGoal;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
+import com.clonz.blastfromthepast.init.ModItems;
 import com.clonz.blastfromthepast.init.ModSounds;
 import com.mojang.serialization.Codec;
 import io.github.itskillerluc.duclib.client.animation.DucAnimation;
@@ -29,6 +30,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -160,14 +162,14 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         return false;
     }
 
-    public Block getWantedDelphinium(Variant variant){
+/*    public Block getWantedDelphinium(Variant variant){
         return switch (variant) {
             case BROAD -> ModBlocks.BLUE_DELPHINIUM.get();
             case CURLY -> ModBlocks.PINK_DELPHINIUM.get();
             case SPIKEY -> ModBlocks.WHITE_DELPHINIUM.get();
             default -> ModBlocks.VIOLET_DELPHINIUM.get();
         };
-    }
+    }*/
 
     @Nullable
     @Override
@@ -273,19 +275,31 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
     //////////////////////////////// VARIANTSSSSSSSSSSS
 
     public enum Variant implements StringRepresentable {
-        STRAIGHT(0,"normal"),
-        BROAD(1, "broad"),
-        CURLY(2, "curly"),
-        SPIKEY(3, "spikey");
+        STRAIGHT(0,"normal", ModBlocks.VIOLET_DELPHINIUM.get(), ModItems.STRAIGHT_GLACEROS_ANTLERS.get()),
+        BROAD(1, "broad", ModBlocks.BLUE_DELPHINIUM.get(), ModItems.BROAD_GLACEROS_ANTLERS.get()),
+        CURLY(2, "curly", ModBlocks.PINK_DELPHINIUM.get(), ModItems.CURLY_GLACEROS_ANTLERS.get()),
+        SPIKEY(3, "spikey", ModBlocks.WHITE_DELPHINIUM.get(), ModItems.SPIKEY_GLACEROS_ANTLERS.get());
 
         public static final Codec<GlacerosEntity.Variant> CODEC = StringRepresentable.fromEnum(GlacerosEntity.Variant::values);
         private static final IntFunction<GlacerosEntity.Variant> BY_ID = ByIdMap.continuous(GlacerosEntity.Variant::getId, values(), ByIdMap.OutOfBoundsStrategy.CLAMP);
         final int id;
         private final String name;
+        private final Block delphinium;
+        private final Item antlerItem;
 
-        private Variant(int id, String name) {
+        Variant(int id, String name, Block delphinium, Item antlerItem) {
             this.id = id;
             this.name = name;
+            this.delphinium = delphinium;
+            this.antlerItem = antlerItem;
+        }
+
+        public Block getDelphinium() {
+            return delphinium;
+        }
+
+        public Item getAntlerItem() {
+            return antlerItem;
         }
 
         public int getId() {
