@@ -38,12 +38,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.plaf.BorderUIResource;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.IntFunction;
 
 public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>, VariantHolder<GlacerosEntity.Variant> {
-    private static final int MAX_STRENGTH = 5;
     public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "glaceros");
     public static final ResourceLocation BABY_LOCATIION = ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "baby_glaceros");
     public static final DucAnimation ANIMATION = DucAnimation.create(LOCATION);
@@ -52,10 +53,12 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.INT);
     public  static final EntityDataAccessor<Boolean> PANICKING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
     public  static final EntityDataAccessor<Boolean> EATING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
+    public  static final EntityDataAccessor<Boolean> SHEARED = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
 
     public int a = 0;
     public boolean readytoPlay = false;
     public int random = 120;
+    public int antlerGrowCooldown;
 
     public GlacerosEntity(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -65,31 +68,19 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        AttributeSupplier.Builder builder = Animal.createMobAttributes();
-        builder = builder.add(Attributes.MOVEMENT_SPEED, 0.2f);
-        builder = builder.add(Attributes.MAX_HEALTH, 20);
-        builder = builder.add(Attributes.FOLLOW_RANGE, 16);
-        builder = builder.add(Attributes.ATTACK_DAMAGE, 0);
-        return builder;
+        return Animal.createMobAttributes()
+                .add(Attributes.MOVEMENT_SPEED, 0.2f)
+                .add(Attributes.MAX_HEALTH, 20)
+                .add(Attributes.FOLLOW_RANGE, 16)
+                .add(Attributes.ATTACK_DAMAGE, 0);
     }
 
     public void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new PanicGoal(this, 2.0) {
-
-          //  @Override
-            //   public boolean canUse() {
-             //   for (Player player : GlacerosEntity.this.level()
-              //          .getEntitiesOfClass(Player.class, GlacerosEntity.this.getBoundingBox().inflate(5.0, 2.0, 5.0))) {
-              //     if (super.canUse() && player.isSprinting()) {
-              //            return true;
-               ///       }
-              //    }
-             //   return false;
-           // }
-        });
-        this.goalSelector.addGoal(3, new FollowParentGoal(this, 1));
-       // this.goalSelector.addGoal(2, new GlacerosAvoidEntityGoal<>(this, Player.class, 8.0f, 2,2, null , null));
+        this.goalSelector.addGoal(1, new PanicGoal(this, 2.0));
+        this.goalSelector.addGoal(3, new FollowParentGoal(this, 1.2));
+        this.goalSelector.addGoal(4, new BreedGoal(this, 1.1));
+        this.goalSelector.addGoal(5, new TemptGoal(this, 1, itemStack -> itemStack.is(this.getVariant().getDelphinium().asItem()) ,false));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 1.0));
         this.goalSelector.addGoal(6, new EatDelphiniumGoal(this, 1, 15));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 5.0F));
@@ -106,12 +97,26 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         if (spawnGroupData instanceof GlacerosEntity.GlacerosGroupData) {
             glaceros$variant = ((GlacerosEntity.GlacerosGroupData)spawnGroupData).variant;
         } else {
-            glaceros$variant = Util.getRandom(GlacerosEntity.Variant.values(), randomsource);
+            //glaceros$variant = Util.getRandom(GlacerosEntity.Variant.values(), randomsource);
+            glaceros$variant = getVariantFromChance(randomsource);
             spawnGroupData = new GlacerosEntity.GlacerosGroupData(glaceros$variant);
         }
 
         this.setVariant(glaceros$variant);
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
+    }
+
+    private Variant getVariantFromChance(RandomSource random){
+        float chance = random.nextFloat();
+        if(chance <= 0.25){
+            return Variant.STRAIGHT;
+        } else if(0.25 < chance && chance <= 0.5){
+            return Variant.SPIKEY;
+        } else if(0.5 < chance && chance <= 0.75){
+            return Variant.CURLY;
+        } else {
+            return Variant.BROAD;
+        }
     }
 
     static class GlacerosGroupData extends AgeableMob.AgeableMobGroupData {
@@ -128,6 +133,14 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         if (level().isClientSide()) {
             animateWhen("idle", !isMoving(this) && onGround());
             animateWhen("eat", this.isEating());
+        }
+
+        if(this.isSheared() && !this.level().isClientSide){
+            if(antlerGrowCooldown != 0){
+                antlerGrowCooldown--;
+            } else {
+                this.setSheared(false);
+            }
         }
 
         if (!isMoving(this))
@@ -159,22 +172,23 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
 
     @Override
     public boolean isFood(ItemStack stack) {
-        return false;
+        return stack.is(this.getVariant().getDelphinium().asItem());
     }
-
-/*    public Block getWantedDelphinium(Variant variant){
-        return switch (variant) {
-            case BROAD -> ModBlocks.BLUE_DELPHINIUM.get();
-            case CURLY -> ModBlocks.PINK_DELPHINIUM.get();
-            case SPIKEY -> ModBlocks.WHITE_DELPHINIUM.get();
-            default -> ModBlocks.VIOLET_DELPHINIUM.get();
-        };
-    }*/
 
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob otherParent) {
-        return ModEntities.GLACEROS.get().create(level);
+        GlacerosEntity child = ModEntities.GLACEROS.get().create(level);
+        child.setBaby(true);
+        child.setVariant(this.getVariant());
+        GlacerosEntity otherGlaceros = (GlacerosEntity) otherParent;
+        if(otherGlaceros.getVariant() != this.getVariant()){
+            if(this.getRandom().nextFloat() < 0.5){
+                child.setVariant(otherGlaceros.getVariant());
+            }
+        }
+
+        return child;
     }
 
     @Override
@@ -212,6 +226,7 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         builder.define(DATA_STRENGTH_ID, 0);
         builder.define(PANICKING, false);
         builder.define(EATING, false);
+        builder.define(SHEARED, false);
     }
 
     @Override
@@ -231,6 +246,14 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         this.entityData.set(EATING, panicking);
     }
 
+    public boolean isSheared() {
+        return this.entityData.get(SHEARED);
+    }
+
+    public void setSheared(boolean sheared) {
+        this.entityData.set(SHEARED, sheared);
+    }
+
     @Override
     public void setVariant(GlacerosEntity.Variant variant) {
         this.entityData.set(DATA_VARIANT_ID, variant.id);
@@ -247,6 +270,8 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         compound.putInt("Variant", this.getVariant().id);
         compound.putBoolean("Panicking", this.isPanicking());
         compound.putBoolean("Eating", this.isEating());
+        compound.putBoolean("Sheared", this.isSheared());
+        compound.putInt("AntlerCooldown", antlerGrowCooldown);
     }
 
     @Override
@@ -255,6 +280,8 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         this.setVariant(Variant.byId(compound.getInt("Variant")));
         this.setPanicking(compound.getBoolean("Panicking"));
         this.setEating(compound.getBoolean("Eating"));
+        this.setSheared(compound.getBoolean("Sheared"));
+        antlerGrowCooldown = compound.getInt("AntlerCooldown");
     }
 
     @Override
