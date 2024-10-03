@@ -3,7 +3,9 @@ package com.clonz.blastfromthepast.entity;
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.client.models.GlacerosModel;
 import com.clonz.blastfromthepast.entity.ai.goal.EatDelphiniumGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.GlacerosAlertPanicGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.GlacerosFightGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.MoveAwayFromBlockGoal;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
@@ -16,6 +18,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
@@ -29,17 +32,20 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.plaf.BorderUIResource;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.IntFunction;
@@ -54,11 +60,13 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
     public  static final EntityDataAccessor<Boolean> PANICKING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
     public  static final EntityDataAccessor<Boolean> EATING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
     public  static final EntityDataAccessor<Boolean> SHEARED = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
+    public  static final EntityDataAccessor<Boolean> RUNNING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
 
     public int a = 0;
     public boolean readytoPlay = false;
     public int random = 120;
     public int antlerGrowCooldown;
+    public int alertCooldown;
 
     public GlacerosEntity(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -77,16 +85,17 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
 
     public void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new PanicGoal(this, 2.0));
-        this.goalSelector.addGoal(3, new FollowParentGoal(this, 1.2));
+        this.goalSelector.addGoal(1, new GlacerosAlertPanicGoal(this, 2.0));
+        this.goalSelector.addGoal(3, new FollowParentGoal(this, 1.4));
         this.goalSelector.addGoal(4, new BreedGoal(this, 1.1));
         this.goalSelector.addGoal(5, new TemptGoal(this, 1, itemStack -> itemStack.is(this.getVariant().getDelphinium().asItem()) ,false));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 1.0));
         this.goalSelector.addGoal(6, new EatDelphiniumGoal(this, 1, 15));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 5.0F));
+        this.goalSelector.addGoal(7, new MoveAwayFromBlockGoal(this, Blocks.FIRE, 1.7, 12));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(0, new GlacerosFightGoal(this, GlacerosEntity.class, false));
-        this.targetSelector.addGoal(5, new AvoidEntityGoal<>(this, PsychoBearEntity.class, 20, 1.2f, 2.0f));
+        this.targetSelector.addGoal(5, new AvoidEntityGoal<>(this, PsychoBearEntity.class, 20, 1.2f, 2.0f));//should avoid only when in sight?
     }
 
     @Override
@@ -128,6 +137,21 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         }
     }
 
+    @Override
+    protected void actuallyHurt(DamageSource damageSource, float damageAmount) {
+        super.actuallyHurt(damageSource, damageAmount);
+        if(damageSource.is(DamageTypeTags.PANIC_CAUSES)){
+            List<GlacerosEntity> glacerosEntities = this.level()
+                    .getEntitiesOfClass(GlacerosEntity.class, this.getBoundingBox().inflate(16));
+            if(!glacerosEntities.isEmpty()){
+                for(GlacerosEntity glaceros : glacerosEntities){
+                    glaceros.setPanicking(true);
+                    glaceros.alertCooldown = 40 + glaceros.getRandom().nextInt(20);
+                }
+            }
+        }
+    }
+
     public void tick() {
         super.tick();
         if (level().isClientSide()) {
@@ -156,8 +180,13 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
             this.readytoPlay = false;
         }
 
-        if (this.isPanicking()) {
-            this.setTarget(null);
+        if(!level().isClientSide){
+            if(alertCooldown != 0){
+                alertCooldown--;
+            } else {
+                this.setPanicking(false);
+            }
+            this.setRunning(this.moveControl.getSpeedModifier() > 1.1);
         }
     }
 
@@ -227,6 +256,7 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         builder.define(PANICKING, false);
         builder.define(EATING, false);
         builder.define(SHEARED, false);
+        builder.define(RUNNING, false);
     }
 
     @Override
@@ -242,8 +272,8 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         return this.entityData.get(EATING);
     }
 
-    public void setEating(boolean panicking) {
-        this.entityData.set(EATING, panicking);
+    public void setEating(boolean eating) {
+        this.entityData.set(EATING, eating);
     }
 
     public boolean isSheared() {
@@ -252,6 +282,14 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
 
     public void setSheared(boolean sheared) {
         this.entityData.set(SHEARED, sheared);
+    }
+
+    public boolean isRunning() {
+        return this.entityData.get(RUNNING);
+    }
+
+    public void setRunning(boolean running) {
+        this.entityData.set(RUNNING, running);
     }
 
     @Override
@@ -272,6 +310,7 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         compound.putBoolean("Eating", this.isEating());
         compound.putBoolean("Sheared", this.isSheared());
         compound.putInt("AntlerCooldown", antlerGrowCooldown);
+        compound.putInt("AlertCooldown", alertCooldown);
     }
 
     @Override
@@ -282,6 +321,7 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         this.setEating(compound.getBoolean("Eating"));
         this.setSheared(compound.getBoolean("Sheared"));
         antlerGrowCooldown = compound.getInt("AntlerCooldown");
+        alertCooldown = compound.getInt("AlertCooldown");
     }
 
     @Override
@@ -342,22 +382,4 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
             return this.name;
         }
     }
-
-
-    // class GlacerosPanicGoal extends PanicGoal {
-     //   public GlacerosPanicGoal(PathfinderMob mob, double speedModifier) {
-     //       super(GlacerosEntity.this, 2.0);
-     //   }
-
-    //    @Override
-     //   public boolean canUse() {
-     //       if (super.canUse()) {
-     //           for (Player player : GlacerosEntity.this.level()
-     //                   .getEntitiesOfClass(Player.class, GlacerosEntity.this.getBoundingBox().inflate(5.0, 2.0, 5.0))) {
-             //       if (player.isSprinting())
-      //              return true;
-      //          }
-      //      }
-     //       return false;
-    //    }//  }
 }

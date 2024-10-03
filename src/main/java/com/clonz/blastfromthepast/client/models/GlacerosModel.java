@@ -38,7 +38,7 @@ public class GlacerosModel extends AnimatableDucModel<GlacerosEntity> {
         }
 
         super.setupAnim(pEntity, pLimbSwing, pLimbSwingAmount, pAgeInTicks, pNetHeadYaw, pHeadPitch);
-        if (pEntity.isPanicking()){
+        if (pEntity.isPanicking() || pEntity.isRunning()){
             this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.glaceros.flee").animation(), pLimbSwing, pLimbSwingAmount, 1, 2);
         } else {
             this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.glaceros.walk").animation(), pLimbSwing, pLimbSwingAmount, 1, 2);
