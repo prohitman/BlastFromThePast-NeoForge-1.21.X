@@ -90,7 +90,7 @@ public class GlacerosSparGoal extends Goal {
                 this.glaceros.setCharging(false);
                 this.targetGlaceros.setCharging(false);
                 this.glaceros.hasImpulse = true;
-                if(this.glaceros.distanceTo(targetGlaceros) > 1.75){
+                if(this.glaceros.distanceTo(targetGlaceros) > 1.5){
                     this.glaceros.getNavigation().moveTo(targetGlaceros, 2.5);
                     this.targetGlaceros.getNavigation().moveTo(glaceros, 2.5);
                 } else {

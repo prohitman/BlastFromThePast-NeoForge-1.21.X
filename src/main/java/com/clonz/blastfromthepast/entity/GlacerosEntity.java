@@ -52,10 +52,10 @@ import java.util.function.IntFunction;
 
 public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>, VariantHolder<GlacerosEntity.Variant> {
     public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "glaceros");
-    public static final ResourceLocation BABY_LOCATIION = ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "baby_glaceros");
+    //public static final ResourceLocation BABY_LOCATIION = ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "baby_glaceros");
     public static final DucAnimation ANIMATION = DucAnimation.create(LOCATION);
     private final Lazy<Map<String, AnimationState>> animations = Lazy.of(() -> GlacerosModel.createStateMap(getAnimation()));
-    private static final EntityDataAccessor<Integer> DATA_STRENGTH_ID = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.INT);
+    //private static final EntityDataAccessor<Integer> DATA_STRENGTH_ID = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.INT);
     public  static final EntityDataAccessor<Boolean> PANICKING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
     public  static final EntityDataAccessor<Boolean> EATING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
@@ -66,9 +66,9 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
     public  static final EntityDataAccessor<Optional<UUID>> SPARRING_PARTNER = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
 
-    public int a = 0;
-    public boolean readytoPlay = false;
-    public int random = 120;
+    //public int a = 0;
+    //public boolean readytoPlay = false;
+    //public int random = 120;
     public int antlerGrowCooldown;
     public int alertCooldown;
     public boolean shouldSparInstantly;
@@ -81,6 +81,8 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         this.setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
         this.setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
     }
+
+    public static void init(){}
 
     public static AttributeSupplier.Builder createAttributes() {
         return Animal.createMobAttributes()
@@ -108,7 +110,7 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
         RandomSource randomsource = level.getRandom();
-        this.setRandomStrength(randomsource);
+        //this.setRandomStrength(randomsource);
         GlacerosEntity.Variant glaceros$variant;
         if (spawnGroupData instanceof GlacerosEntity.GlacerosGroupData) {
             glaceros$variant = ((GlacerosEntity.GlacerosGroupData)spawnGroupData).variant;
@@ -169,20 +171,12 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
             }
             animateWhen("charge_prepare", this.isCharging());
             animateWhen("charge", this.isRushing());
-            if(!this.isEating()){
+/*            if(!this.isEating()){
                 stopAnimation("eat");
-            }
+            }*/
         }
 
-        if(this.isSheared() && !this.level().isClientSide){
-            if(antlerGrowCooldown != 0){
-                antlerGrowCooldown--;
-            } else {
-                this.setSheared(false);
-            }
-        }
-
-        if (!isMoving(this))
+        /*if (!isMoving(this))
             this.a ++;;
 
         if (!level().isClientSide() && this.a == this.random) {
@@ -193,7 +187,7 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         if (!level().isClientSide() && this.a == this.random + 1) {
             this.a = 0;
             this.readytoPlay = false;
-        }
+        }*/
 
         if(sparringCooldown > 0){
             sparringCooldown--;
@@ -217,17 +211,24 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
                 this.setCharging(false);
                 this.setRushing(false);
             }
+            if(this.isSheared()){
+                if(antlerGrowCooldown != 0){
+                    antlerGrowCooldown--;
+                } else {
+                    this.setSheared(false);
+                }
+            }
         }
     }
 
-    private void setStrength(int strength) {
+/*    private void setStrength(int strength) {
         this.entityData.set(DATA_STRENGTH_ID, Math.max(1, Math.min(5, strength)));
     }
 
     private void setRandomStrength(RandomSource random) {
         int i = random.nextFloat() < 0.04F ? 5 : 3;
         this.setStrength(1 + random.nextInt(i));
-    }
+    }*/
 
     @Override
     public boolean isFood(ItemStack stack) {
@@ -275,14 +276,11 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         return tickCount;
     }
 
-    public static void init() {
-    }
-
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_VARIANT_ID, 0);
-        builder.define(DATA_STRENGTH_ID, 0);
+        //builder.define(DATA_STRENGTH_ID, 0);
         builder.define(PANICKING, false);
         builder.define(EATING, false);
         builder.define(SHEARED, false);
@@ -442,15 +440,13 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         return ModSounds.GLACEROS_DEATH.get();
     }
 
-    //////////////////////////////// VARIANTSSSSSSSSSSS
-
     public enum Variant implements StringRepresentable {
         STRAIGHT(0,"normal", ModBlocks.VIOLET_DELPHINIUM.get(), ModItems.STRAIGHT_GLACEROS_ANTLERS.get()),
         BROAD(1, "broad", ModBlocks.BLUE_DELPHINIUM.get(), ModItems.BROAD_GLACEROS_ANTLERS.get()),
         CURLY(2, "curly", ModBlocks.PINK_DELPHINIUM.get(), ModItems.CURLY_GLACEROS_ANTLERS.get()),
         SPIKEY(3, "spikey", ModBlocks.WHITE_DELPHINIUM.get(), ModItems.SPIKEY_GLACEROS_ANTLERS.get());
 
-        public static final Codec<GlacerosEntity.Variant> CODEC = StringRepresentable.fromEnum(GlacerosEntity.Variant::values);
+        //public static final Codec<GlacerosEntity.Variant> CODEC = StringRepresentable.fromEnum(GlacerosEntity.Variant::values);
         private static final IntFunction<GlacerosEntity.Variant> BY_ID = ByIdMap.continuous(GlacerosEntity.Variant::getId, values(), ByIdMap.OutOfBoundsStrategy.CLAMP);
         final int id;
         private final String name;

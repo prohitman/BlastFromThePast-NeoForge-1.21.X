@@ -3,6 +3,7 @@ package com.clonz.blastfromthepast.entity.ai.goal;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MoveToBlockGoal;
@@ -63,6 +64,10 @@ public class EatDelphiniumGoal extends MoveToBlockGoal {
 
     protected void onReachedTarget() {
         if (net.neoforged.neoforge.event.EventHooks.canEntityGrief(this.mob.level(), mob)) {
+            this.mob.heal(2);
+            if(this.mob.isBaby()){
+                this.mob.ageUp(AgeableMob.getSpeedUpSecondsWhenFeeding(-this.mob.getAge()), true);
+            }
             mob.level().destroyBlock(blockPos, false, mob);
         }
     }

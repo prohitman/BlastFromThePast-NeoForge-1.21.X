@@ -14,11 +14,10 @@ import net.minecraft.resources.ResourceLocation;
 
 public class GlacerosRenderer extends MobRenderer<GlacerosEntity, GlacerosModel> {
 
-    private static final ResourceLocation NORMAL = ResourceLocation.fromNamespaceAndPath("blastfromthepast","textures/entity/glaceros/glaceros.png");
-    private static final ResourceLocation BROAD = ResourceLocation.fromNamespaceAndPath("blastfromthepast","textures/entity/glaceros/glaceros_broad.png");
-    private static final ResourceLocation CURLY = ResourceLocation.fromNamespaceAndPath("blastfromthepast","textures/entity/glaceros/glaceros_curly.png");
-    private static final ResourceLocation CURVY = ResourceLocation.fromNamespaceAndPath("blastfromthepast","textures/entity/glaceros/glaceros_curvy.png");
-    private static final ResourceLocation SPIKEY = ResourceLocation.fromNamespaceAndPath("blastfromthepast","textures/entity/glaceros/glaceros_spikey.png");
+    private static final ResourceLocation NORMAL = ClientResourceHelper.entityTexLocWithTypeSubFolder(ModEntities.GLACEROS.getId());
+    private static final ResourceLocation BROAD = ClientResourceHelper.entityTecLocWithTypeSubFolderWithSuffix(ModEntities.GLACEROS.getId(),"_broad");
+    private static final ResourceLocation CURLY = ClientResourceHelper.entityTecLocWithTypeSubFolderWithSuffix(ModEntities.GLACEROS.getId(),"_curly");
+    private static final ResourceLocation SPIKEY = ClientResourceHelper.entityTecLocWithTypeSubFolderWithSuffix(ModEntities.GLACEROS.getId(),"_spikey");
     private static final ResourceLocation BABY_TEXTURE = ClientResourceHelper.entityTexLocWithTypeSubFolderWithPrefix(ModEntities.GLACEROS.getId(), "baby_");
 
     private final GlacerosModel adult;
