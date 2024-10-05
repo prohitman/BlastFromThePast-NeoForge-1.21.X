@@ -21,7 +21,7 @@ public class ModRecipesGen extends RecipeProvider {
         createIceCream(recipeOutput, ModItems.SAP_ICE_CREAM, ModItems.SAP_BALL);
         createIceCream(recipeOutput, ModItems.PSYCHO_BERRY_ICE_CREAM, ModItems.PSYCHO_BERRY);
         createIceCream(recipeOutput, ModItems.MELON_ICE_CREAM, Items.MELON_SLICE);
-
+        smeltingResultFromBase(recipeOutput, ModItems.COOKED_VENISON, ModItems.RAW_VENISON);
     }
 
     private static void createIceCream(RecipeOutput recipeOutput, ItemLike iceCream, ItemLike mainIngredient) {

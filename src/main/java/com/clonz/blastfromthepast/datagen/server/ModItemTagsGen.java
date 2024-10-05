@@ -8,7 +8,9 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +27,8 @@ public class ModItemTagsGen extends ItemTagsProvider {
         tag(ItemTags.MEAT)
                 .add(ModItems.COOKED_VENISON.get())
                 .add(ModItems.RAW_VENISON.get());
+        tag(Tags.Items.FOODS_COOKED_MEAT)
+                .add(ModItems.COOKED_VENISON.get());
         copy(BlockTags.LOGS_THAT_BURN, ItemTags.LOGS_THAT_BURN);
         copy(BlockTags.PLANKS, ItemTags.PLANKS);
         copy(BlockTags.LEAVES, ItemTags.LEAVES);
