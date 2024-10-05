@@ -15,23 +15,14 @@ public class ModSounds {
             DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, BlastFromThePast.MODID);
 
     // GLACEROS
-    public static final DeferredHolder<SoundEvent, SoundEvent> SOUND_ENTITY_GLACEROS_DEATH = SOUND_EVENTS.register(
-            "glaceros_death",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.
-                    fromNamespaceAndPath("blastfromthepast", "glaceros_death"))
-    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> GLACEROS_DEATH = registerSoundEventForEntityType(ModEntities.GLACEROS, "_death");
 
-    public static final DeferredHolder<SoundEvent, SoundEvent> SOUND_ENTITY_GLACEROS_HURT = SOUND_EVENTS.register(
-            "glaceros_hurt",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.
-                    fromNamespaceAndPath("blastfromthepast", "glaceros_hurt"))
-    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> GLACEROS_HURT = registerSoundEventForEntityType(ModEntities.GLACEROS, "_hurt");
 
-    public static final DeferredHolder<SoundEvent, SoundEvent> SOUND_ENTITY_GLACEROS_IDLE = SOUND_EVENTS.register(
-            "glaceros_idle",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.
-                    fromNamespaceAndPath("blastfromthepast", "glaceros_idle"))
-    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> GLACEROS_IDLE = registerSoundEventForEntityType(ModEntities.GLACEROS, "_idle");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GLACEROS_SHEAR = registerSoundEventForEntityType(ModEntities.GLACEROS, "_shear");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GLACEROS_HOOF_SCRAPE = registerSoundEventForEntityType(ModEntities.GLACEROS, "_hoof_scrape");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GLACEROS_CLASH = registerSoundEventForEntityType(ModEntities.GLACEROS, "_clash");
 
     // SNOWDO
     public static final DeferredHolder<SoundEvent, SoundEvent> SOUND_ENTITY_SNOWDO_DEATH = SOUND_EVENTS.register(

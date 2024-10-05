@@ -2,6 +2,7 @@ package com.clonz.blastfromthepast.events;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
+import com.clonz.blastfromthepast.init.ModSounds;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -22,7 +23,7 @@ public class NeoForgeEvents {
                 if(!event.getEntity().isCreative()){
                     event.getEntity().getItemInHand(event.getHand()).setDamageValue(1);
                 }
-                event.getLevel().playSound(event.getTarget(), event.getPos(), SoundEvents.BOGGED_SHEAR, SoundSource.PLAYERS, 1 ,1);
+                event.getLevel().playSound(event.getTarget(), event.getPos(), ModSounds.GLACEROS_SHEAR.get(), SoundSource.PLAYERS, 1 ,1);
                 event.getEntity().swing(event.getHand());
                 ItemStack antlers = new ItemStack(glaceros.getVariant().getAntlerItem(), 2);
                 event.getLevel().addFreshEntity

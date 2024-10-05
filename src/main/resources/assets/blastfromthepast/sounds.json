@@ -22,6 +22,28 @@
       "blastfromthepast:glaceros_idle_2"
     ]
   },
+  "glaceros_shear": {
+    "subtitle": "sounds.blastfromthepast.glaceros_shear",
+    "sounds": [
+      "blastfromthepast:glaceros_shear_0",
+      "blastfromthepast:glaceros_shear_1",
+      "blastfromthepast:glaceros_shear_2"
+    ]
+  },
+  "glaceros_hoof_scrape": {
+    "subtitle": "sounds.blastfromthepast.glaceros_hoof_scrape",
+    "sounds": [
+      "blastfromthepast:glaceros_hoof_scrape"
+    ]
+  },
+  "glaceros_clash": {
+    "subtitle": "sounds.blastfromthepast.glaceros_clash",
+    "sounds": [
+      "blastfromthepast:glaceros_clash_0",
+      "blastfromthepast:glaceros_clash_1",
+      "blastfromthepast:glaceros_clash_2"
+    ]
+  },
   "snowdo_death": {
     "subtitle": "sounds.blastfromthepast.snowdo_death",
     "sounds": [

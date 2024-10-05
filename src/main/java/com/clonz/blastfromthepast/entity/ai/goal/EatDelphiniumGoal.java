@@ -72,4 +72,10 @@ public class EatDelphiniumGoal extends MoveToBlockGoal {
         Block delphinium = levelReader.getBlockState(blockPos).getBlock();
         return delphinium == mob.getVariant().getDelphinium();
     }
+
+    @Override
+    public void stop() {
+        super.stop();
+        this.mob.setEating(false);
+    }
 }

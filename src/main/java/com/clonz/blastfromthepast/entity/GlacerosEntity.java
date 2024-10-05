@@ -4,7 +4,7 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.client.models.GlacerosModel;
 import com.clonz.blastfromthepast.entity.ai.goal.EatDelphiniumGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.GlacerosAlertPanicGoal;
-import com.clonz.blastfromthepast.entity.ai.goal.GlacerosFightGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.GlacerosSparGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.MoveAwayFromBlockGoal;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
@@ -13,7 +13,6 @@ import com.clonz.blastfromthepast.init.ModSounds;
 import com.mojang.serialization.Codec;
 import io.github.itskillerluc.duclib.client.animation.DucAnimation;
 import io.github.itskillerluc.duclib.entity.Animatable;
-import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -32,7 +31,6 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -41,13 +39,15 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.Lazy;
+import net.neoforged.neoforge.event.entity.living.LivingKnockBackEvent;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.plaf.BorderUIResource;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.IntFunction;
 
 public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>, VariantHolder<GlacerosEntity.Variant> {
@@ -61,12 +61,19 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
     public  static final EntityDataAccessor<Boolean> EATING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
     public  static final EntityDataAccessor<Boolean> SHEARED = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
     public  static final EntityDataAccessor<Boolean> RUNNING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
+    public  static final EntityDataAccessor<Boolean> CHARGING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
+    public  static final EntityDataAccessor<Boolean> RUSHING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
+    public  static final EntityDataAccessor<Optional<UUID>> SPARRING_PARTNER = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+
 
     public int a = 0;
     public boolean readytoPlay = false;
     public int random = 120;
     public int antlerGrowCooldown;
     public int alertCooldown;
+    public boolean shouldSparInstantly;
+    public int sparringCooldown = 150 + this.getRandom().nextInt(50);
+    public int chargeTimer;
 
     public GlacerosEntity(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -91,10 +98,10 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         this.goalSelector.addGoal(5, new TemptGoal(this, 1, itemStack -> itemStack.is(this.getVariant().getDelphinium().asItem()) ,false));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 1.0));
         this.goalSelector.addGoal(6, new EatDelphiniumGoal(this, 1, 15));
-        this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 5.0F));
+        this.goalSelector.addGoal(7, new GlacerosLookAtPlayerGoal(this, Player.class, 5.0F));
         this.goalSelector.addGoal(7, new MoveAwayFromBlockGoal(this, Blocks.FIRE, 1.7, 12));
-        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
-        this.targetSelector.addGoal(0, new GlacerosFightGoal(this, GlacerosEntity.class, false));
+        this.goalSelector.addGoal(8, new GlacerosLookAroundGoal(this));
+        this.goalSelector.addGoal(8, new GlacerosSparGoal(this));
         this.targetSelector.addGoal(5, new AvoidEntityGoal<>(this, PsychoBearEntity.class, 20, 1.2f, 2.0f));//should avoid only when in sight?
     }
 
@@ -157,6 +164,14 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         if (level().isClientSide()) {
             animateWhen("idle", !isMoving(this) && onGround());
             animateWhen("eat", this.isEating());
+            if(this.getRandom().nextInt(this.isBaby() ? 30 : 100) == 0){
+                playAnimation("tail");
+            }
+            animateWhen("charge_prepare", this.isCharging());
+            animateWhen("charge", this.isRushing());
+            if(!this.isEating()){
+                stopAnimation("eat");
+            }
         }
 
         if(this.isSheared() && !this.level().isClientSide){
@@ -180,13 +195,28 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
             this.readytoPlay = false;
         }
 
+        if(sparringCooldown > 0){
+            sparringCooldown--;
+        }
+
         if(!level().isClientSide){
             if(alertCooldown != 0){
                 alertCooldown--;
             } else {
                 this.setPanicking(false);
             }
-            this.setRunning(this.moveControl.getSpeedModifier() > 1.1);
+            this.setRunning((this.moveControl.getSpeedModifier() > 1.1 && !this.isSparring()));
+            if(this.isCharging()){
+                this.setZza(0);
+                this.getNavigation().stop();
+            }
+            if(this.isSparring() && this.getSparringPartner() != null){
+                this.getLookControl().setLookAt(this.getSparringPartner());
+            }
+            if(this.getSparringPartner() == null){
+                this.setCharging(false);
+                this.setRushing(false);
+            }
         }
     }
 
@@ -257,6 +287,35 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         builder.define(EATING, false);
         builder.define(SHEARED, false);
         builder.define(RUNNING, false);
+        builder.define(CHARGING, false);
+        builder.define(RUSHING, false);
+        builder.define(SPARRING_PARTNER, Optional.empty());
+    }
+
+    @Nullable
+    public UUID getSparringPartnerUUID(){
+        return this.entityData.get(SPARRING_PARTNER).orElse(null);
+    }
+
+    public void setSparringPartnerUUID(UUID sparringPartner){
+        this.entityData.set(SPARRING_PARTNER, Optional.ofNullable(sparringPartner));
+    }
+
+    @Nullable
+    public Entity getSparringPartner() {
+        UUID id = getSparringPartnerUUID();
+        if (id != null && !this.level().isClientSide) {
+            return ((ServerLevel) level()).getEntity(id);
+        }
+        return null;
+    }
+
+    public void setSparringPartner(@Nullable Entity sparringPartner) {
+        if (sparringPartner == null) {
+            this.setSparringPartnerUUID(null);
+        } else {
+            this.setSparringPartnerUUID(sparringPartner.getUUID());
+        }
     }
 
     @Override
@@ -266,6 +325,26 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
 
     public void setPanicking(boolean panicking) {
         this.entityData.set(PANICKING, panicking);
+    }
+
+    public boolean isCharging() {
+        return this.entityData.get(CHARGING);
+    }
+
+    public void setCharging(boolean charging) {
+        this.entityData.set(CHARGING, charging);
+    }
+
+    public boolean isRushing() {
+        return this.entityData.get(RUSHING);
+    }
+
+    public void setRushing(boolean rushing) {
+        this.entityData.set(RUSHING, rushing);
+    }
+
+    public boolean isSparring(){
+        return this.isRushing() || this.isCharging();
     }
 
     public boolean isEating() {
@@ -302,6 +381,24 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         return GlacerosEntity.Variant.byId(this.entityData.get(DATA_VARIANT_ID));
     }
 
+    public boolean canSparWith(GlacerosEntity glaceros) {
+        return !glaceros.isSparring() && !glaceros.isSheared() && !glaceros.isBaby() && glaceros.getSparringPartnerUUID() == null && glaceros.sparringCooldown == 0;
+    }
+
+    public void knockBackSparring(GlacerosEntity glacerosEntity, float strength) {
+        applyKnockbackFromGlaceros(strength, glacerosEntity.getX() - this.getX(), glacerosEntity.getZ() - this.getZ());
+    }
+
+    private void applyKnockbackFromGlaceros(float strength, double ratioX, double ratioZ) {
+        if (!(strength <= 0.0F)) {
+            this.playSound(ModSounds.GLACEROS_CLASH.get(), 5, 5);
+            this.hasImpulse = true;
+            Vec3 vector3d = this.getDeltaMovement();
+            Vec3 vector3d1 = (new Vec3(ratioX, 0.0D, ratioZ)).normalize().scale(strength);
+            this.setDeltaMovement(vector3d.x / 2.0D - vector3d1.x, 0.3F, vector3d.z / 2.0D - vector3d1.z);
+        }
+    }
+
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
@@ -309,8 +406,11 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         compound.putBoolean("Panicking", this.isPanicking());
         compound.putBoolean("Eating", this.isEating());
         compound.putBoolean("Sheared", this.isSheared());
+        compound.putBoolean("Charging", this.isCharging());
+        compound.putBoolean("Rushing", this.isRushing());
         compound.putInt("AntlerCooldown", antlerGrowCooldown);
         compound.putInt("AlertCooldown", alertCooldown);
+        compound.putInt("SparringCooldown", sparringCooldown);
     }
 
     @Override
@@ -320,23 +420,26 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         this.setPanicking(compound.getBoolean("Panicking"));
         this.setEating(compound.getBoolean("Eating"));
         this.setSheared(compound.getBoolean("Sheared"));
+        this.setCharging(compound.getBoolean("Charging"));
+        this.setRushing(compound.getBoolean("Rushing"));
         antlerGrowCooldown = compound.getInt("AntlerCooldown");
         alertCooldown = compound.getInt("AlertCooldown");
+        sparringCooldown = compound.getInt("SparringCooldown");
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSource) {
-        return ModSounds.SOUND_ENTITY_GLACEROS_HURT.get();
+        return ModSounds.GLACEROS_HURT.get();
     }
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return ModSounds.SOUND_ENTITY_GLACEROS_IDLE.get();
+        return ModSounds.GLACEROS_IDLE.get();
     }
 
     @Override
     protected SoundEvent getDeathSound() {
-        return ModSounds.SOUND_ENTITY_GLACEROS_DEATH.get();
+        return ModSounds.GLACEROS_DEATH.get();
     }
 
     //////////////////////////////// VARIANTSSSSSSSSSSS
@@ -380,6 +483,51 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         @Override
         public String getSerializedName() {
             return this.name;
+        }
+    }
+
+    public class GlacerosLookAtPlayerGoal extends LookAtPlayerGoal{
+
+        public GlacerosLookAtPlayerGoal(Mob mob, Class<? extends LivingEntity> lookAtType, float lookDistance) {
+            super(mob, lookAtType, lookDistance);
+        }
+
+        @Override
+        public boolean canUse() {
+            if(GlacerosEntity.this.isSparring()){
+                return false;
+            }
+            return super.canUse();
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            if(GlacerosEntity.this.isSparring()){
+                return false;
+            }
+            return super.canContinueToUse();
+        }
+    }
+
+    public class GlacerosLookAroundGoal extends RandomLookAroundGoal{
+        public GlacerosLookAroundGoal(Mob mob) {
+            super(mob);
+        }
+
+        @Override
+        public boolean canUse() {
+            if(GlacerosEntity.this.isSparring()){
+                return false;
+            }
+            return super.canUse();
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            if(GlacerosEntity.this.isSparring()){
+                return false;
+            }
+            return super.canContinueToUse();
         }
     }
 }
