@@ -1,4 +1,4 @@
-// 1.21	2024-10-05T16:13:20.0704549	Tags for minecraft:item mod id blastfromthepast
+// 1.21	2024-10-05T18:52:33.3819653	Tags for minecraft:item mod id blastfromthepast
 9b03da703b68c3d79864427fc75aaf80b4a99d2b data/blastfromthepast/tags/item/baby_frostomper_food.json
 3f9ee7e575a4e21dadef974b0fa582d4bfc6c762 data/blastfromthepast/tags/item/baby_frostomper_tempt_items.json
 4c5cb1513054c5726a2e630bfc1ec70be84d45ab data/blastfromthepast/tags/item/baby_psycho_bear_food.json
@@ -9,6 +9,7 @@ a62ba860f75c9cb002ecb0d2777e16e00f122cda data/blastfromthepast/tags/item/baby_ps
 89bd40d092fef93bb4f3b678ce10ccc56724f54b data/blastfromthepast/tags/item/psycho_bear_pacifier.json
 917b31c4f2541bc6ccc2599c3ddedbd2c2ab84e8 data/blastfromthepast/tags/item/psycho_bear_tempt_items.json
 5d6439f3e7d0ed1eac76c1362e5ce33815715526 data/c/tags/item/foods/cooked_meat.json
+4b8f394ed38a072b629140e61f637dd1f315ad6e data/minecraft/tags/item/decorated_pot_sherds.json
 baa6c765b710fa56ad81e7b238020f184a80e6f1 data/minecraft/tags/item/leaves.json
 b76f0b7acfc200c28885d044f3d5e95964c47a0d data/minecraft/tags/item/logs_that_burn.json
 587e419aa8f278a4345f1aa28ba3323b11347ef1 data/minecraft/tags/item/meat.json

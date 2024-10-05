@@ -24,6 +24,11 @@ public class ModItemTagsGen extends ItemTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
+        tag(ItemTags.DECORATED_POT_SHERDS)
+                .add(ModItems.BEAST_POTTERY_SHERD.get())
+                .add(ModItems.FROST_POTTERY_SHERD.get())
+                .add(ModItems.WOODS_POTTERY_SHERD.get());
+
         tag(ItemTags.MEAT)
                 .add(ModItems.COOKED_VENISON.get())
                 .add(ModItems.RAW_VENISON.get());

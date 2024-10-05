@@ -5,6 +5,7 @@ import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
 import com.clonz.blastfromthepast.item.BFTPBoatItem;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -33,6 +34,13 @@ public class ModItems {
     public static final DeferredItem<Item> CURLY_GLACEROS_ANTLERS = register("curly_glaceros_antlers",
             () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> SPIKEY_GLACEROS_ANTLERS = register("spikey_glaceros_antlers",
+            () -> new Item(new Item.Properties()));
+
+    public static final DeferredItem<Item> BEAST_POTTERY_SHERD = register("beast_pottery_sherd",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> WOODS_POTTERY_SHERD = register("woods_pottery_sherd",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> FROST_POTTERY_SHERD = register("frost_pottery_sherd",
             () -> new Item(new Item.Properties()));
 
     public static final DeferredItem<Item> GLACEROS_SPAWN_EGG = register("glaceros_spawn_egg",

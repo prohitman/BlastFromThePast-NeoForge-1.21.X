@@ -27,6 +27,9 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.BROAD_GLACEROS_ANTLERS.get());
         basicItem(ModItems.SPIKEY_GLACEROS_ANTLERS.get());
         basicItem(ModItems.CURLY_GLACEROS_ANTLERS.get());
+        basicItem(ModItems.BEAST_POTTERY_SHERD.get());
+        basicItem(ModItems.WOODS_POTTERY_SHERD.get());
+        basicItem(ModItems.FROST_POTTERY_SHERD.get());
         withExistingParent(ModItems.SNOWDO_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.GLACEROS_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.FROSTOMPER_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));

@@ -66,7 +66,7 @@ public class BlastFromThePast {
         ModBlocks.BLOCKS.register(modEventBus);
         ModSounds.SOUND_EVENTS.register(modEventBus);
         ModBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
-
+        ModDecoratedPatterns.PATTERNS.register(modEventBus);
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
     }
 

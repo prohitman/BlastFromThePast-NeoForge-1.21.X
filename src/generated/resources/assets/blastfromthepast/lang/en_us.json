@@ -42,11 +42,13 @@
   "entity.blastfromthepast.psycho_bear": "Psycho Bear",
   "entity.blastfromthepast.snowdo": "Snowdo",
   "item.blastfromthepast.bear_claw": "Bear Claw",
+  "item.blastfromthepast.beast_pottery_sherd": "Beast Pottery Sherd",
   "item.blastfromthepast.broad_glaceros_antlers": "Broad Glaceros Antlers",
   "item.blastfromthepast.cedar_boat": "Cedar Boat",
   "item.blastfromthepast.cedar_chest_boat": "Cedar Chest Boat",
   "item.blastfromthepast.cooked_venison": "Cooked Venison",
   "item.blastfromthepast.curly_glaceros_antlers": "Curly Glaceros Antlers",
+  "item.blastfromthepast.frost_pottery_sherd": "Frost Pottery Sherd",
   "item.blastfromthepast.frostomper_spawn_egg": "Frostomper Spawn Egg",
   "item.blastfromthepast.glaceros_spawn_egg": "Glaceros Spawn Egg",
   "item.blastfromthepast.melon_ice_cream": "Melon Ice Cream",
@@ -59,5 +61,6 @@
   "item.blastfromthepast.snowdo_spawn_egg": "Snowdo Spawn Egg",
   "item.blastfromthepast.spikey_glaceros_antlers": "Spikey Glaceros Antlers",
   "item.blastfromthepast.straight_glaceros_antlers": "Straight Glaceros Antlers",
+  "item.blastfromthepast.woods_pottery_sherd": "Woods Pottery Sherd",
   "itemGroup.blastfromthepast": "Blast From The Past"
 }

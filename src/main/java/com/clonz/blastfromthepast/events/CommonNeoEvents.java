@@ -4,6 +4,7 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.init.ModBlocks;
+import com.clonz.blastfromthepast.init.ModDecoratedPatterns;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -25,7 +26,9 @@ public class CommonNeoEvents {
 
     @SubscribeEvent
     public static void setup(final FMLCommonSetupEvent event){
+        event.enqueueWork(ModDecoratedPatterns::expandVanillaPottery);
         registerFlammables();
+        //ModDecoratedPatterns.init();
     }
 
     public static void registerFlammables(){

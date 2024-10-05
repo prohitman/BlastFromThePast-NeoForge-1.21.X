@@ -35,6 +35,9 @@ public class ModTabs {
                         output.accept(ModItems.BROAD_GLACEROS_ANTLERS);
                         output.accept(ModItems.CURLY_GLACEROS_ANTLERS);
                         output.accept(ModItems.SPIKEY_GLACEROS_ANTLERS);
+                        output.accept(ModItems.BEAST_POTTERY_SHERD);
+                        output.accept(ModItems.WOODS_POTTERY_SHERD);
+                        output.accept(ModItems.FROST_POTTERY_SHERD);
                         output.accept(ModItems.SAP_BALL.get());
                         output.accept(ModItems.PSYCHO_BERRY.get());
                         output.accept(ModItems.SAP_ICE_CREAM.get());
