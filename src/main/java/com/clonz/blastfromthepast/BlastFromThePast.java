@@ -1,13 +1,16 @@
 package com.clonz.blastfromthepast;
 
+import com.clonz.blastfromthepast.client.models.BurrelModel;
 import com.clonz.blastfromthepast.client.models.GlacerosModel;
 import com.clonz.blastfromthepast.client.models.SnowdoModel;
 import com.clonz.blastfromthepast.client.models.SpeartoothTigerModel;
+import com.clonz.blastfromthepast.client.renderers.BurrelRenderer;
 import com.clonz.blastfromthepast.client.renderers.GlacerosRenderer;
 import com.clonz.blastfromthepast.client.renderers.SnowdoRenderer;
 import com.clonz.blastfromthepast.client.renderers.SpeartoothTigerRenderer;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
+import com.clonz.blastfromthepast.entity.burrel.Burrel;
 import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
 import com.clonz.blastfromthepast.init.*;
 import com.mojang.logging.LogUtils;
@@ -86,6 +89,7 @@ public class BlastFromThePast {
             EntityRenderers.register(ModEntities.GLACEROS.get(), GlacerosRenderer::new);
             EntityRenderers.register(ModEntities.SNOWDO.get(), SnowdoRenderer::new);
             EntityRenderers.register(ModEntities.SPEARTOOTH.get(), SpeartoothTigerRenderer::new);
+            EntityRenderers.register(ModEntities.BURREL.get(), BurrelRenderer::new);
             ItemBlockRenderTypes.setRenderLayer(ModBlocks.CEDAR_DOOR.get(), RenderType.CUTOUT);
 
         }
@@ -95,6 +99,7 @@ public class BlastFromThePast {
             event.registerLayerDefinition(GlacerosModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(GlacerosEntity.LOCATION));
             event.registerLayerDefinition(SnowdoModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(SnowdoEntity.LOCATION));
             event.registerLayerDefinition(SpeartoothTigerModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(SpeartoothTiger.LOCATION));
+            event.registerLayerDefinition(BurrelModel.LOCATION, () -> BaseDucModel.getLakeDefinition(Burrel.LOCATION));
         }
     }
 }

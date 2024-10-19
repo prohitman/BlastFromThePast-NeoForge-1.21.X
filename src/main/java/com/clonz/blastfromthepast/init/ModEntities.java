@@ -3,6 +3,7 @@ package com.clonz.blastfromthepast.init;
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
+import com.clonz.blastfromthepast.entity.burrel.Burrel;
 import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
@@ -36,12 +37,16 @@ public class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<SpeartoothTiger>> SPEARTOOTH = registerMob("speartooth_tiger", SpeartoothTiger::new
             , 1.0F, 1.0F, 0x302220, 0xACACAC);
 
+    public static final DeferredHolder<EntityType<?>, EntityType<Burrel>> BURREL = registerMob("burrel", Burrel::new
+            , 1.0F, 1.0F, 0x302220, 0xACACAC);
+
 
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> GlacerosEntity.init());
         event.enqueueWork(() -> SnowdoEntity.init());
         event.enqueueWork(() -> SpeartoothTiger.init());
+        event.enqueueWork(() -> Burrel.init());
     }
 
     @SubscribeEvent
@@ -49,5 +54,6 @@ public class ModEntities {
         event.put(ModEntities.GLACEROS.get(), GlacerosEntity.createAttributes().build());
         event.put(ModEntities.SNOWDO.get(), SnowdoEntity.createAttributes().build());
         event.put(ModEntities.SPEARTOOTH.get(), SpeartoothTiger.createAttributes().build());
+        event.put(ModEntities.BURREL.get(), Burrel.createAttributes().build());
     }
 }

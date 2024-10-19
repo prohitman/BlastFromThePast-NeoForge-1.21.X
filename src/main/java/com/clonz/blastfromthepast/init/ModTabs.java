@@ -21,6 +21,7 @@ public class ModTabs {
                         output.accept(ModItems.GLACEROS_SPAWN_EGG.get());
                         output.accept(ModItems.SNOWDO_SPAWN_EGG.get());
                         output.accept(ModItems.SPEARTOOTH_SPAWN_EGG.get());
+                        output.accept(ModItems.BURREL_SPAWN_EGG.get());
                         output.accept(ModBlocks.CEDAR_LOG.get());
                         output.accept(ModBlocks.STRIPPED_CEDAR_LOG.get());
                         output.accept(ModBlocks.SAPPY_CEDAR_LOG.get());
