@@ -2,6 +2,8 @@ package com.clonz.blastfromthepast.client.models;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.burrel.Burrel;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.itskillerluc.duclib.client.model.AnimatableDucModel;
 import io.github.itskillerluc.duclib.client.model.Ducling;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -29,5 +31,22 @@ public class BurrelModel extends AnimatableDucModel<Burrel> {
         super.setupAnim(pEntity, pLimbSwing, pLimbSwingAmount, pAgeInTicks, pNetHeadYaw, pHeadPitch);
         this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.burrel.walk").animation(), pLimbSwing, pLimbSwingAmount, 2, 1);
         this.animate(pEntity.idleState, pEntity.getAnimation().getAnimations().get("animation.burrel.idle").animation(), pAgeInTicks);
+        this.animate(pEntity.climbingState, pEntity.getAnimation().getAnimations().get("animation.burrel.climb").animation(), pAgeInTicks);
+    }
+
+
+    @Override
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
+        if (this.young) {
+            poseStack.pushPose();
+            poseStack.scale(0.3F, 0.3F, 0.3F);
+            poseStack.translate(0F, 1.2F, 0F);
+            poseStack.popPose();
+        } else {
+            poseStack.pushPose();
+            poseStack.scale(1, 1, 1);
+            poseStack.popPose();
+        }
+        super.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, color);
     }
 }
