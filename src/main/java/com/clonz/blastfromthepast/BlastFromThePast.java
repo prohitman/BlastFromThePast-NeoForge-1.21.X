@@ -1,26 +1,16 @@
 package com.clonz.blastfromthepast;
 
-import com.clonz.blastfromthepast.client.models.PsychoBearModel;
-import com.clonz.blastfromthepast.client.models.BurrelModel;
-import com.clonz.blastfromthepast.client.models.GlacerosModel;
-import com.clonz.blastfromthepast.client.models.SnowdoModel;
-import com.clonz.blastfromthepast.client.models.FrostomperModel;
+import com.clonz.blastfromthepast.client.models.*;
 import com.clonz.blastfromthepast.client.models.boats.BFTPBoatModel;
 import com.clonz.blastfromthepast.client.models.boats.BFTPChestBoatModel;
-import com.clonz.blastfromthepast.client.models.SpeartoothTigerModel;
-import com.clonz.blastfromthepast.client.renderers.BurrelRenderer;
-import com.clonz.blastfromthepast.client.renderers.GlacerosRenderer;
-import com.clonz.blastfromthepast.client.renderers.PsychoBearRenderer;
-import com.clonz.blastfromthepast.client.renderers.SnowdoRenderer;
-import com.clonz.blastfromthepast.client.renderers.SpeartoothTigerRenderer;
-import com.clonz.blastfromthepast.client.renderers.FrostomperRenderer;
+import com.clonz.blastfromthepast.client.renderers.*;
 import com.clonz.blastfromthepast.client.renderers.boat.BFTPBoatRenderer;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
-import com.clonz.blastfromthepast.entity.burrel.Burrel;
-import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
 import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
+import com.clonz.blastfromthepast.entity.burrel.Burrel;
 import com.clonz.blastfromthepast.entity.pack.EntityPacks;
+import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
 import com.clonz.blastfromthepast.init.*;
 import com.mojang.logging.LogUtils;
 import io.github.itskillerluc.duclib.client.model.BaseDucModel;
@@ -31,12 +21,6 @@ import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
-import org.slf4j.Logger;
-
-import com.mojang.logging.LogUtils;
-
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -48,7 +32,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
-
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -56,9 +40,6 @@ import org.slf4j.Logger;
 public class BlastFromThePast {
     public static final String MODID = "blastfromthepast";
     public static final Logger LOGGER = LogUtils.getLogger();
-    public BlastFromThePast(IEventBus modEventBus, ModContainer modContainer)
-    {
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     public BlastFromThePast(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
@@ -80,6 +61,7 @@ public class BlastFromThePast {
         ModSounds.SOUND_EVENTS.register(modEventBus);
         ModBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
         ModDecoratedPatterns.PATTERNS.register(modEventBus);
+        ModArmorMaterials.ARMOR_MATERIAL.register(modEventBus);
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
     }
 
@@ -91,19 +73,7 @@ public class BlastFromThePast {
         return getEntityPacks(server.overworld());
     }
 
-    // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
-        //  if (event.getTabKey() == CreativeModeTabs.COMBAT) {
-        //       event.accept(ModItems.ICE_SPEAR);
-        //   }
-
-
-        //    if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
-        //    event.accept(ModBlocks.FROZEN_PINE_LOG);
-        //      event.accept(ModBlocks.STRIPPED_FROZEN_PINE_LOG);
-        //     }
-
-
     }
 
 
@@ -113,8 +83,8 @@ public class BlastFromThePast {
     }
 
     @SubscribeEvent
-    public void onServerTick(LevelTickEvent.Post event){
-        if(event.getLevel() instanceof ServerLevel serverLevel && event.getLevel().dimension().equals(Level.OVERWORLD) && serverLevel.tickRateManager().runsNormally()){
+    public void onServerTick(LevelTickEvent.Post event) {
+        if (event.getLevel() instanceof ServerLevel serverLevel && event.getLevel().dimension().equals(Level.OVERWORLD) && serverLevel.tickRateManager().runsNormally()) {
             getEntityPacks(serverLevel).tick();
         }
     }
@@ -128,14 +98,12 @@ public class BlastFromThePast {
             EntityRenderers.register(ModEntities.SNOWDO.get(), SnowdoRenderer::new);
             EntityRenderers.register(ModEntities.FROSTOMPER.get(), FrostomperRenderer::new);
             EntityRenderers.register(ModEntities.PSYCHO_BEAR.get(), PsychoBearRenderer::new);
+            EntityRenderers.register(ModEntities.SPEARTOOTH.get(), SpeartoothTigerRenderer::new);
+            EntityRenderers.register(ModEntities.BURREL.get(), BurrelRenderer::new);
             EntityRenderers.register(ModEntities.BFTPBOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, false)));
             EntityRenderers.register(ModEntities.BFTPCHEST_BOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, true)));
             BlockEntityRenderers.register(ModBlockEntities.SIGN.get(), SignRenderer::new);
             BlockEntityRenderers.register(ModBlockEntities.HANGING_SIGN.get(), HangingSignRenderer::new);
-            EntityRenderers.register(ModEntities.SPEARTOOTH.get(), SpeartoothTigerRenderer::new);
-            EntityRenderers.register(ModEntities.BURREL.get(), BurrelRenderer::new);
-            ItemBlockRenderTypes.setRenderLayer(ModBlocks.CEDAR_DOOR.get(), RenderType.CUTOUT);
-
         }
 
         @SubscribeEvent
@@ -145,14 +113,14 @@ public class BlastFromThePast {
             event.registerLayerDefinition(SnowdoModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(SnowdoEntity.LOCATION));
             event.registerLayerDefinition(FrostomperModel.ADULT_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.FROSTOMPER.getId()));
             event.registerLayerDefinition(FrostomperModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.FROSTOMPER.getId().withPrefix("baby_")));
+            event.registerLayerDefinition(SpeartoothTigerModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(SpeartoothTiger.LOCATION));
+            event.registerLayerDefinition(BurrelModel.LOCATION, () -> BaseDucModel.getLakeDefinition(Burrel.LOCATION));
             event.registerLayerDefinition(PsychoBearModel.ADULT_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.PSYCHO_BEAR.getId()));
             event.registerLayerDefinition(PsychoBearModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.PSYCHO_BEAR.getId().withPrefix("baby_")));
             for (BFTPBoat.BoatType boat$type : BFTPBoat.BoatType.values()) {
                 event.registerLayerDefinition(BFTPBoatRenderer.createBoatModelName(boat$type), BFTPBoatModel::createBodyModel);
                 event.registerLayerDefinition(BFTPBoatRenderer.createChestBoatModelName(boat$type), BFTPChestBoatModel::createBodyModel);
             }
-            event.registerLayerDefinition(SpeartoothTigerModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(SpeartoothTiger.LOCATION));
-            event.registerLayerDefinition(BurrelModel.LOCATION, () -> BaseDucModel.getLakeDefinition(Burrel.LOCATION));
         }
     }
 }

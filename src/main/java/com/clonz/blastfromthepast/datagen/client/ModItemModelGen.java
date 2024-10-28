@@ -23,12 +23,6 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.RAW_VENISON.get());
         basicItem(ModItems.SAP_BALL.get());
         basicItem(ModItems.COOKED_VENISON.get());
-        basicItem(ModItems.SHAGGY_PELT.get());
-
-        basicItem(ModItems.FROST_BITE_HELMET.get());
-        basicItem(ModItems.FROST_BITE_BOOTS.get());
-        basicItem(ModItems.FROST_BITE_CHESTPLATE.get());
-        basicItem(ModItems.FROST_BITE_LEGGINGS.get());
         basicItem(ModItems.STRAIGHT_GLACEROS_ANTLERS.get());
         basicItem(ModItems.BROAD_GLACEROS_ANTLERS.get());
         basicItem(ModItems.SPIKEY_GLACEROS_ANTLERS.get());
@@ -38,7 +32,6 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.FROST_POTTERY_SHERD.get());
         withExistingParent(ModItems.SNOWDO_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.GLACEROS_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
-        withExistingParent(ModItems.SPEARTOOTH_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.FROSTOMPER_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.PSYCHO_BEAR_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         basicItem(ModItems.CEDAR_BOAT.get());
@@ -49,6 +42,14 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.PSYCHO_BERRY_ICE_CREAM.get());
         basicItem(ModItems.MELON_ICE_CREAM.get());
         basicItem(ModItems.BEAR_CLAW.get());
+
+        basicItem(ModItems.FROST_BITE_HELMET.get());
+        basicItem(ModItems.FROST_BITE_BOOTS.get());
+        basicItem(ModItems.FROST_BITE_CHESTPLATE.get());
+        basicItem(ModItems.FROST_BITE_LEGGINGS.get());
+        withExistingParent(ModItems.SNOWDO_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
+        withExistingParent(ModItems.GLACEROS_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
+        withExistingParent(ModItems.SPEARTOOTH_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
 
         //Blocks
         registerWoodGroup(ModBlocks.CEDAR);
@@ -110,13 +111,21 @@ public class ModItemModelGen extends ItemModelProvider {
     }
 
     private void createWithParent(DeferredBlock<? extends Block> key) {
-        withExistingParent(key.getId().getPath(), modLoc("block/" + key.getId().getPath()));
+        withExistingParent(key.getId().getPath(), modLoc( "block/" + key.getId().getPath()));
     }
 
-    private void singleTextureBlock(DeferredBlock<? extends Block> key) {
+    private void singleTextureBlock(DeferredBlock<? extends Block> key){
         singleTexture(key.getId().getPath(), mcLoc("item/generated"), "layer0",
                 modLoc("item/" + key.getId().getPath())).renderType("cutout_mipped");
     }
+
+    private void createSuffixedParent(DeferredBlock<? extends Block> handler, String suffix) {
+        withExistingParent(handler.getId().getPath(), modLoc( "block/" + handler.getId().getPath() + suffix));
+    }
+
+    private void singleTextureDoublePlantBlock(DeferredBlock<Block> block, boolean isTop){
+        singleTexture((block.getId().getPath()),
+                mcLoc("item/generated"),
+                "layer0", modLoc("block/" + block.getId().getPath() + (isTop ? "_top" : "_bottom")));
+    }
 }
-
-

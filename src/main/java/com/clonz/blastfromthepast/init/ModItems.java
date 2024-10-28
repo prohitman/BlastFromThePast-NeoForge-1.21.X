@@ -7,10 +7,11 @@ import com.clonz.blastfromthepast.item.FrostbiteArmor;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.function.Supplier;
 
 
 public class ModItems {
@@ -43,10 +44,10 @@ public class ModItems {
     public static final DeferredItem<Item> FROST_POTTERY_SHERD = register("frost_pottery_sherd",
             () -> new Item(new Item.Properties()));
 
-    public static final DeferredItem<Item> GLACEROS_SPAWN_EGG = ITEMS.register("glaceros_spawn_egg",
+    public static final DeferredItem<Item> GLACEROS_SPAWN_EGG = register("glaceros_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.GLACEROS, 0x7c908b, 0xffb122, new Item.Properties()));
 
-    public static final DeferredItem<Item> SNOWDO_SPAWN_EGG = ITEMS.register("snowdo_spawn_egg",
+    public static final DeferredItem<Item> SNOWDO_SPAWN_EGG = register("snowdo_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.SNOWDO, 0x74a3af, 0xcdc9df, new Item.Properties()));
 
     public static final DeferredItem<Item> SPEARTOOTH_SPAWN_EGG = ITEMS.register("speartooth_tiger_spawn_egg",
@@ -56,16 +57,6 @@ public class ModItems {
     public static final DeferredItem<Item> BURREL_SPAWN_EGG = ITEMS.register("burrel_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.BURREL, 0x74a3af, 0xcdc9df, new Item.Properties()));
 
-    public static final DeferredItem<Item> ICE_SPEAR = ITEMS.register("ice_spear", () -> new Item(new Item.Properties().stacksTo(1)));
-
-    public static final DeferredItem<Item> SPEARTOOTH = ITEMS.register("speartooth", () -> new Item(new Item.Properties()));
-
-    public static final DeferredItem<Item> SHAGGY_PELT = ITEMS.register("shaggy_pelt", () -> new Item(new Item.Properties()));
-
-    public static final DeferredItem<ArmorItem> FROST_BITE_HELMET = ITEMS.register("frost_bite_helmet", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.HELMET, new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(10))));
-    public static final DeferredItem<ArmorItem> FROST_BITE_CHESTPLATE = ITEMS.register("frost_bite_chestplate", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ArmorItem.Type.CHESTPLATE.getDurability(10))));
-    public static final DeferredItem<ArmorItem> FROST_BITE_LEGGINGS = ITEMS.register("frost_bite_leggings", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ArmorItem.Type.LEGGINGS.getDurability(10))));
-    public static final DeferredItem<ArmorItem> FROST_BITE_BOOTS = ITEMS.register("frost_bite_boots", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.BOOTS, new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(10))));
     public static final DeferredItem<Item> FROSTOMPER_SPAWN_EGG = register("frostomper_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.FROSTOMPER, 0x74a3af, 0xcdc9df, new Item.Properties()));
 
@@ -90,6 +81,20 @@ public class ModItems {
     private static DeferredItem<Item> registerIceCream(String name) {
         return register(name, () -> new Item(new Item.Properties().stacksTo(16).food(ModFoods.BOWL_ICE_CREAM)));
     }
+
+
+    public static final DeferredItem<Item> ICE_SPEAR = ITEMS.register("ice_spear", () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> SPEARTOOTH = ITEMS.register("speartooth", () -> new Item(new Item.Properties()));
+
+    public static final DeferredItem<Item> SHAGGY_PELT = ITEMS.register("shaggy_pelt", () -> new Item(new Item.Properties()));
+
+    public static final DeferredItem<ArmorItem> FROST_BITE_HELMET = ITEMS.register("frost_bite_helmet", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.HELMET, new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(10))));
+    public static final DeferredItem<ArmorItem> FROST_BITE_CHESTPLATE = ITEMS.register("frost_bite_chestplate", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ArmorItem.Type.CHESTPLATE.getDurability(10))));
+    public static final DeferredItem<ArmorItem> FROST_BITE_LEGGINGS = ITEMS.register("frost_bite_leggings", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ArmorItem.Type.LEGGINGS.getDurability(10))));
+    public static final DeferredItem<ArmorItem> FROST_BITE_BOOTS = ITEMS.register("frost_bite_boots", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.BOOTS, new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(10))));
+
+
 
 /*    public static final DeferredItem<BlockItem> FROZEN_PINE_LOG =
             ITEMS.registerSimpleBlockItem("cedar_log", ModBlocks.CEDAR_LOG);

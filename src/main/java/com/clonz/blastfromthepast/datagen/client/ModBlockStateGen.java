@@ -37,11 +37,11 @@ public class ModBlockStateGen extends BlockStateProvider {
     private void registerStoneGroup(BFTPStoneGroup stoneGroup){
         createSnowyBlock(stoneGroup.BLOCK,
                 models().cubeAll(this.name(stoneGroup.BLOCK.get()),
-                this.blockTexture(stoneGroup.BLOCK.get())),
+                        this.blockTexture(stoneGroup.BLOCK.get())),
                 models().cubeBottomTop("snowy_" + this.name(stoneGroup.BLOCK.get()),
-                modLoc("block/" + "snowy_" + stoneGroup.BLOCK.getId().getPath()),
-                this.blockTexture(stoneGroup.BLOCK.get()),
-                this.blockTexture(Blocks.SNOW)));
+                        modLoc("block/" + "snowy_" + stoneGroup.BLOCK.getId().getPath()),
+                        this.blockTexture(stoneGroup.BLOCK.get()),
+                        this.blockTexture(Blocks.SNOW)));
         stairsBlock(stoneGroup.STAIRS.get(), this.blockTexture(stoneGroup.BLOCK.get()));
         slabBlock(stoneGroup.SLAB.get(), this.blockTexture(stoneGroup.BLOCK.get()), this.blockTexture(stoneGroup.BLOCK.get()));
         wallBlock(stoneGroup.WALL.get(), this.blockTexture(stoneGroup.BLOCK.get()));
@@ -118,14 +118,14 @@ public class ModBlockStateGen extends BlockStateProvider {
 
     private void createSnowyBlock(DeferredBlock<Block> block, ModelFile stone, ModelFile snowy){
         getVariantBuilder(block.get()).forAllStatesExcept(state -> {
-           ModelFile model = stone;
-           if(state.getValue(SnowyStoneBlock.SNOWY)){
-               model = snowy;
-           }
-           return ConfiguredModel.builder()
-                   .modelFile(model)
-                   .uvLock(true)
-                   .build();
+            ModelFile model = stone;
+            if(state.getValue(SnowyStoneBlock.SNOWY)){
+                model = snowy;
+            }
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .uvLock(true)
+                    .build();
         });
     }
 

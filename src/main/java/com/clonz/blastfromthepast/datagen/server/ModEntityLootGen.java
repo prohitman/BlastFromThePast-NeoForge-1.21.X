@@ -42,20 +42,20 @@ public class ModEntityLootGen extends EntityLootSubProvider {
         this.add(ModEntities.GLACEROS.get(), LootTable.lootTable()
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1))
                         .add(
-                            LootItem.lootTableItem(Items.LEATHER)
-                                    .setWeight(3)
-                                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(0.0F, 2.0F)))
-                                    .apply(EnchantedCountIncreaseFunction.lootingMultiplier(this.registries, UniformGenerator.between(0.0F, 1.0F))))
+                                LootItem.lootTableItem(Items.LEATHER)
+                                        .setWeight(3)
+                                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(0.0F, 2.0F)))
+                                        .apply(EnchantedCountIncreaseFunction.lootingMultiplier(this.registries, UniformGenerator.between(0.0F, 1.0F))))
                 )
                 .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1))
                         .add(
-                            LootItem.lootTableItem(ModItems.RAW_VENISON)
-                                    .setWeight(3)
-                                    .apply(SmeltItemFunction.smelted()
-                                            .when(AnyOfCondition.anyOf(this.shouldSmeltLoot())))
-                                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(0.0F, 2.0F)))
-                                    .apply(EnchantedCountIncreaseFunction.lootingMultiplier(this.registries, UniformGenerator.between(0.0F, 1.0F))))
-            ));
+                                LootItem.lootTableItem(ModItems.RAW_VENISON)
+                                        .setWeight(3)
+                                        .apply(SmeltItemFunction.smelted()
+                                                .when(AnyOfCondition.anyOf(this.shouldSmeltLoot())))
+                                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(0.0F, 2.0F)))
+                                        .apply(EnchantedCountIncreaseFunction.lootingMultiplier(this.registries, UniformGenerator.between(0.0F, 1.0F))))
+                ));
         this.add(ModEntities.GLACEROS.get(), GLACEROS_STRAIGHT, createGlacerosTable(ModItems.STRAIGHT_GLACEROS_ANTLERS));
         this.add(ModEntities.GLACEROS.get(), GLACEROS_BROAD, createGlacerosTable(ModItems.BROAD_GLACEROS_ANTLERS));
         this.add(ModEntities.GLACEROS.get(), GLACEROS_CURLY, createGlacerosTable(ModItems.CURLY_GLACEROS_ANTLERS));

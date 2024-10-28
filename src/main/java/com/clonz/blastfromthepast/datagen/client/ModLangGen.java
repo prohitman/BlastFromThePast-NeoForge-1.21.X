@@ -29,20 +29,59 @@ public class ModLangGen extends LanguageProvider {
         addItem(ModItems.SAP_BALL);
         addItem(ModItems.RAW_VENISON);
         addItem(ModItems.COOKED_VENISON);
+        addItem(ModItems.STRAIGHT_GLACEROS_ANTLERS);
+        addItem(ModItems.SPIKEY_GLACEROS_ANTLERS);
+        addItem(ModItems.BROAD_GLACEROS_ANTLERS);
+        addItem(ModItems.CURLY_GLACEROS_ANTLERS);
+        addItem(ModItems.BEAST_POTTERY_SHERD);
+        addItem(ModItems.WOODS_POTTERY_SHERD);
+        addItem(ModItems.FROST_POTTERY_SHERD);
         addItem(ModItems.GLACEROS_SPAWN_EGG);
         addItem(ModItems.SNOWDO_SPAWN_EGG);
+        addItem(ModItems.FROSTOMPER_SPAWN_EGG);
+        addItem(ModItems.PSYCHO_BEAR_SPAWN_EGG);
+        addItem(ModItems.CEDAR_BOAT);
+        addItem(ModItems.CEDAR_CHEST_BOAT);
+        addItem(ModItems.SPEARTOOTH_SPAWN_EGG);
+        addItem(ModItems.SHAGGY_PELT);
 
-        //Blocks
-        addBlock(ModBlocks.CEDAR_DOOR);
-        addBlock(ModBlocks.CEDAR_LOG);
-        addBlock(ModBlocks.SAPPY_CEDAR_LOG);
-        addBlock(ModBlocks.STRIPPED_CEDAR_LOG);
-        addBlock(ModBlocks.CEDAR_LEAVES);
-        addBlock(ModBlocks.CEDAR_PLANKS);
+        addItem(ModItems.FROST_BITE_HELMET);
+        addItem(ModItems.FROST_BITE_CHESTPLATE);
+        addItem(ModItems.FROST_BITE_LEGGINGS);
+        addItem(ModItems.FROST_BITE_BOOTS);
+
+
+        addItem(ModItems.PSYCHO_BERRY);
+        addItem(ModItems.SAP_ICE_CREAM);
+        addItem(ModItems.PSYCHO_BERRY_ICE_CREAM);
+        addItem(ModItems.MELON_ICE_CREAM);
+        addBlock(ModBlocks.BEAST_CHOPS);
+        addBlock(ModBlocks.BEAST_CHOPS_COOKED);
+        addBlock(ModBlocks.BEAST_CHOPS_GLAZED);
+        addBlock(ModBlocks.SHAGGY_BLOCK);
 
         //Entities
         addEntity(ModEntities.GLACEROS);
         addEntity(ModEntities.SNOWDO);
+        addEntity(ModEntities.SPEARTOOTH);
+
+
+        addItem(ModItems.BEAR_CLAW);
+
+        //Blocks
+        addBlock(ModBlocks.SAPPY_CEDAR_LOG);
+        registerWoodGroup(ModBlocks.CEDAR);
+        addBlock(ModBlocks.WHITE_DELPHINIUM);
+        addBlock(ModBlocks.PINK_DELPHINIUM);
+        addBlock(ModBlocks.VIOLET_DELPHINIUM);
+        addBlock(ModBlocks.BLUE_DELPHINIUM);
+        registerStoneGroup(ModBlocks.PERMAFROST);
+
+        //Entities
+        addEntity(ModEntities.GLACEROS);
+        addEntity(ModEntities.SNOWDO);
+        addEntity(ModEntities.FROSTOMPER);
+        addEntity(ModEntities.PSYCHO_BEAR);
 
         add("itemGroup." + BlastFromThePast.MODID, "Blast From The Past");
     }
@@ -51,12 +90,55 @@ public class ModLangGen extends LanguageProvider {
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
     }
 
+    private void addBlockWithSuffix(DeferredBlock<? extends Block> key, String suffix) {
+        add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")).concat(suffix));
+    }
+
     private void addItem(DeferredItem<? extends Item> key){
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
     }
 
     private <T extends Entity> void addEntity(DeferredHolder<EntityType<?>, EntityType<T>> key){
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
+    }
+
+    private void registerStoneGroup(BFTPStoneGroup stoneGroup){
+        addBlock(stoneGroup.BLOCK);
+        addBlock(stoneGroup.COBBLESTONE);
+        addBlock(stoneGroup.POLISHED);
+        addBlock(stoneGroup.CHISELED_BRICKS);
+        addBlock(stoneGroup.BRICKS);
+        addBlock(stoneGroup.WALL);
+        addBlock(stoneGroup.STAIRS);
+        addBlock(stoneGroup.SLAB);
+        addBlock(stoneGroup.POLISHED_SLAB);
+        addBlock(stoneGroup.POLISHED_STAIRS);
+        addBlock(stoneGroup.POLISHED_WALL);
+        addBlock(stoneGroup.BRICKS_SLAB);
+        addBlock(stoneGroup.BRICKS_STAIRS);
+        addBlock(stoneGroup.BRICKS_WALL);
+        addBlock(stoneGroup.COBBLESTONE_SLAB);
+        addBlock(stoneGroup.COBBLESTONE_STAIRS);
+        addBlock(stoneGroup.COBBLESTONE_WALL);
+    }
+
+    private void registerWoodGroup(BFTPWoodGroup woodGroup){
+        addBlockWithSuffix(woodGroup.BLOCK, " Planks");
+        addBlock(woodGroup.LOG);
+        addBlock(woodGroup.STRIPPED_LOG);
+        addBlock(woodGroup.WOOD);
+        addBlock(woodGroup.STRIPPED_WOOD);
+        addBlock(woodGroup.SLAB);
+        addBlock(woodGroup.STAIRS);
+        addBlock(woodGroup.LEAVES);
+        addBlock(woodGroup.FENCE);
+        addBlock(woodGroup.FENCE_GATE);
+        addBlock(woodGroup.PRESSURE_PLATE);
+        addBlock(woodGroup.BUTTON);
+        addBlock(woodGroup.TRAPDOOR);
+        addBlock(woodGroup.DOOR);
+        addBlock(woodGroup.SIGN);
+        addBlock(woodGroup.HANGING_SIGN);
     }
 
 }

@@ -1,16 +1,16 @@
 package com.clonz.blastfromthepast.init;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.entity.FrostomperEntity;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.PsychoBearEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
-import com.clonz.blastfromthepast.entity.burrel.Burrel;
-import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
-import net.minecraft.core.registries.Registries;
-import com.clonz.blastfromthepast.entity.FrostomperEntity;
 import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
 import com.clonz.blastfromthepast.entity.boats.BFTPChestBoat;
+import com.clonz.blastfromthepast.entity.burrel.Burrel;
+import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
 import com.clonz.blastfromthepast.util.HitboxHelper;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
@@ -20,7 +20,6 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.minecraft.core.registries.Registries;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class ModEntities {
@@ -43,13 +42,20 @@ public class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<FrostomperEntity>> FROSTOMPER = registerMob("frostomper", FrostomperEntity::new,
             HitboxHelper.pixelsToBlocks(77.0F), HitboxHelper.pixelsToBlocks(70.0F), 0x302219, 0xACACAC);
 
-    public static final DeferredHolder<EntityType<?>, EntityType<BFTPBoat>> BFTPBOAT = ENTITIES.register("boat",() -> EntityType.Builder
+    public static final DeferredHolder<EntityType<?>, EntityType<SpeartoothTiger>> SPEARTOOTH = registerMob("speartooth_tiger", SpeartoothTiger::new
+            , 1.0F, 1.0F, 0x302220, 0xACACAC);
+
+    public static final DeferredHolder<EntityType<?>, EntityType<Burrel>> BURREL = registerMob("burrel", Burrel::new
+            , 1.0F, 1.0F, 0x302220, 0xACACAC);
+
+
+    public static final DeferredHolder<EntityType<?>, EntityType<BFTPBoat>> BFTPBOAT = ENTITIES.register("boat", () -> EntityType.Builder
             .<BFTPBoat>of(BFTPBoat::new, MobCategory.MISC)
             .sized(1.375F, 0.5625F)
             .clientTrackingRange(10)
             .build(getName("boat")));
 
-    public static final DeferredHolder<EntityType<?>, EntityType<BFTPChestBoat>> BFTPCHEST_BOAT = ENTITIES.register("chest_boat",() -> EntityType.Builder
+    public static final DeferredHolder<EntityType<?>, EntityType<BFTPChestBoat>> BFTPCHEST_BOAT = ENTITIES.register("chest_boat", () -> EntityType.Builder
             .<BFTPChestBoat>of(BFTPChestBoat::new, MobCategory.MISC)
             .sized(1.375F, 0.5625F)
             .clientTrackingRange(10)
@@ -73,7 +79,7 @@ public class ModEntities {
     }
 
     @SubscribeEvent
-    public static void  registerAttributes(EntityAttributeCreationEvent event) {
+    public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(ModEntities.GLACEROS.get(), GlacerosEntity.createAttributes().build());
         event.put(ModEntities.SNOWDO.get(), SnowdoEntity.createAttributes().build());
         event.put(ModEntities.SPEARTOOTH.get(), SpeartoothTiger.createAttributes().build());

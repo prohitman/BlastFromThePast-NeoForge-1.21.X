@@ -23,13 +23,11 @@ public class ModTabs {
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.GLACEROS_SPAWN_EGG.get());
                         output.accept(ModItems.SNOWDO_SPAWN_EGG.get());
-                        output.accept(ModItems.SPEARTOOTH_SPAWN_EGG.get());
-                        output.accept(ModItems.BURREL_SPAWN_EGG.get());
-                        output.accept(ModBlocks.CEDAR_LOG.get());
-                        output.accept(ModBlocks.STRIPPED_CEDAR_LOG.get());
                         output.accept(ModItems.FROSTOMPER_SPAWN_EGG.get());
                         output.accept(ModItems.PSYCHO_BEAR_SPAWN_EGG.get());
                         output.accept(ModBlocks.SAPPY_CEDAR_LOG.get());
+                        output.accept(ModItems.SPEARTOOTH_SPAWN_EGG.get());
+                        output.accept(ModItems.BURREL_SPAWN_EGG.get());
                         addWoodGroupToTab(output, ModBlocks.CEDAR);
                         output.accept(ModItems.CEDAR_BOAT.get());
                         output.accept(ModItems.CEDAR_CHEST_BOAT.get());
@@ -43,6 +41,15 @@ public class ModTabs {
                         output.accept(ModItems.WOODS_POTTERY_SHERD);
                         output.accept(ModItems.FROST_POTTERY_SHERD);
                         output.accept(ModItems.SAP_BALL.get());
+                        output.accept(ModItems.PSYCHO_BERRY.get());
+                        output.accept(ModItems.SAP_ICE_CREAM.get());
+                        output.accept(ModItems.PSYCHO_BERRY_ICE_CREAM.get());
+                        output.accept(ModItems.MELON_ICE_CREAM.get());
+                        output.accept(ModItems.BEAR_CLAW.get());
+                        output.accept(ModBlocks.VIOLET_DELPHINIUM);
+                        output.accept(ModBlocks.WHITE_DELPHINIUM);
+                        output.accept(ModBlocks.BLUE_DELPHINIUM);
+                        output.accept(ModBlocks.PINK_DELPHINIUM);
                         output.accept(ModItems.SPEARTOOTH.get());
                         output.accept(ModItems.ICE_SPEAR.get());
                         output.accept(ModBlocks.BEAST_CHOPS.get());
@@ -55,25 +62,16 @@ public class ModTabs {
                         output.accept(ModItems.FROST_BITE_CHESTPLATE);
                         output.accept(ModItems.FROST_BITE_LEGGINGS);
 
-                        output.accept(ModItems.PSYCHO_BERRY.get());
-                        output.accept(ModItems.SAP_ICE_CREAM.get());
-                        output.accept(ModItems.PSYCHO_BERRY_ICE_CREAM.get());
-                        output.accept(ModItems.MELON_ICE_CREAM.get());
-                        output.accept(ModItems.BEAR_CLAW.get());
-                        output.accept(ModBlocks.VIOLET_DELPHINIUM);
-                        output.accept(ModBlocks.WHITE_DELPHINIUM);
-                        output.accept(ModBlocks.BLUE_DELPHINIUM);
-                        output.accept(ModBlocks.PINK_DELPHINIUM);
                         addStoneGroupToTab(output, ModBlocks.PERMAFROST);
                     }).build());
 
-    private static void addStoneGroupToTab(CreativeModeTab.Output output, BFTPStoneGroup stoneGroup){
-        for(DeferredBlock<?> deferredBlock : stoneGroup.blocks){
+    private static void addStoneGroupToTab(CreativeModeTab.Output output, BFTPStoneGroup stoneGroup) {
+        for (DeferredBlock<?> deferredBlock : stoneGroup.blocks) {
             output.accept(deferredBlock);
         }
     }
 
-    private static void addWoodGroupToTab(CreativeModeTab.Output output, BFTPWoodGroup woodGroup){
+    private static void addWoodGroupToTab(CreativeModeTab.Output output, BFTPWoodGroup woodGroup) {
         output.accept(woodGroup.LOG);
         output.accept(woodGroup.WOOD);
         output.accept(woodGroup.STRIPPED_LOG);
