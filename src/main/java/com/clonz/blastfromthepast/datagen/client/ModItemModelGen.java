@@ -1,6 +1,8 @@
 package com.clonz.blastfromthepast.datagen.client;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.block.BFTPStoneGroup;
+import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModItems;
 import net.minecraft.data.PackOutput;
@@ -27,17 +29,84 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.FROST_BITE_BOOTS.get());
         basicItem(ModItems.FROST_BITE_CHESTPLATE.get());
         basicItem(ModItems.FROST_BITE_LEGGINGS.get());
+        basicItem(ModItems.STRAIGHT_GLACEROS_ANTLERS.get());
+        basicItem(ModItems.BROAD_GLACEROS_ANTLERS.get());
+        basicItem(ModItems.SPIKEY_GLACEROS_ANTLERS.get());
+        basicItem(ModItems.CURLY_GLACEROS_ANTLERS.get());
+        basicItem(ModItems.BEAST_POTTERY_SHERD.get());
+        basicItem(ModItems.WOODS_POTTERY_SHERD.get());
+        basicItem(ModItems.FROST_POTTERY_SHERD.get());
         withExistingParent(ModItems.SNOWDO_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.GLACEROS_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.SPEARTOOTH_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
+        withExistingParent(ModItems.FROSTOMPER_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
+        withExistingParent(ModItems.PSYCHO_BEAR_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
+        basicItem(ModItems.CEDAR_BOAT.get());
+        basicItem(ModItems.CEDAR_CHEST_BOAT.get());
+
+        basicItem(ModItems.PSYCHO_BERRY.get());
+        basicItem(ModItems.SAP_ICE_CREAM.get());
+        basicItem(ModItems.PSYCHO_BERRY_ICE_CREAM.get());
+        basicItem(ModItems.MELON_ICE_CREAM.get());
+        basicItem(ModItems.BEAR_CLAW.get());
+
         //Blocks
-        createWithParent(ModBlocks.CEDAR_LEAVES);
-        createWithParent(ModBlocks.CEDAR_PLANKS);
-        createWithParent(ModBlocks.CEDAR_LOG);
-        createWithParent(ModBlocks.STRIPPED_CEDAR_LOG);
+        registerWoodGroup(ModBlocks.CEDAR);
+        registerStoneGroup(ModBlocks.PERMAFROST);
         createWithParent(ModBlocks.SAPPY_CEDAR_LOG);
-        createWithParent(ModBlocks.CEDAR_LEAVES);
-        singleTextureBlock(ModBlocks.CEDAR_DOOR);
+        singleTextureDoublePlantBlock(ModBlocks.WHITE_DELPHINIUM, true);
+        singleTextureDoublePlantBlock(ModBlocks.BLUE_DELPHINIUM, true);
+        singleTextureDoublePlantBlock(ModBlocks.VIOLET_DELPHINIUM, true);
+        singleTextureDoublePlantBlock(ModBlocks.PINK_DELPHINIUM, true);
+    }
+
+    private void registerStoneGroup(BFTPStoneGroup stoneGroup){
+        createWithParent(stoneGroup.BLOCK);
+        createWithParent(stoneGroup.STAIRS);
+        createWithParent(stoneGroup.SLAB);
+        withExistingParent(stoneGroup.WALL.getId().getPath(), mcLoc("block/wall_inventory"))
+                .texture("wall", modLoc("block/" + stoneGroup.WALL.getId().getPath().replaceAll("_wall", "")));
+
+        createWithParent(stoneGroup.CHISELED_BRICKS);
+        createWithParent(stoneGroup.BRICKS);
+        createWithParent(stoneGroup.BRICKS_STAIRS);
+        createWithParent(stoneGroup.BRICKS_SLAB);
+        withExistingParent(stoneGroup.BRICKS_WALL.getId().getPath(), mcLoc("block/wall_inventory"))
+                .texture("wall", modLoc("block/" + stoneGroup.BRICKS_WALL.getId().getPath().replaceAll("_wall", "")));
+
+        createWithParent(stoneGroup.POLISHED);
+        createWithParent(stoneGroup.POLISHED_STAIRS);
+        createWithParent(stoneGroup.POLISHED_SLAB);
+        withExistingParent(stoneGroup.POLISHED_WALL.getId().getPath(), mcLoc("block/wall_inventory"))
+                .texture("wall", modLoc("block/" + stoneGroup.POLISHED_WALL.getId().getPath().replaceAll("_wall", "")));
+
+        createWithParent(stoneGroup.COBBLESTONE);
+        createWithParent(stoneGroup.COBBLESTONE_STAIRS);
+        createWithParent(stoneGroup.COBBLESTONE_SLAB);
+        withExistingParent(stoneGroup.COBBLESTONE_WALL.getId().getPath(), mcLoc("block/wall_inventory"))
+                .texture("wall", modLoc("block/" + stoneGroup.COBBLESTONE_WALL.getId().getPath().replaceAll("_wall", "")));
+
+    }
+
+
+    private void registerWoodGroup(BFTPWoodGroup woodGroup){
+        createWithParent(woodGroup.BLOCK);
+        createWithParent(woodGroup.LOG);
+        createWithParent(woodGroup.STRIPPED_LOG);
+        createWithParent(woodGroup.WOOD);
+        createWithParent(woodGroup.STRIPPED_WOOD);
+        createWithParent(woodGroup.SLAB);
+        createWithParent(woodGroup.STAIRS);
+        createWithParent(woodGroup.LEAVES);
+        createSuffixedParent(woodGroup.FENCE, "_inventory");
+        createWithParent(woodGroup.FENCE_GATE);
+        createWithParent(woodGroup.PRESSURE_PLATE);
+        createSuffixedParent(woodGroup.BUTTON, "_inventory");
+        withExistingParent(woodGroup.TRAPDOOR.getId().getPath(),
+                modLoc("block/" + woodGroup.BLOCK.getId().getPath() + "_trapdoor_bottom"));
+        singleTextureBlock(woodGroup.DOOR);
+        basicItem(woodGroup.SIGN_ITEM.get());
+        basicItem(woodGroup.HANGING_SIGN_ITEM.get());
     }
 
     private void createWithParent(DeferredBlock<? extends Block> key) {

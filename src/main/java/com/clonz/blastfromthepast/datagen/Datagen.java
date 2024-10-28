@@ -4,8 +4,7 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.datagen.client.ModBlockStateGen;
 import com.clonz.blastfromthepast.datagen.client.ModItemModelGen;
 import com.clonz.blastfromthepast.datagen.client.ModLangGen;
-import com.clonz.blastfromthepast.datagen.server.ModBlockTagsGen;
-import com.clonz.blastfromthepast.datagen.server.ModItemTagsGen;
+import com.clonz.blastfromthepast.datagen.server.*;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -29,8 +28,11 @@ public class Datagen {
         ExistingFileHelper fileHelper = event.getExistingFileHelper();
 
         CompletableFuture<TagsProvider.TagLookup<Block>> tagLookup = generator.addProvider(event.includeServer(), new ModBlockTagsGen(packOutput, lookupProvider, fileHelper)).contentsGetter();
-
         generator.addProvider(event.includeServer(), new ModItemTagsGen(packOutput, lookupProvider, tagLookup, fileHelper));
+        generator.addProvider(event.includeServer(), new ModEntityTagsGen(packOutput, lookupProvider, fileHelper));
+        generator.addProvider(event.includeServer(), new ModRecipesGen(packOutput, lookupProvider));
+        generator.addProvider(event.includeServer(), new ModLootTableGen(packOutput, lookupProvider));
+
 
         generator.addProvider(event.includeClient(), new ModBlockStateGen(packOutput, fileHelper));
         generator.addProvider(event.includeClient(), new ModItemModelGen(packOutput, fileHelper));

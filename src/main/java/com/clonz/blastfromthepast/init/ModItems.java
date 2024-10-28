@@ -1,10 +1,13 @@
 package com.clonz.blastfromthepast.init;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
+import com.clonz.blastfromthepast.item.BFTPBoatItem;
 import com.clonz.blastfromthepast.item.FrostbiteArmor;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -15,13 +18,29 @@ public class ModItems {
 
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(BlastFromThePast.MODID);
 
-    public static final DeferredItem<Item> RAW_VENISON = ITEMS.register("raw_venison",
+    public static final DeferredItem<Item> RAW_VENISON = register("raw_venison",
             () -> new Item(new Item.Properties().food(ModFoods.RAW_VENSION)));
 
-    public static final DeferredItem<Item> COOKED_VENISON = ITEMS.register("cooked_venison",
+    public static final DeferredItem<Item> COOKED_VENISON = register("cooked_venison",
             () -> new Item(new Item.Properties().food(ModFoods.COOKED_VENSION)));
 
-    public static final DeferredItem<Item> SAP_BALL = ITEMS.register("sap_ball",
+    public static final DeferredItem<Item> SAP_BALL = register("sap_ball",
+            () -> new Item(new Item.Properties()));
+
+    public static final DeferredItem<Item> STRAIGHT_GLACEROS_ANTLERS = register("straight_glaceros_antlers",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> BROAD_GLACEROS_ANTLERS = register("broad_glaceros_antlers",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> CURLY_GLACEROS_ANTLERS = register("curly_glaceros_antlers",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> SPIKEY_GLACEROS_ANTLERS = register("spikey_glaceros_antlers",
+            () -> new Item(new Item.Properties()));
+
+    public static final DeferredItem<Item> BEAST_POTTERY_SHERD = register("beast_pottery_sherd",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> WOODS_POTTERY_SHERD = register("woods_pottery_sherd",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> FROST_POTTERY_SHERD = register("frost_pottery_sherd",
             () -> new Item(new Item.Properties()));
 
     public static final DeferredItem<Item> GLACEROS_SPAWN_EGG = ITEMS.register("glaceros_spawn_egg",
@@ -47,8 +66,30 @@ public class ModItems {
     public static final DeferredItem<ArmorItem> FROST_BITE_CHESTPLATE = ITEMS.register("frost_bite_chestplate", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ArmorItem.Type.CHESTPLATE.getDurability(10))));
     public static final DeferredItem<ArmorItem> FROST_BITE_LEGGINGS = ITEMS.register("frost_bite_leggings", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ArmorItem.Type.LEGGINGS.getDurability(10))));
     public static final DeferredItem<ArmorItem> FROST_BITE_BOOTS = ITEMS.register("frost_bite_boots", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.BOOTS, new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(10))));
+    public static final DeferredItem<Item> FROSTOMPER_SPAWN_EGG = register("frostomper_spawn_egg",
+            () -> new DeferredSpawnEggItem(ModEntities.FROSTOMPER, 0x74a3af, 0xcdc9df, new Item.Properties()));
 
+    public static final DeferredItem<Item> CEDAR_BOAT = register("cedar_boat", () -> new BFTPBoatItem(false, BFTPBoat.BoatType.CEDAR, (new Item.Properties()).stacksTo(1)));
+    public static final DeferredItem<Item> CEDAR_CHEST_BOAT = register("cedar_chest_boat", () -> new BFTPBoatItem(true, BFTPBoat.BoatType.CEDAR, (new Item.Properties()).stacksTo(1)));
 
+    public static final DeferredItem<Item> PSYCHO_BERRY = register("psycho_berry",
+            () -> new Item(new Item.Properties().food(ModFoods.PSYCHO_BERRY)));
+
+    public static final DeferredItem<Item> SAP_ICE_CREAM = registerIceCream("sap_ice_cream");
+
+    public static final DeferredItem<Item> PSYCHO_BERRY_ICE_CREAM = registerIceCream("psycho_berry_ice_cream");
+
+    public static final DeferredItem<Item> MELON_ICE_CREAM = registerIceCream("melon_ice_cream");
+
+    public static final DeferredItem<Item> BEAR_CLAW = register("bear_claw",
+            () -> new Item(new Item.Properties()));
+
+    public static final DeferredItem<Item> PSYCHO_BEAR_SPAWN_EGG = register("psycho_bear_spawn_egg",
+            () -> new DeferredSpawnEggItem(ModEntities.PSYCHO_BEAR, 0x74a3af, 0xcdc9df, new Item.Properties()));
+
+    private static DeferredItem<Item> registerIceCream(String name) {
+        return register(name, () -> new Item(new Item.Properties().stacksTo(16).food(ModFoods.BOWL_ICE_CREAM)));
+    }
 
 /*    public static final DeferredItem<BlockItem> FROZEN_PINE_LOG =
             ITEMS.registerSimpleBlockItem("cedar_log", ModBlocks.CEDAR_LOG);
@@ -67,5 +108,7 @@ public class ModItems {
     public static final DeferredItem<BlockItem> CEDAR_DOOR =
             ITEMS.registerSimpleBlockItem("cedar_door", ModBlocks.CEDAR_DOOR);*/
 
-
+    public static DeferredItem<Item> register(String name, Supplier<Item> block) {
+        return ITEMS.register(name, block);
+    }
 }

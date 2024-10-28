@@ -14,6 +14,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -32,13 +33,19 @@ public class GlacerosModel extends AnimatableDucModel<GlacerosEntity> {
 
     @Override
     public void setupAnim(@NotNull GlacerosEntity pEntity, float pLimbSwing, float pLimbSwingAmount, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
+        if(!pEntity.isBaby()){
+            ((Ducling)getAnyDescendantWithName("Antlers1").orElseThrow()).visible = !pEntity.isSheared();
+        }
+
         super.setupAnim(pEntity, pLimbSwing, pLimbSwingAmount, pAgeInTicks, pNetHeadYaw, pHeadPitch);
-        if (pEntity.isPanicking()){
+        if (pEntity.isPanicking() || pEntity.isRunning()){
             this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.glaceros.flee").animation(), pLimbSwing, pLimbSwingAmount, 1, 2);
         } else {
             this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.glaceros.walk").animation(), pLimbSwing, pLimbSwingAmount, 1, 2);
         }
-        ((Ducling) getAnyDescendantWithName("neck").orElseThrow()).xRot = pHeadPitch * ((float)Math.PI / 180F);
+
+        ((Ducling) getAnyDescendantWithName("neck").orElseThrow()).xRot = (pHeadPitch + (pEntity.isSparring() ? 90 : 0)) * ((float)Math.PI / 180F);
         ((Ducling) getAnyDescendantWithName("neck").orElseThrow()).yRot = pNetHeadYaw * ((float)Math.PI / 180F);
     }
+
 }

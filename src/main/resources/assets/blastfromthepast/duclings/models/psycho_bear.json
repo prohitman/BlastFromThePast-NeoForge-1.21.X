@@ -1,0 +1,106 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.Psycho Bear",
+				"texture_width": 256,
+				"texture_height": 256,
+				"visible_bounds_width": 5,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "PsychoBear",
+					"pivot": [0, 24, 0]
+				},
+				{
+					"name": "Body",
+					"parent": "PsychoBear",
+					"pivot": [0, 15, 16]
+				},
+				{
+					"name": "Torso",
+					"parent": "Body",
+					"pivot": [0, 24, 0],
+					"cubes": [
+						{"origin": [-12, 12, 0], "size": [24, 20, 21], "inflate": 0.001, "uv": [0, 43]},
+						{"origin": [-12, 9, -19], "size": [24, 3, 40], "inflate": 0.001, "uv": [0, 0]},
+						{"origin": [0, 32, -19], "size": [0, 5, 36], "uv": [0, 69]},
+						{"origin": [-12, 12, -19], "size": [24, 21, 19], "inflate": 0.001, "uv": [71, 65]}
+					]
+				},
+				{
+					"name": "Head",
+					"parent": "Torso",
+					"pivot": [0, 26, -19],
+					"cubes": [
+						{"origin": [-8, 20, -32], "size": [16, 12, 13], "uv": [88, 0]},
+						{"origin": [-4, 22, -39], "size": [8, 5, 7], "uv": [0, 84]},
+						{"origin": [-8, 32, -26], "size": [4, 2, 2], "uv": [18, 23]},
+						{"origin": [4, 32, -26], "size": [4, 2, 2], "uv": [18, 23], "mirror": true},
+						{"origin": [-12, 20, -24], "size": [4, 7, 0], "uv": [0, 0]},
+						{"origin": [8, 20, -24], "size": [4, 7, 0], "uv": [0, 0], "mirror": true}
+					]
+				},
+				{
+					"name": "jaw",
+					"parent": "Head",
+					"pivot": [0, 22, -32],
+					"cubes": [
+						{"origin": [-4, 20, -39], "size": [8, 2, 7], "uv": [30, 84]},
+						{"origin": [-4, 22, -36], "size": [0, 2, 2], "pivot": [-4, 22, -36], "rotation": [0, 0, -5], "uv": [0, 5]},
+						{"origin": [4, 22, -36], "size": [0, 2, 2], "pivot": [4, 22, -36], "rotation": [0, 0, 5], "uv": [0, 5], "mirror": true}
+					]
+				},
+				{
+					"name": "tail",
+					"parent": "Torso",
+					"pivot": [0, 27, 21],
+					"cubes": [
+						{"origin": [-4, 23, 21], "size": [8, 8, 10], "uv": [69, 43]}
+					]
+				},
+				{
+					"name": "arm1",
+					"parent": "Body",
+					"pivot": [-11, 25, -12],
+					"cubes": [
+						{"origin": [-15, 0, -18], "size": [9, 27, 12], "uv": [60, 105]},
+						{"origin": [-6, 0, -17], "size": [4, 5, 10], "uv": [0, 23]},
+						{"origin": [-15, 3, -6], "size": [0, 24, 5], "uv": [102, 100]}
+					]
+				},
+				{
+					"name": "arm2",
+					"parent": "Body",
+					"pivot": [11, 25, -12],
+					"cubes": [
+						{"origin": [6, 0, -18], "size": [9, 27, 12], "uv": [60, 105], "mirror": true},
+						{"origin": [2, 0, -17], "size": [4, 5, 10], "uv": [0, 23], "mirror": true},
+						{"origin": [15, 3, -6], "size": [0, 24, 5], "uv": [102, 100], "mirror": true}
+					]
+				},
+				{
+					"name": "leg1",
+					"parent": "PsychoBear",
+					"pivot": [-7.5, 12, 16],
+					"cubes": [
+						{"origin": [-12, 0, 11], "size": [9, 12, 11], "uv": [0, 0]},
+						{"origin": [-12, 0, 8], "size": [9, 2, 3], "uv": [88, 25]}
+					]
+				},
+				{
+					"name": "leg2",
+					"parent": "PsychoBear",
+					"pivot": [7.5, 12, 16],
+					"cubes": [
+						{"origin": [3, 0, 11], "size": [9, 12, 11], "uv": [0, 0], "mirror": true},
+						{"origin": [3, 0, 8], "size": [9, 2, 3], "uv": [88, 25], "mirror": true}
+					]
+				}
+			]
+		}
+	]
+}

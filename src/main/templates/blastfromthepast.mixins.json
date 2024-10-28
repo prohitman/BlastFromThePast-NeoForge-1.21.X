@@ -1,12 +1,25 @@
 {
   "required": true,
-  "package": "com.clonz.blastfromthepast.mixin,",
+  "package": "com.clonz.blastfromthepast.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
-  ],
-  "client": [
-  ],
+  "refmap": "blastfromthepast.refmap.json",
+  "minVersion": "0.8",
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+    "AbstractChestedHorseAccessor",
+    "BreedGoalAccessor",
+    "ContainerOpenersCounterMixin",
+    "FollowParentGoalAccessor",
+    "GoalAccessor",
+    "LivingEntityAccessor",
+    "MeleeAttackGoalAccessor",
+    "MoveToBlockGoalAccessor",
+    "PathAccessor",
+    "ServerPlayerAccessor",
+    "WalkNodeEvaluatorAccess"
+  ],
+  "client": [
+  ]
 }

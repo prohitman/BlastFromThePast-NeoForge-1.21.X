@@ -1,0 +1,9 @@
+// 1.21	2024-10-05T18:06:46.782438	Loot Tables
+c1bdf92b60fbc6ed00514133a1c7ef606752ceeb data/blastfromthepast/loot_table/entities/frostomper.json
+c2aa15852453431e842ee32a7c31a3fbd9454a74 data/blastfromthepast/loot_table/entities/glaceros.json
+f308f6ebb211c87c2e9c4bade0d31f84f3e8c7f3 data/blastfromthepast/loot_table/entities/glaceros/broad.json
+3d1e21eb792cbc030b2c04c375bc4fc249b26503 data/blastfromthepast/loot_table/entities/glaceros/curly.json
+381855fbc134121408e4e6a4d0ec2325282b8cdb data/blastfromthepast/loot_table/entities/glaceros/spikey.json
+a3ad032a8406ba59d18b02f6f76167a1a52e3a77 data/blastfromthepast/loot_table/entities/glaceros/straight.json
+dbcbd7ceb7bfe5eb29b58a3d3ec38e2811806c5f data/blastfromthepast/loot_table/entities/psycho_bear.json
+ed8ef39d1333bee1215d640878e766bd266c8f96 data/blastfromthepast/loot_table/entities/snowdo.json

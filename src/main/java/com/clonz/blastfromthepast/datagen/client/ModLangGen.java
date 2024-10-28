@@ -1,6 +1,8 @@
 package com.clonz.blastfromthepast.datagen.client;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.block.BFTPStoneGroup;
+import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
@@ -29,13 +31,6 @@ public class ModLangGen extends LanguageProvider {
         addItem(ModItems.COOKED_VENISON);
         addItem(ModItems.GLACEROS_SPAWN_EGG);
         addItem(ModItems.SNOWDO_SPAWN_EGG);
-        addItem(ModItems.SPEARTOOTH_SPAWN_EGG);
-        addItem(ModItems.SHAGGY_PELT);
-
-        addItem(ModItems.FROST_BITE_HELMET);
-        addItem(ModItems.FROST_BITE_CHESTPLATE);
-        addItem(ModItems.FROST_BITE_LEGGINGS);
-        addItem(ModItems.FROST_BITE_BOOTS);
 
         //Blocks
         addBlock(ModBlocks.CEDAR_DOOR);
@@ -44,15 +39,10 @@ public class ModLangGen extends LanguageProvider {
         addBlock(ModBlocks.STRIPPED_CEDAR_LOG);
         addBlock(ModBlocks.CEDAR_LEAVES);
         addBlock(ModBlocks.CEDAR_PLANKS);
-        addBlock(ModBlocks.BEAST_CHOPS);
-        addBlock(ModBlocks.BEAST_CHOPS_COOKED);
-        addBlock(ModBlocks.BEAST_CHOPS_GLAZED);
-        addBlock(ModBlocks.SHAGGY_BLOCK);
 
         //Entities
         addEntity(ModEntities.GLACEROS);
         addEntity(ModEntities.SNOWDO);
-        addEntity(ModEntities.SPEARTOOTH);
 
         add("itemGroup." + BlastFromThePast.MODID, "Blast From The Past");
     }
@@ -61,11 +51,11 @@ public class ModLangGen extends LanguageProvider {
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
     }
 
-    private void addItem(DeferredItem<? extends Item> key) {
+    private void addItem(DeferredItem<? extends Item> key){
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
     }
 
-    private <T extends Entity> void addEntity(DeferredHolder<EntityType<?>, EntityType<T>> key) {
+    private <T extends Entity> void addEntity(DeferredHolder<EntityType<?>, EntityType<T>> key){
         add(key.get().getDescriptionId(), StringUtils.capitaliseAllWords(key.getId().getPath().replaceAll("_", " ")));
     }
 
