@@ -91,7 +91,7 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
         super.readAdditionalSaveData(compound);
         this.entityData.set(ATTACHED_FACE, Direction.from3DDataValue(compound.getByte("attachface")));
     }
-
+//
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
