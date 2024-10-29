@@ -63,6 +63,8 @@ public class ModEntityLootGen extends EntityLootSubProvider {
 
         this.add(ModEntities.SNOWDO.get(), LootTable.lootTable());
         this.add(ModEntities.FROSTOMPER.get(), LootTable.lootTable());
+        this.add(ModEntities.SPEARTOOTH.get(), LootTable.lootTable());
+        this.add(ModEntities.BURREL.get(), LootTable.lootTable());
         this.add(ModEntities.PSYCHO_BEAR.get(), LootTable.lootTable()
                 .withPool(LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1.0F))

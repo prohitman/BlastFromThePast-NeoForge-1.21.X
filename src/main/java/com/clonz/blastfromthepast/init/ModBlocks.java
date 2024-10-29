@@ -35,6 +35,8 @@ public class ModBlocks {
 
     public static final DeferredBlock<Block> SHAGGY_BLOCK = createRegistry("shaggy_block",
             () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.WHITE_WOOL)), new Item.Properties());
+    public static final DeferredBlock<Block> BEASTLY_FEMUR = createRegistry("beastly_femur",
+            () -> new FemurBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.BONE_BLOCK).noOcclusion()), new Item.Properties());
 
     public static final DeferredBlock<CustomLogBlock> SAPPY_CEDAR_LOG = createRegistry("sappy_cedar_log",
             () -> new CustomLogBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_LOG), CEDAR.LOG), new Item.Properties());

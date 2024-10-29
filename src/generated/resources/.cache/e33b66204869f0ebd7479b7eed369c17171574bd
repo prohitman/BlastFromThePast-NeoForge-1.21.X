@@ -1,4 +1,5 @@
-// 1.21	2024-09-15T18:32:44.0125667	Block States: blastfromthepast
+// 1.21	2024-10-29T11:53:19.9135662	Block States: blastfromthepast
+2f3623eec46863ba6d6137d6dd2159dbcadef567 assets/blastfromthepast/blockstates/beastly_femur.json
 59e80ec9b69bffb55b37cf5dc20d046f1ee9d21f assets/blastfromthepast/blockstates/blue_delphinium.json
 974e378bacbdfcb5f0f17d0a1abebd5d2fd6443a assets/blastfromthepast/blockstates/cedar.json
 5a5a6b0122bacb9eb715e5c9aa70c0b956b191ad assets/blastfromthepast/blockstates/cedar_button.json
@@ -77,6 +78,8 @@ d1728281355b80ffe8f3234caaa047bf7f583fb5 assets/blastfromthepast/models/block/ce
 e26bd4560d1b715d5b326d7428287876c6874b9f assets/blastfromthepast/models/block/cedar_trapdoor_top.json
 b61d68c4d84c8a8d43c2f0dba0b1b05e155fc96a assets/blastfromthepast/models/block/cedar_wood.json
 49420bb767add9002367463070714348d33aa9a9 assets/blastfromthepast/models/block/cedar_wood_horizontal.json
+59d688ed0cda530fcbb1dadb4c923027be8ccf61 assets/blastfromthepast/models/block/femur.json
+c653dd995922b8e107e4431794500649f94e50da assets/blastfromthepast/models/block/femur_connected.json
 998485616189f8925a93c986ffc88a847174f70b assets/blastfromthepast/models/block/permafrost.json
 51f12c0f168dfc18241ade87f0b4c5e62a79dfb8 assets/blastfromthepast/models/block/permafrost_bricks.json
 08356f2944ed5a66a229ee2ead1a7d481d623eeb assets/blastfromthepast/models/block/permafrost_bricks_slab.json

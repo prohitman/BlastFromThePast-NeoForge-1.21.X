@@ -59,13 +59,6 @@ public class ModLangGen extends LanguageProvider {
         addBlock(ModBlocks.BEAST_CHOPS_COOKED);
         addBlock(ModBlocks.BEAST_CHOPS_GLAZED);
         addBlock(ModBlocks.SHAGGY_BLOCK);
-
-        //Entities
-        addEntity(ModEntities.GLACEROS);
-        addEntity(ModEntities.SNOWDO);
-        addEntity(ModEntities.SPEARTOOTH);
-
-
         addItem(ModItems.BEAR_CLAW);
 
         //Blocks
@@ -76,12 +69,15 @@ public class ModLangGen extends LanguageProvider {
         addBlock(ModBlocks.VIOLET_DELPHINIUM);
         addBlock(ModBlocks.BLUE_DELPHINIUM);
         registerStoneGroup(ModBlocks.PERMAFROST);
+        addBlock(ModBlocks.BEASTLY_FEMUR);
 
         //Entities
         addEntity(ModEntities.GLACEROS);
         addEntity(ModEntities.SNOWDO);
         addEntity(ModEntities.FROSTOMPER);
         addEntity(ModEntities.PSYCHO_BEAR);
+        addEntity(ModEntities.SPEARTOOTH);
+        addEntity(ModEntities.BURREL);
 
         add("itemGroup." + BlastFromThePast.MODID, "Blast From The Past");
     }

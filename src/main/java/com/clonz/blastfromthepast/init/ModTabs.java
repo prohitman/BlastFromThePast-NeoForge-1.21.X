@@ -52,6 +52,7 @@ public class ModTabs {
                         output.accept(ModBlocks.PINK_DELPHINIUM);
                         output.accept(ModItems.SPEARTOOTH.get());
                         output.accept(ModItems.ICE_SPEAR.get());
+                        output.accept(ModBlocks.BEASTLY_FEMUR);
                         output.accept(ModBlocks.BEAST_CHOPS.get());
                         output.accept(ModBlocks.BEAST_CHOPS_COOKED.get());
                         output.accept(ModBlocks.BEAST_CHOPS_GLAZED.get());

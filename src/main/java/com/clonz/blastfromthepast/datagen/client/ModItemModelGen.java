@@ -43,10 +43,10 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.MELON_ICE_CREAM.get());
         basicItem(ModItems.BEAR_CLAW.get());
 
-        basicItem(ModItems.FROST_BITE_HELMET.get());
+/*        basicItem(ModItems.FROST_BITE_HELMET.get());
         basicItem(ModItems.FROST_BITE_BOOTS.get());
         basicItem(ModItems.FROST_BITE_CHESTPLATE.get());
-        basicItem(ModItems.FROST_BITE_LEGGINGS.get());
+        basicItem(ModItems.FROST_BITE_LEGGINGS.get());*/
         withExistingParent(ModItems.SNOWDO_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.GLACEROS_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
         withExistingParent(ModItems.SPEARTOOTH_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
@@ -59,6 +59,7 @@ public class ModItemModelGen extends ItemModelProvider {
         singleTextureDoublePlantBlock(ModBlocks.BLUE_DELPHINIUM, true);
         singleTextureDoublePlantBlock(ModBlocks.VIOLET_DELPHINIUM, true);
         singleTextureDoublePlantBlock(ModBlocks.PINK_DELPHINIUM, true);
+        withExistingParent(ModBlocks.BEASTLY_FEMUR.getId().getPath(), modLoc( "block/" + "femur"));
     }
 
     private void registerStoneGroup(BFTPStoneGroup stoneGroup){

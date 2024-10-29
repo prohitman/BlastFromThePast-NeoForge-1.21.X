@@ -3,18 +3,17 @@ package com.clonz.blastfromthepast.datagen.client;
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.block.BFTPStoneGroup;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
+import com.clonz.blastfromthepast.block.FemurBlock;
 import com.clonz.blastfromthepast.block.signs.SnowyStoneBlock;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
+import net.minecraft.data.models.blockstates.BlockStateGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
-import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
-import net.neoforged.neoforge.client.model.generators.ModelProvider;
+import net.neoforged.neoforge.client.model.generators.*;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
@@ -32,6 +31,18 @@ public class ModBlockStateGen extends BlockStateProvider {
         createDoublePlantBlock(ModBlocks.BLUE_DELPHINIUM);
         createDoublePlantBlock(ModBlocks.PINK_DELPHINIUM);
         createDoublePlantBlock(ModBlocks.VIOLET_DELPHINIUM);
+        createFemurBlock();
+    }
+
+    private void createFemurBlock(){
+        BlockModelBuilder connectedFemur = models().withExistingParent("femur_connected", modLoc("block/tipless_beastly_femur"));
+        BlockModelBuilder femur = models().withExistingParent("femur", modLoc("block/beastly_femur"));
+
+        getVariantBuilder(ModBlocks.BEASTLY_FEMUR.get()).forAllStatesExcept(
+                state -> ConfiguredModel.builder()
+                        .modelFile(state.getValue(FemurBlock.CONNECTED) ? connectedFemur : femur)
+                        .rotationY(((int) state.getValue(BlockStateProperties.HORIZONTAL_FACING).toYRot()) % 360)
+                        .build());
     }
 
     private void registerStoneGroup(BFTPStoneGroup stoneGroup){
