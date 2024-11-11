@@ -32,7 +32,8 @@ public class Datagen {
         generator.addProvider(event.includeServer(), new ModEntityTagsGen(packOutput, lookupProvider, fileHelper));
         generator.addProvider(event.includeServer(), new ModRecipesGen(packOutput, lookupProvider));
         generator.addProvider(event.includeServer(), new ModLootTableGen(packOutput, lookupProvider));
-
+        CompletableFuture<HolderLookup.Provider> datapackGen = generator.addProvider(event.includeServer(), new ModDatapackRegistriesGen(packOutput, lookupProvider)).getRegistryProvider();
+        generator.addProvider(event.includeServer(), new ModBiomeTagsGen(packOutput, datapackGen, fileHelper));
 
         generator.addProvider(event.includeClient(), new ModBlockStateGen(packOutput, fileHelper));
         generator.addProvider(event.includeClient(), new ModItemModelGen(packOutput, fileHelper));

@@ -132,11 +132,13 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+    maven { url = 'https://maven.minecraftforge.net/' }
 }
 
 dependencies {
     implementation "io.github.itskillerluc.duclib:duclib-1.21-neoforge:1.2.0"
     runtimeOnly "curse.maven:debug-utils-forge-783008:5607923"
+    implementation "com.github.glitchfiend:TerraBlender-neoforge:1.21-4.0.0.2"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
