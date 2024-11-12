@@ -4,16 +4,19 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.block.BFTPStoneGroup;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.block.FemurBlock;
+import com.clonz.blastfromthepast.block.PsychoBerryBush;
 import com.clonz.blastfromthepast.block.signs.SnowyStoneBlock;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.models.blockstates.BlockStateGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.neoforged.neoforge.client.model.generators.*;
+import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
@@ -32,6 +35,8 @@ public class ModBlockStateGen extends BlockStateProvider {
         createDoublePlantBlock(ModBlocks.PINK_DELPHINIUM);
         createDoublePlantBlock(ModBlocks.VIOLET_DELPHINIUM);
         createFemurBlock();
+        createPsychoBerryBush();
+        createSinglePlant(ModBlocks.PSYCHO_BERRY_SPROUT);
     }
 
     private void createFemurBlock(){
@@ -42,6 +47,16 @@ public class ModBlockStateGen extends BlockStateProvider {
                 state -> ConfiguredModel.builder()
                         .modelFile(state.getValue(FemurBlock.CONNECTED) ? connectedFemur : femur)
                         .rotationY(((int) state.getValue(BlockStateProperties.HORIZONTAL_FACING).toYRot()) % 360)
+                        .build());
+    }
+
+    private void createPsychoBerryBush(){
+        BlockModelBuilder grownBush = models().withExistingParent("grown_psycho_berry_bush", modLoc("block/thorns")).texture("2", "block/thorn_berries");
+        BlockModelBuilder bush = models().withExistingParent("psycho_berry_bush", modLoc("block/thorns")).texture("2", "block/thorns");
+
+        getVariantBuilder(ModBlocks.PSYCHO_BERRY_BUSH.get()).forAllStatesExcept(
+                state -> ConfiguredModel.builder()
+                        .modelFile(state.getValue(PsychoBerryBush.AGE) == 1 ? grownBush : bush)
                         .build());
     }
 
@@ -104,6 +119,18 @@ public class ModBlockStateGen extends BlockStateProvider {
 
     private String name(net.minecraft.world.level.block.Block block) {
         return BuiltInRegistries.BLOCK.getKey(block).getPath();
+    }
+
+    private void createSinglePlant(DeferredBlock<Block> block){
+        createSinglePlant(block, models().cross(block.getId().getPath(),
+                modLoc("block/" + block.getId().getPath())).renderType("cutout_mipped"));
+    }
+
+    private void createSinglePlant(DeferredBlock<Block> block, ModelFile model) {
+        getVariantBuilder(block.get()).forAllStatesExcept(state -> ConfiguredModel.builder()
+                .modelFile(model)
+                .uvLock(true)
+                .build());
     }
 
     private void createDoublePlantBlock(DeferredBlock<Block> block) {

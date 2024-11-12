@@ -70,6 +70,8 @@ public class ModLangGen extends LanguageProvider {
         addBlock(ModBlocks.BLUE_DELPHINIUM);
         registerStoneGroup(ModBlocks.PERMAFROST);
         addBlock(ModBlocks.BEASTLY_FEMUR);
+        addBlock(ModBlocks.PSYCHO_BERRY_BUSH);
+        addBlock(ModBlocks.PSYCHO_BERRY_SPROUT);
 
         //Entities
         addEntity(ModEntities.GLACEROS);

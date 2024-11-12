@@ -25,6 +25,8 @@ public class ModBlockTagsGen extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
+        tag(BlockTags.LEAVES)
+                .add(ModBlocks.PSYCHO_BERRY_BUSH.get());
         tag(BlockTags.LOGS_THAT_BURN)
                 .add(ModBlocks.SAPPY_CEDAR_LOG.get());
         tag(ModTags.Blocks.FROSTOMPER_CAN_BREAK)

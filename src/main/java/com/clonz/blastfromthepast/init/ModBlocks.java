@@ -2,28 +2,18 @@ package com.clonz.blastfromthepast.init;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.block.*;
-import com.clonz.blastfromthepast.block.BeastChopsBlock;
-import com.clonz.blastfromthepast.block.CustomLeavesBlock;
-import com.clonz.blastfromthepast.block.CustomLogBlock;
-import com.clonz.blastfromthepast.block.CustomPlanksBlock;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.Supplier;
 
 public class ModBlocks {
@@ -37,7 +27,10 @@ public class ModBlocks {
             () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.WHITE_WOOL)), new Item.Properties());
     public static final DeferredBlock<Block> BEASTLY_FEMUR = createRegistry("beastly_femur",
             () -> new FemurBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.BONE_BLOCK).noOcclusion()), new Item.Properties());
-
+    public static final DeferredBlock<Block> PSYCHO_BERRY_BUSH = createRegistry("psycho_berry_bush",
+            () -> new PsychoBerryBush(BlockBehaviour.Properties.ofFullCopy(Blocks.SPRUCE_LEAVES).noCollission()), new Item.Properties());
+    public static final DeferredBlock<Block> PSYCHO_BERRY_SPROUT = createRegistry("psycho_berry_sprout",
+            () -> new PsychoBerrySprout(BlockBehaviour.Properties.ofFullCopy(Blocks.DANDELION).randomTicks()), new Item.Properties());
     public static final DeferredBlock<CustomLogBlock> SAPPY_CEDAR_LOG = createRegistry("sappy_cedar_log",
             () -> new CustomLogBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_LOG), CEDAR.LOG), new Item.Properties());
 

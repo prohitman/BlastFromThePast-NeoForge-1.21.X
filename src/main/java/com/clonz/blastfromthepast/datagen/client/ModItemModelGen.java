@@ -59,7 +59,9 @@ public class ModItemModelGen extends ItemModelProvider {
         singleTextureDoublePlantBlock(ModBlocks.BLUE_DELPHINIUM, true);
         singleTextureDoublePlantBlock(ModBlocks.VIOLET_DELPHINIUM, true);
         singleTextureDoublePlantBlock(ModBlocks.PINK_DELPHINIUM, true);
-        withExistingParent(ModBlocks.BEASTLY_FEMUR.getId().getPath(), modLoc( "block/" + "femur"));
+        withExistingParent(ModBlocks.BEASTLY_FEMUR.getId().getPath(), modLoc( "block/femur"));
+        withExistingParent(ModBlocks.PSYCHO_BERRY_BUSH.getId().getPath(), modLoc("block/grown_psycho_berry_bush"));
+        singleTexturePlantBlock(ModBlocks.PSYCHO_BERRY_SPROUT);
     }
 
     private void registerStoneGroup(BFTPStoneGroup stoneGroup){
@@ -118,6 +120,11 @@ public class ModItemModelGen extends ItemModelProvider {
     private void singleTextureBlock(DeferredBlock<? extends Block> key){
         singleTexture(key.getId().getPath(), mcLoc("item/generated"), "layer0",
                 modLoc("item/" + key.getId().getPath())).renderType("cutout_mipped");
+    }
+
+    private void singleTexturePlantBlock(DeferredBlock<? extends Block> key){
+        singleTexture(key.getId().getPath(), mcLoc("item/generated"), "layer0",
+                modLoc("block/" + key.getId().getPath())).renderType("cutout_mipped");
     }
 
     private void createSuffixedParent(DeferredBlock<? extends Block> handler, String suffix) {
