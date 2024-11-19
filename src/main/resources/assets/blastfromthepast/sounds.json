@@ -1,4 +1,13 @@
 {
+  "blizzard_revelry": {
+    "subtitle": "sounds.blastfromthepast.blizzard_revelry",
+    "sounds": [
+      {
+        "name": "blastfromthepast:blizzard_revelry",
+        "stream": true
+      }
+    ]
+  },
   "glaceros_death": {
     "subtitle": "sounds.blastfromthepast.glaceros_death",
     "sounds": [

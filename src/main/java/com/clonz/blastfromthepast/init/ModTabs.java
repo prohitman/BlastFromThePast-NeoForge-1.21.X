@@ -21,6 +21,7 @@ public class ModTabs {
                     .title(Component.translatable("itemGroup.blastfromthepast")).withTabsBefore(CreativeModeTabs.COMBAT)
                     .icon(() -> ModItems.RAW_VENISON.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
+                        output.accept(ModItems.BLIZZARD_REVELRY_DISC.get());
                         output.accept(ModItems.GLACEROS_SPAWN_EGG.get());
                         output.accept(ModItems.SNOWDO_SPAWN_EGG.get());
                         output.accept(ModItems.FROSTOMPER_SPAWN_EGG.get());

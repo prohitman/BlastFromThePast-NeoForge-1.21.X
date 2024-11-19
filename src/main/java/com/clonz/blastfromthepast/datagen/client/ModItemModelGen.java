@@ -20,6 +20,7 @@ public class ModItemModelGen extends ItemModelProvider {
     @Override
     protected void registerModels() {
         //Items
+        basicItem(ModItems.BLIZZARD_REVELRY_DISC.get());
         basicItem(ModItems.RAW_VENISON.get());
         basicItem(ModItems.SAP_BALL.get());
         basicItem(ModItems.COOKED_VENISON.get());

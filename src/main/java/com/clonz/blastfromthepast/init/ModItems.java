@@ -7,6 +7,7 @@ import com.clonz.blastfromthepast.item.FrostbiteArmor;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -18,6 +19,9 @@ public class ModItems {
     public static final Boat.Type CEDAR_TYPE = Boat.Type.byName("cedar");
 
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(BlastFromThePast.MODID);
+
+    public static final DeferredItem<Item>  BLIZZARD_REVELRY_DISC = register("blizzard_revelry_disc",
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE).jukeboxPlayable(ModSounds.BLIZZARD_REVELRY_KEY)));
 
     public static final DeferredItem<Item> RAW_VENISON = register("raw_venison",
             () -> new Item(new Item.Properties().food(ModFoods.RAW_VENSION)));

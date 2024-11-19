@@ -2,10 +2,13 @@ package com.clonz.blastfromthepast.init;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.JukeboxSong;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -13,6 +16,10 @@ public class ModSounds {
 
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
             DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, BlastFromThePast.MODID);
+
+    // MUSIC DISC
+    public static final DeferredHolder<SoundEvent, SoundEvent> BLIZZARD_REVELRY = registerSoundEvent(ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "blizzard_revelry"));
+    public static final ResourceKey<JukeboxSong> BLIZZARD_REVELRY_KEY = registerSong("blizzard_revelry");
 
     // GLACEROS
     public static final DeferredHolder<SoundEvent, SoundEvent> GLACEROS_DEATH = registerSoundEventForEntityType(ModEntities.GLACEROS, "_death");
@@ -66,6 +73,18 @@ public class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_SCRATCH = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_scratch");
     public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_SLASH = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_slash");
     public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_SNORE = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_snore");
+
+
+    private static ResourceKey<JukeboxSong> registerSong(String name) {
+         return ResourceKey.create(Registries.JUKEBOX_SONG, ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, name));
+    }
+
+    private static <T extends Entity> DeferredHolder<SoundEvent, SoundEvent> registerSoundEvent(ResourceLocation soundEventLocation) {
+        return SOUND_EVENTS.register(
+                soundEventLocation.getPath(),
+                () -> SoundEvent.createFixedRangeEvent(soundEventLocation, 16f)
+        );
+    }
 
     private static <T extends Entity> DeferredHolder<SoundEvent, SoundEvent> registerSoundEventForEntityType(DeferredHolder<EntityType<?>, EntityType<T>> entityTypeHolder, String suffix) {
         ResourceLocation soundEventLocation = entityTypeHolder.getId().withSuffix(suffix);
