@@ -82,6 +82,9 @@ public class ModItems {
     public static final DeferredItem<Item> PSYCHO_BEAR_SPAWN_EGG = register("psycho_bear_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.PSYCHO_BEAR, 0x74a3af, 0xcdc9df, new Item.Properties()));
 
+    public static final DeferredItem<Item> IDOL_OF_RETRIEVAL = register("idol_of_retrieval",
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
+
     private static DeferredItem<Item> registerIceCream(String name) {
         return register(name, () -> new Item(new Item.Properties().stacksTo(16).food(ModFoods.BOWL_ICE_CREAM)));
     }

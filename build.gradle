@@ -41,7 +41,7 @@ neoForge {
     }
 
     // This line is optional. Access Transformers are automatically detected
-    accessTransformers = project.files('src/main/templates/META-INF/accesstransformer.cfg')
+    accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -139,6 +139,8 @@ dependencies {
     implementation "io.github.itskillerluc.duclib:duclib-1.21-neoforge:1.2.0"
     runtimeOnly "curse.maven:debug-utils-forge-783008:5607923"
     implementation "com.github.glitchfiend:TerraBlender-neoforge:1.21-4.0.0.2"
+
+    implementation "curse.maven:adorned-1036809:5740650"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -165,6 +167,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 // Include the output of "generateModMetadata" as an input directory for the build
 // this works with both building through Gradle and the IDE.
 sourceSets.main.resources.srcDir generateModMetadata
+sourceSets.main.resources.exclude ".cache/**"
 // To avoid having to run "generateModMetadata" manually, make it run on every project reload
 neoForge.ideSyncTask generateModMetadata
 

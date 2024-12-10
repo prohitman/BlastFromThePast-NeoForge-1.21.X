@@ -6,7 +6,9 @@ import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
+import com.clonz.blastfromthepast.init.ModSounds;
 import net.minecraft.data.PackOutput;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -16,6 +18,9 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import org.codehaus.plexus.util.StringUtils;
+
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
 public class ModLangGen extends LanguageProvider {
 
@@ -61,6 +66,7 @@ public class ModLangGen extends LanguageProvider {
         addBlock(ModBlocks.BEAST_CHOPS_GLAZED);
         addBlock(ModBlocks.SHAGGY_BLOCK);
         addItem(ModItems.BEAR_CLAW);
+        addItem(ModItems.IDOL_OF_RETRIEVAL);
 
         //Blocks
         addBlock(ModBlocks.SAPPY_CEDAR_LOG);
@@ -73,6 +79,7 @@ public class ModLangGen extends LanguageProvider {
         addBlock(ModBlocks.BEASTLY_FEMUR);
         addBlock(ModBlocks.PSYCHO_BERRY_BUSH);
         addBlock(ModBlocks.PSYCHO_BERRY_SPROUT);
+        addBlock(ModBlocks.TAR);
 
         //Entities
         addEntity(ModEntities.GLACEROS);
@@ -81,8 +88,28 @@ public class ModLangGen extends LanguageProvider {
         addEntity(ModEntities.PSYCHO_BEAR);
         addEntity(ModEntities.SPEARTOOTH);
         addEntity(ModEntities.BURREL);
+        addEntity(ModEntities.HOLLOW);
+
+        addSounds();
 
         add("itemGroup." + BlastFromThePast.MODID, "Blast From The Past");
+    }
+
+    private void addSounds() {
+        Class<ModSounds> sounds = ModSounds.class;
+        Arrays.stream(sounds.getFields()).forEach(field -> {
+            if (Modifier.isStatic(field.getModifiers()) && field.getType().equals(DeferredHolder.class)) {
+                try {
+                    addSound((DeferredHolder<?, ?>) field.get(null));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void addSound(DeferredHolder<?, ?> holder) {
+        add("sound." + BlastFromThePast.MODID + holder.getId().getPath(), StringUtils.capitaliseAllWords(holder.getId().getPath().replaceAll("_", " ")));
     }
 
     private void addBlock(DeferredBlock<? extends Block> key) {

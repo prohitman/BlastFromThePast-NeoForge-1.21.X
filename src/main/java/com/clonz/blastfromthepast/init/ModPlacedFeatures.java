@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.ClampedInt;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.*;
 
@@ -21,6 +22,9 @@ public class ModPlacedFeatures {
 
     public static ResourceKey<PlacedFeature> FROSTBITE_FOREST_FLOWERS = ResourceKey.create(Registries.PLACED_FEATURE,
             ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "frostbite_forest_flowers"));
+
+    public static ResourceKey<PlacedFeature> TAR_PIT = ResourceKey.create(Registries.PLACED_FEATURE,
+            ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "tar_pit"));
 
     public static void register(BootstrapContext<PlacedFeature> context) {
         HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
@@ -38,6 +42,17 @@ public class ModPlacedFeatures {
                 InSquarePlacement.spread(),
                 PlacementUtils.HEIGHTMAP,
                 CountPlacement.of(ClampedInt.of(UniformInt.of(-3, 1), 0, 1)),
+                BiomeFilter.biome()
+        );
+
+        Holder<ConfiguredFeature<?, ?>> tarPitConfigured = configuredFeatures.getOrThrow(ModConfiguredFeatures.TAR_PIT);
+        PlacementUtils.register(
+                context,
+                TAR_PIT,
+                tarPitConfigured,
+                RarityFilter.onAverageOnceEvery(40),
+                InSquarePlacement.spread(),
+                PlacementUtils.HEIGHTMAP_WORLD_SURFACE,
                 BiomeFilter.biome()
         );
     }

@@ -44,6 +44,8 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.MELON_ICE_CREAM.get());
         basicItem(ModItems.BEAR_CLAW.get());
 
+        basicItem(ModItems.IDOL_OF_RETRIEVAL.get());
+
 /*        basicItem(ModItems.FROST_BITE_HELMET.get());
         basicItem(ModItems.FROST_BITE_BOOTS.get());
         basicItem(ModItems.FROST_BITE_CHESTPLATE.get());

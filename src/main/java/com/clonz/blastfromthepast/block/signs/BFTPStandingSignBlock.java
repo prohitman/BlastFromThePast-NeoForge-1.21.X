@@ -14,7 +14,6 @@ public class BFTPStandingSignBlock extends StandingSignBlock {
         super(woodType, properties);
     }
 
-    @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
         return new BFTPSignBlockEntity(pPos, pState);

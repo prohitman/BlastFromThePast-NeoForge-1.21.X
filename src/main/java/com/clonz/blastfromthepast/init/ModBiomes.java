@@ -52,39 +52,44 @@ public class ModBiomes {
     }
 
     public static Biome frostbiteForest(HolderGetter<PlacedFeature> placedFeatures, HolderGetter<ConfiguredWorldCarver<?>> worldCarvers) {
-        MobSpawnSettings.Builder mobspawnsettings$builder = new MobSpawnSettings.Builder();
-        BiomeDefaultFeatures.farmAnimals(mobspawnsettings$builder);
-        mobspawnsettings$builder.addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.WOLF, 8, 4, 4))
+        MobSpawnSettings.Builder mobSpawnsBuilder = new MobSpawnSettings.Builder();
+        BiomeDefaultFeatures.farmAnimals(mobSpawnsBuilder);
+        mobSpawnsBuilder.addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.WOLF, 8, 4, 4))
                 .addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.RABBIT, 4, 2, 3))
                 .addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.FOX, 8, 2, 4));
-        BiomeDefaultFeatures.commonSpawns(mobspawnsettings$builder);
-        BiomeGenerationSettings.Builder biomegenerationsettings$builder = new BiomeGenerationSettings.Builder(placedFeatures, worldCarvers);
-        globalOverworldGeneration(biomegenerationsettings$builder);
-        BiomeDefaultFeatures.addFerns(biomegenerationsettings$builder);
-        BiomeDefaultFeatures.addDefaultOres(biomegenerationsettings$builder);
-        BiomeDefaultFeatures.addDefaultSoftDisks(biomegenerationsettings$builder);
+        BiomeDefaultFeatures.commonSpawns(mobSpawnsBuilder);
+        BiomeGenerationSettings.Builder biomeGenBuilder = new BiomeGenerationSettings.Builder(placedFeatures, worldCarvers);
+        globalOverworldGeneration(biomeGenBuilder);
+        BiomeDefaultFeatures.addFerns(biomeGenBuilder);
+        BiomeDefaultFeatures.addDefaultOres(biomeGenBuilder);
+        BiomeDefaultFeatures.addDefaultSoftDisks(biomeGenBuilder);
         //BiomeDefaultFeatures.addTaigaTrees(biomegenerationsettings$builder);
-        addFrostbiteForestTrees(biomegenerationsettings$builder);
+        addFrostbiteForestTrees(biomeGenBuilder);
         //BiomeDefaultFeatures.addDefaultFlowers(biomegenerationsettings$builder);
-        addFrostbiteForestFlowers(biomegenerationsettings$builder);
-        BiomeDefaultFeatures.addTaigaGrass(biomegenerationsettings$builder);
-        BiomeDefaultFeatures.addDefaultExtraVegetation(biomegenerationsettings$builder);
-        BiomeDefaultFeatures.addRareBerryBushes(biomegenerationsettings$builder);
+        addFrostbiteForestFlowers(biomeGenBuilder);
+        addTarPits(biomeGenBuilder);
+        BiomeDefaultFeatures.addTaigaGrass(biomeGenBuilder);
+        BiomeDefaultFeatures.addDefaultExtraVegetation(biomeGenBuilder);
+        BiomeDefaultFeatures.addRareBerryBushes(biomeGenBuilder);
+
 
         return biome(true, -0.5F, 0.4F,
                 FROSTBITE_WATER_COLOR, FROSTBITE_WATER_FOG_COLOR,
                 FROSTBITE_GRASS_COLOR, FROSBITE_FOLIAGE_COLOR,
-                mobspawnsettings$builder, biomegenerationsettings$builder, null);
+                mobSpawnsBuilder, biomeGenBuilder, null);
     }
 
-    private static void addFrostbiteForestTrees(BiomeGenerationSettings.Builder biomegenerationsettings$builder) {
-        biomegenerationsettings$builder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
+    private static void addFrostbiteForestTrees(BiomeGenerationSettings.Builder biomeBuilder) {
+        biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
                 ModPlacedFeatures.TREES_FROSTBITE_FOREST);
     }
 
-    private static void addFrostbiteForestFlowers(BiomeGenerationSettings.Builder biomegenerationsettings$builder) {
-        biomegenerationsettings$builder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
-                ModPlacedFeatures.FROSTBITE_FOREST_FLOWERS);
+    private static void addTarPits(BiomeGenerationSettings.Builder biomeBuilder) {
+        biomeBuilder.addFeature(GenerationStep.Decoration.LAKES, ModPlacedFeatures.TAR_PIT);
+    }
+
+    private static void addFrostbiteForestFlowers(BiomeGenerationSettings.Builder biomeBuilder) {
+        biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, ModPlacedFeatures.FROSTBITE_FOREST_FLOWERS);
     }
 
     private static void globalOverworldGeneration(BiomeGenerationSettings.Builder generationSettings) {

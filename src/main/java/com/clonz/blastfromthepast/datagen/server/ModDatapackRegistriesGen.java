@@ -3,6 +3,7 @@ package com.clonz.blastfromthepast.datagen.server;
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.init.ModBiomes;
 import com.clonz.blastfromthepast.init.ModConfiguredFeatures;
+import com.clonz.blastfromthepast.init.ModFeatures;
 import com.clonz.blastfromthepast.init.ModPlacedFeatures;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;

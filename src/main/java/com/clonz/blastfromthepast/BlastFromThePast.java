@@ -11,6 +11,7 @@ import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
 import com.clonz.blastfromthepast.entity.burrel.Burrel;
 import com.clonz.blastfromthepast.entity.pack.EntityPacks;
 import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
+import com.clonz.blastfromthepast.events.CuriosCompat;
 import com.clonz.blastfromthepast.init.*;
 import com.mojang.logging.LogUtils;
 import io.github.itskillerluc.duclib.client.model.BaseDucModel;
@@ -18,6 +19,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -25,6 +27,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -40,6 +43,7 @@ import org.slf4j.Logger;
 public class BlastFromThePast {
     public static final String MODID = "blastfromthepast";
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static final boolean CURIOS_LOADED = ModList.get().isLoaded("curios");
 
     public BlastFromThePast(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
@@ -62,6 +66,12 @@ public class BlastFromThePast {
         ModBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
         ModDecoratedPatterns.PATTERNS.register(modEventBus);
         ModArmorMaterials.ARMOR_MATERIAL.register(modEventBus);
+        ModFeatures.FEATURES.register(modEventBus);
+        ModDataSerializers.DATA_SERIALIZERS.register(modEventBus);
+
+        if (CURIOS_LOADED) {
+            NeoForge.EVENT_BUS.register(CuriosCompat.class);
+        }
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
     }
 
@@ -102,6 +112,8 @@ public class BlastFromThePast {
             EntityRenderers.register(ModEntities.BURREL.get(), BurrelRenderer::new);
             EntityRenderers.register(ModEntities.BFTPBOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, false)));
             EntityRenderers.register(ModEntities.BFTPCHEST_BOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, true)));
+            EntityRenderers.register(ModEntities.HOLLOW.get(), HollowRenderer::new);
+
             BlockEntityRenderers.register(ModBlockEntities.SIGN.get(), SignRenderer::new);
             BlockEntityRenderers.register(ModBlockEntities.HANGING_SIGN.get(), HangingSignRenderer::new);
         }
@@ -117,10 +129,15 @@ public class BlastFromThePast {
             event.registerLayerDefinition(BurrelModel.LOCATION, () -> BaseDucModel.getLakeDefinition(Burrel.LOCATION));
             event.registerLayerDefinition(PsychoBearModel.ADULT_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.PSYCHO_BEAR.getId()));
             event.registerLayerDefinition(PsychoBearModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.PSYCHO_BEAR.getId().withPrefix("baby_")));
+            event.registerLayerDefinition(HollowModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.HOLLOW.getId()));
             for (BFTPBoat.BoatType boat$type : BFTPBoat.BoatType.values()) {
                 event.registerLayerDefinition(BFTPBoatRenderer.createBoatModelName(boat$type), BFTPBoatModel::createBodyModel);
                 event.registerLayerDefinition(BFTPBoatRenderer.createChestBoatModelName(boat$type), BFTPChestBoatModel::createBodyModel);
             }
         }
+    }
+
+    public static ResourceLocation location(String name) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, name);
     }
 }

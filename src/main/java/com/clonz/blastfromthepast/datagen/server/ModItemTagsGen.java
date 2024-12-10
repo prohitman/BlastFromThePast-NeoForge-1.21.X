@@ -58,5 +58,10 @@ public class ModItemTagsGen extends ItemTagsProvider {
                 .addTag(ModTags.Items.BABY_PSYCHO_BEAR_FOOD);
         tag(ModTags.Items.PSYCHO_BEAR_PACIFIER)
                 .add(ModItems.PSYCHO_BERRY_ICE_CREAM.get());
+        tag(ModTags.Items.GLACEROS_ANTLERS)
+                .add(ModItems.BROAD_GLACEROS_ANTLERS.get())
+                .add(ModItems.CURLY_GLACEROS_ANTLERS.get())
+                .add(ModItems.SPIKEY_GLACEROS_ANTLERS.get())
+                .add(ModItems.STRAIGHT_GLACEROS_ANTLERS.get());
     }
 }

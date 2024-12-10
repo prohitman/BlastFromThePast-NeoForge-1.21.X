@@ -1,3 +1,4 @@
-// 1.21	2024-09-17T12:38:06.5469894	Tags for minecraft:entity_type mod id blastfromthepast
+// 1.21	2024-12-03T15:17:33.060689329	Tags for minecraft:entity_type mod id blastfromthepast
 5eda8897ed8a5c7d42c420dab0db4c0543d3af29 data/blastfromthepast/tags/entity_type/psycho_bear_ignores.json
+d90fa73adf071d8c5a00418bc8f54f5b4a6188c3 data/blastfromthepast/tags/entity_type/tar_invulnerable.json
 1abff2dedbb41b60f6d9f3dd4e21327edcf869d7 data/minecraft/tags/entity_type/freeze_immune_entity_types.json

@@ -21,11 +21,14 @@ public class ModEntityTagsGen extends EntityTypeTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        this.tag(EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES)
+        tag(EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES)
                 .add(ModEntities.FROSTOMPER.get());
-        this.tag(ModTags.EntityTypes.PSYCHO_BEAR_IGNORES)
+        tag(ModTags.EntityTypes.PSYCHO_BEAR_IGNORES)
                 .addTag(Tags.EntityTypes.BOSSES)
                 .add(ModEntities.FROSTOMPER.get())
                 .add(EntityType.CREEPER);
+
+        tag(ModTags.EntityTypes.TAR_INVULNERABLE)
+                .add(EntityType.ITEM);
     }
 }

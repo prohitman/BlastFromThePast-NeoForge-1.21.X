@@ -5,17 +5,22 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public enum TransitioningState {
-    INACTIVE(false),
-    INACTIVE_TO_ACTIVE(true),
-    ACTIVE(false),
-    ACTIVE_TO_INACTIVE(true);
+public enum TransitioningState implements StateValue {
+    INACTIVE(0, false),
+    INACTIVE_TO_ACTIVE(1, true),
+    ACTIVE(2, false),
+    ACTIVE_TO_INACTIVE(3, true);
 
+    private final int id;
     private final boolean transitional;
 
-    TransitioningState(boolean transitional){
+    TransitioningState(int id, boolean transitional) {
+        this.id = id;
         this.transitional = transitional;
     }
+
+    @Override
+    public int id() { return this.id; }
 
     public boolean isTransitional() {
         return this.transitional;

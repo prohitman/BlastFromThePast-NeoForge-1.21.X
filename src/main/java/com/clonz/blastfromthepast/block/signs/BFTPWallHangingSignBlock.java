@@ -14,7 +14,6 @@ public class BFTPWallHangingSignBlock extends WallHangingSignBlock {
         super(pType, pProperties);
     }
 
-    @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
         return new BFTPHangingSignBlockEntity(pPos, pState);

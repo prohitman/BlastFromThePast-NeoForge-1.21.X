@@ -1,22 +1,32 @@
 package com.clonz.blastfromthepast.util;
 
+import com.clonz.blastfromthepast.entity.HollowEntity;
 import com.clonz.blastfromthepast.entity.misc.AnimatedAttacker;
+import com.clonz.blastfromthepast.init.ModEnchantments;
+import com.clonz.blastfromthepast.init.ModEntities;
+import com.clonz.blastfromthepast.init.ModItems;
+import com.clonz.blastfromthepast.init.ModTags;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
@@ -24,6 +34,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -188,5 +199,92 @@ public class EntityHelper {
         double leniency = leniencyFactor / distanceAwayFromTarget;
         return sameDirection(viewVector, vectorAwayFromTarget, leniency)
                 && (!checkBody || sameDirection(getBodyViewVector(looker, 1.0F).multiply(1, checkY ? 1 : 0, 1).normalize(), vectorAwayFromTarget, leniency));
+    }
+
+    public static boolean canWalkOnTarBlocks(LivingEntity entity) {
+        ItemStack boots = entity.getItemBySlot(EquipmentSlot.FEET);
+        return boots.is(ModTags.Items.ALLOWS_WALKING_ON_TAR) || boots.getEnchantmentLevel(ModEnchantments.TAR_MARCHER) != 0;
+    }
+
+    public static boolean noBlockCollisions(LivingEntity entity) {
+        return !entity.level().getBlockCollisions(entity, entity.getBoundingBox()).iterator().hasNext();
+    }
+
+    @Nullable
+    public static BlockPos findSafeSpot(LivingEntity entity) {
+        if (!(entity.level() instanceof ServerLevel serverLevel)) {return null;}
+
+        final HollowEntity dummyHollow = ModEntities.HOLLOW.get().create(serverLevel);
+        assert dummyHollow != null;
+
+        // Calc a valid position within the world
+        BlockPos validBlockPos = serverLevel.getWorldBorder().clampToBounds(entity.position());
+        Vec3 validPos = new Vec3(validBlockPos.getX(), Mth.clamp(entity.getY(), serverLevel.getMinBuildHeight(), serverLevel.getMaxBuildHeight()), validBlockPos.getZ());
+        dummyHollow.setPos(validPos);
+
+        if (validPos.y > serverLevel.getMinBuildHeight()) {
+            // Check if the current position is safe
+            if (noBlockCollisions(dummyHollow)) {
+                return entity.blockPosition();
+            }
+            double originalY = entity.getY();
+            // Otherwise, check above the current position
+            for (int offsetY = 0; offsetY < 12; offsetY += 2) {
+                dummyHollow.setPos(entity.getX(), originalY + offsetY, entity.getZ());
+                if (noBlockCollisions(dummyHollow)) {
+                    return entity.blockPosition().above(offsetY);
+                }
+            }
+        }
+
+        BlockPos teleportPos = null;
+        BlockPos potentialPos = null;
+        for (var newPos : BlockPos.spiralAround(BlockPos.containing(dummyHollow.position()), 32, Direction.SOUTH, Direction.WEST)) {
+            int newY = serverLevel.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, newPos.getX(), newPos.getZ());
+            // broken heightmap (nether, other mod dimensions)
+            if (newY >= serverLevel.getLogicalHeight()) {
+                break;
+            }
+//            serverLevel.addAlwaysVisibleParticle(new BlockParticleOption(ParticleTypes.BLOCK_MARKER, Blocks.BARRIER.defaultBlockState()), newPos.getX() + 0.5, newY + 0.5, newPos.getZ() + 0.5, 0, 0, 0);
+            dummyHollow.setPos(newPos.getX(), newY + 0.01, newPos.getZ());
+//            serverLevel.setBlock(newPos.atY(newY), Blocks.BARRIER.defaultBlockState(), 3);
+            if (noBlockCollisions(dummyHollow)) {
+                if (newY == serverLevel.getMinBuildHeight()) {
+                    if (potentialPos == null) {
+                        potentialPos = BlockPos.containing(dummyHollow.position());
+                    }
+                    continue;
+                }
+                teleportPos = BlockPos.containing(dummyHollow.position());
+                break;
+            } else if (potentialPos == null) {
+                dummyHollow.setPos(newPos.getX(), newY + 1, newPos.getZ());
+                if (noBlockCollisions(dummyHollow)) {
+                    potentialPos = BlockPos.containing(dummyHollow.position());
+                }
+            }
+        }
+        // If no safe spot was found, return the first found spot
+        if (teleportPos == null) {
+            teleportPos = potentialPos;
+        }
+        return teleportPos;
+    }
+
+    public static boolean shouldCreateHollow(ServerPlayer player) {
+        return !player.serverLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)
+                && getIdolOfRetrievalInHand(player) != null
+                && !player.isSpectator();
+        // TODO: check if the player only has the idol in their inventory
+    }
+
+    @Nullable
+    public static ItemStack getIdolOfRetrievalInHand(ServerPlayer player) {
+        if (player.getMainHandItem().is(ModItems.IDOL_OF_RETRIEVAL)) {
+            return player.getMainHandItem();
+        } else if (player.getOffhandItem().is(ModItems.IDOL_OF_RETRIEVAL)) {
+            return player.getOffhandItem();
+        }
+        return null;
     }
 }

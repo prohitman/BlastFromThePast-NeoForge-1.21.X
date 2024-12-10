@@ -52,7 +52,8 @@ public class ModBlocks {
     public static final DeferredBlock<Block> BEAST_CHOPS_GLAZED = createRegistry("beast_chops_glazed",
             () -> new BeastChopsBlock(BlockBehaviour.Properties.of().forceSolidOn().strength(0.5F).sound(SoundType.WOOL).pushReaction(PushReaction.DESTROY)).setLevelAndSaturation(8, 12F), new Item.Properties().stacksTo(1));
 
-
+    public static final DeferredBlock<Block> TAR = createRegistry("tar",
+            () -> new TarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.POWDER_SNOW).mapColor(MapColor.COLOR_BLACK).strength(4F).sound(SoundType.SLIME_BLOCK)), new Item.Properties());
     public static <T extends Block> DeferredBlock<T> createRegistry(String name, Supplier<T> block, Item.Properties properties) {
         DeferredBlock<T> object = BLOCKS.register(name, block);
         ModItems.ITEMS.register(name, () -> new BlockItem(object.get(), properties));
