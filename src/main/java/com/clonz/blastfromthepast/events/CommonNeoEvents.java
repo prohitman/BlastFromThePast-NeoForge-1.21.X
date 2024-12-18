@@ -1,6 +1,8 @@
 package com.clonz.blastfromthepast.events;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.network.RiddenEntityPayload;
+import com.clonz.blastfromthepast.network.ServerPayloadHandler;
 import com.clonz.blastfromthepast.worldgen.biome.BFTPOverworldRegion;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
@@ -12,6 +14,9 @@ import net.minecraft.world.level.block.FireBlock;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import terrablender.api.Regions;
 
 @EventBusSubscriber(modid = BlastFromThePast.MODID, bus = EventBusSubscriber.Bus.MOD)
@@ -27,6 +32,16 @@ public class CommonNeoEvents {
                     ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "overworld"),
                     2));
         });
+    }
+
+    @SubscribeEvent
+    public static void registerPayloadHandlers(final RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar("1");
+        registrar.playToServer(
+                RiddenEntityPayload.TYPE,
+                RiddenEntityPayload.STREAM_CODEC,
+                ServerPayloadHandler::handleRiddenEntityPayload
+        );
     }
 
     public static void registerFlammables(){

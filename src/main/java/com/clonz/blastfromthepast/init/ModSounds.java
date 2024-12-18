@@ -32,29 +32,13 @@ public class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> GLACEROS_CLASH = registerSoundEventForEntityType(ModEntities.GLACEROS, "_clash");
 
     // SNOWDO
-    public static final DeferredHolder<SoundEvent, SoundEvent> SOUND_ENTITY_SNOWDO_DEATH = SOUND_EVENTS.register(
-            "snowdo_death",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.
-                    fromNamespaceAndPath("blastfromthepast", "snowdo_death"))
-    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> SNOWDO_DEATH = registerSoundEventForEntityType(ModEntities.SNOWDO, "_death");
 
-    public static final DeferredHolder<SoundEvent, SoundEvent> SOUND_ENTITY_SNOWDO_HURT = SOUND_EVENTS.register(
-            "snowdo_hurt",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.
-                    fromNamespaceAndPath("blastfromthepast", "snowdo_hurt"))
-    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> SNOWDO_HURT = registerSoundEventForEntityType(ModEntities.SNOWDO, "_hurt");
 
-    public static final DeferredHolder<SoundEvent, SoundEvent> SOUND_ENTITY_SNOWDO_IDLE = SOUND_EVENTS.register(
-            "snowdo_idle",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.
-                    fromNamespaceAndPath("blastfromthepast", "snowdo_idle"))
-    );
-
-    public static final DeferredHolder<SoundEvent, SoundEvent> SOUND_ENTITY_SNOWDO_TRIP = SOUND_EVENTS.register(
-            "snowdo_trip",
-            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.
-                    fromNamespaceAndPath("blastfromthepast", "snowdo_trip"))
-    );
+    public static final DeferredHolder<SoundEvent, SoundEvent> SNOWDO_IDLE = registerSoundEventForEntityType(ModEntities.SNOWDO, "_idle");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SNOWDO_TRIP = registerSoundEventForEntityType(ModEntities.SNOWDO, "_trip");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SNOWDO_FLAP = registerSoundEventForEntityType(ModEntities.SNOWDO, "_flap");
 
     // FROSTOMPER
     public static final DeferredHolder<SoundEvent, SoundEvent> FROSTOMPER_CHARGE = registerSoundEventForEntityType(ModEntities.FROSTOMPER, "_charge");

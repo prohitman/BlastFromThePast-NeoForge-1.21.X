@@ -2,15 +2,23 @@ package com.clonz.blastfromthepast.events;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
+import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import com.clonz.blastfromthepast.init.ModSounds;
+import com.clonz.blastfromthepast.network.RiddenEntityPayload;
+import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.util.Optional;
 
 @EventBusSubscriber(modid = BlastFromThePast.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class NeoForgeEvents {
@@ -30,6 +38,17 @@ public class NeoForgeEvents {
                         (new ItemEntity(event.getLevel(), glaceros.getX(), glaceros.getY() + 0.5, glaceros.getZ(), antlers));
 
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
+        Player player = event.getEntity();
+
+        if (player.getFirstPassenger() instanceof SnowdoEntity snowdo && event.getLevel().isClientSide()) {
+            snowdo.setRiddenPlayer(Optional.empty());
+            snowdo.stopRiding();
+            PacketDistributor.sendToServer(new RiddenEntityPayload(snowdo.getId()));
         }
     }
 }

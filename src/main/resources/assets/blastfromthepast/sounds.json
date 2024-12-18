@@ -74,6 +74,19 @@
       "blastfromthepast:snowdo_idle_2"
     ]
   },
+  "snowdo_trip": {
+    "subtitle": "sounds.blastfromthepast.snowdo_trip",
+    "sounds": [
+      "blastfromthepast:snowdo_trip"
+    ]
+  },
+  "snowdo_flap": {
+    "subtitle": "sounds.blastfromthepast.snowdo_flap",
+    "sounds": [
+      "blastfromthepast:snowdo_flap_0",
+      "blastfromthepast:snowdo_flap_1"
+    ]
+  },
   "frostomper_charge": {
     "subtitle": "sounds.blastfromthepast.frostomper_charge",
     "sounds": [

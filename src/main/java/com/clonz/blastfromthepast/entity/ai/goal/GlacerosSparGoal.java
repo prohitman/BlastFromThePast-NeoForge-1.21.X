@@ -15,7 +15,6 @@ public class GlacerosSparGoal extends Goal {
     private GlacerosEntity targetGlaceros;
     private Path path;
 
-
     public GlacerosSparGoal(GlacerosEntity glaceros) {
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.TARGET));
         this.glaceros = glaceros;
