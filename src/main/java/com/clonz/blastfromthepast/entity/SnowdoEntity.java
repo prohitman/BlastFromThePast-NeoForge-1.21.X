@@ -1,7 +1,9 @@
 package com.clonz.blastfromthepast.entity;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.block.SnowdoEggBlock;
 import com.clonz.blastfromthepast.client.models.SnowdoModel;
+import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
 import com.clonz.blastfromthepast.init.ModSounds;
@@ -29,6 +31,7 @@ import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.Lazy;
@@ -63,7 +66,14 @@ public class SnowdoEntity extends Animal implements Animatable<SnowdoModel> {
 
     public void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new BreedGoal(this, 1));
+        this.goalSelector.addGoal(1, new BreedGoal(this, 1){
+            @Override
+            protected void breed() {
+                int number = this.animal.getRandom().nextInt(3) + 1;
+                BlockState snowdoEggs = ModBlocks.SNOWDO_EGG.get().defaultBlockState().setValue(SnowdoEggBlock.EGGS, number);
+                this.animal.level().setBlock(this.animal.blockPosition(), snowdoEggs, 2);
+            }
+        });
         this.goalSelector.addGoal(2, new PanicGoal(this, 1.5));
         this.goalSelector.addGoal(3, new TemptGoal(this, 1.0, (stack) -> stack.is(ModItems.MELON_ICE_CREAM), false));
         this.goalSelector.addGoal(4, new FollowParentGoal(this, 1.1));

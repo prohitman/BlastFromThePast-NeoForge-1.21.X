@@ -48,6 +48,7 @@ public class ModTabs {
                         output.accept(ModItems.SAP_ICE_CREAM.get());
                         output.accept(ModItems.PSYCHO_BERRY_ICE_CREAM.get());
                         output.accept(ModItems.MELON_ICE_CREAM.get());
+                        output.accept(ModBlocks.SNOWDO_EGG.get());
                         output.accept(ModItems.BEAR_CLAW.get());
                         output.accept(ModBlocks.VIOLET_DELPHINIUM);
                         output.accept(ModBlocks.WHITE_DELPHINIUM);

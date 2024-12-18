@@ -45,7 +45,7 @@ public class NeoForgeEvents {
     public static void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
         Player player = event.getEntity();
 
-        if (player.getFirstPassenger() instanceof SnowdoEntity snowdo && event.getLevel().isClientSide()) {
+        if (player.getFirstPassenger() instanceof SnowdoEntity snowdo && player.getMainHandItem().isEmpty() && event.getLevel().isClientSide()) {
             snowdo.setRiddenPlayer(Optional.empty());
             snowdo.stopRiding();
             PacketDistributor.sendToServer(new RiddenEntityPayload(snowdo.getId()));

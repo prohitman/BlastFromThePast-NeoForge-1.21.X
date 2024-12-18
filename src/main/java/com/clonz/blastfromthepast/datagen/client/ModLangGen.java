@@ -73,6 +73,7 @@ public class ModLangGen extends LanguageProvider {
         addBlock(ModBlocks.BEASTLY_FEMUR);
         addBlock(ModBlocks.PSYCHO_BERRY_BUSH);
         addBlock(ModBlocks.PSYCHO_BERRY_SPROUT);
+        addBlock(ModBlocks.SNOWDO_EGG);
 
         //Entities
         addEntity(ModEntities.GLACEROS);

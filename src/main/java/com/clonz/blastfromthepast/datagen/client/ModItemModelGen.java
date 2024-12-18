@@ -63,6 +63,7 @@ public class ModItemModelGen extends ItemModelProvider {
         withExistingParent(ModBlocks.BEASTLY_FEMUR.getId().getPath(), modLoc( "block/femur"));
         withExistingParent(ModBlocks.PSYCHO_BERRY_BUSH.getId().getPath(), modLoc("block/grown_psycho_berry_bush"));
         singleTexturePlantBlock(ModBlocks.PSYCHO_BERRY_SPROUT);
+        singleTextureBlock(ModBlocks.SNOWDO_EGG);
     }
 
     private void registerStoneGroup(BFTPStoneGroup stoneGroup){

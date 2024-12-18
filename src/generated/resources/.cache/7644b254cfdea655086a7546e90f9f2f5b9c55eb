@@ -1,4 +1,4 @@
-// 1.21	2024-11-26T15:39:15.2399603	Item Models: blastfromthepast
+// 1.21	2024-12-18T22:19:28.869355	Item Models: blastfromthepast
 bcbfa5ec18f5b276bd6804a15978cd2afb375a80 assets/blastfromthepast/models/item/bear_claw.json
 cc9a32b3b85e217680cc06e64744e0b138fb7916 assets/blastfromthepast/models/item/beastly_femur.json
 e595065c4dc42a22439ce0e203f1c30abd4871c9 assets/blastfromthepast/models/item/beast_pottery_sherd.json
@@ -54,6 +54,7 @@ c0b559c5933c2360710f8025f6a43377851847eb assets/blastfromthepast/models/item/psy
 bf574dfb2afe26a4a22bf4734637430ef9cf682c assets/blastfromthepast/models/item/sappy_cedar_log.json
 a7697c580817cbe3a45be157a70176a75fc37a12 assets/blastfromthepast/models/item/sap_ball.json
 27625c0a39117bc47417b16449c2a041cb65da7c assets/blastfromthepast/models/item/sap_ice_cream.json
+2e2f3c249405769cb5b710d6b0af7a43719a8bb5 assets/blastfromthepast/models/item/snowdo_egg.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/blastfromthepast/models/item/snowdo_spawn_egg.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/blastfromthepast/models/item/speartooth_tiger_spawn_egg.json
 0990ba5d64b7794cac3bd9f68eb9591d22b1f0a7 assets/blastfromthepast/models/item/spikey_glaceros_antlers.json

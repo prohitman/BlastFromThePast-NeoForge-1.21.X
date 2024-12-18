@@ -7,6 +7,7 @@ import com.clonz.blastfromthepast.item.FrostbiteArmor;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemNameBlockItem;
 import net.minecraft.world.item.Rarity;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -68,7 +69,7 @@ public class ModItems {
     public static final DeferredItem<Item> CEDAR_CHEST_BOAT = register("cedar_chest_boat", () -> new BFTPBoatItem(true, BFTPBoat.BoatType.CEDAR, (new Item.Properties()).stacksTo(1)));
 
     public static final DeferredItem<Item> PSYCHO_BERRY = register("psycho_berry",
-            () -> new Item(new Item.Properties().food(ModFoods.PSYCHO_BERRY)));
+            () -> new ItemNameBlockItem(ModBlocks.PSYCHO_BERRY_SPROUT.get(), new Item.Properties().food(ModFoods.PSYCHO_BERRY)));
 
     public static final DeferredItem<Item> SAP_ICE_CREAM = registerIceCream("sap_ice_cream");
 
