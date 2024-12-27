@@ -2,8 +2,13 @@ package com.clonz.blastfromthepast.block;
 
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModItems;
+import com.clonz.blastfromthepast.init.ModSounds;
+import com.clonz.blastfromthepast.util.ShapeUtils;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -15,27 +20,30 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class BeastChopsBlock extends Block {
-
-
+public class BeastChopsBlock extends RotatedPillarBlock {
     public static final IntegerProperty STATES = IntegerProperty.create("states", 0, 4);
-    public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.Plane.HORIZONTAL);
+    public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
     private static final VoxelShape FULL = Block.box(0, 0, 0, 16, 16, 16);
     private static final VoxelShape FIRST = Shapes.or(
@@ -72,17 +80,21 @@ public class BeastChopsBlock extends Block {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        switch (state.getValue(STATES)) {
-            case 1:
-                return FIRST;
-            case 2:
-                return SECOND;
-            case 3:
-                return THIRD;
-            case 4:
-                return FOURTH;
-            default:
-                return FULL;
+        VoxelShape baseShape = getVoxelShapeForState(state.getValue(STATES));
+
+        Direction.Axis axis = state.getValue(RotatedPillarBlock.AXIS);
+        Direction facing = state.getValue(BlockStateProperties.FACING);
+
+        return ShapeUtils.rotateShape(baseShape, axis, facing);
+    }
+
+    private VoxelShape getVoxelShapeForState(int state) {
+        switch (state) {
+            case 1: return FIRST;
+            case 2: return SECOND;
+            case 3: return THIRD;
+            case 4: return FOURTH;
+            default: return FULL;
         }
     }
 
@@ -118,7 +130,7 @@ public class BeastChopsBlock extends Block {
             if (this != ModBlocks.BEAST_CHOPS_COOKED.get() && state.getValue(STATES) != 0) {
                 return ItemInteractionResult.FAIL;
             } else {
-                level.setBlock(pos, ModBlocks.BEAST_CHOPS_GLAZED.get().defaultBlockState().setValue(FACING, state.getValue(FACING)), 3);
+                level.setBlock(pos, ModBlocks.BEAST_CHOPS_GLAZED.get().defaultBlockState().setValue(FACING, state.getValue(FACING)).setValue(STATES, state.getValue(STATES)), 3);
                 if (!player.isCreative()) {
                     itemStack.shrink(1);
                 }
@@ -142,6 +154,7 @@ public class BeastChopsBlock extends Block {
                 pLevel.removeBlock(pPos, false);
                 pLevel.gameEvent(pPlayer, GameEvent.BLOCK_DESTROY, pPos);
             }
+            pPlayer.playSound(SoundEvents.GENERIC_EAT, 1, Mth.randomBetween(pLevel.getRandom(), 0.8F, 1.2F));
             return InteractionResult.SUCCESS;
         }
     }
@@ -156,13 +169,13 @@ public class BeastChopsBlock extends Block {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(STATES, FACING);
+        builder.add(STATES, FACING, AXIS);
     }
 
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(AXIS, context.getClickedFace().getAxis());
     }
 
     @Override

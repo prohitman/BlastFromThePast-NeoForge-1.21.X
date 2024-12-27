@@ -70,6 +70,7 @@ public class ModBiomes {
         BiomeDefaultFeatures.addTaigaGrass(biomegenerationsettings$builder);
         BiomeDefaultFeatures.addDefaultExtraVegetation(biomegenerationsettings$builder);
         BiomeDefaultFeatures.addRareBerryBushes(biomegenerationsettings$builder);
+        BiomeDefaultFeatures.addSparseJungleMelons(biomegenerationsettings$builder);
 
         return biome(true, -0.5F, 0.4F,
                 FROSTBITE_WATER_COLOR, FROSTBITE_WATER_FOG_COLOR,

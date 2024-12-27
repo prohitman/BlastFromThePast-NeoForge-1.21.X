@@ -4,13 +4,13 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.block.*;
 import com.clonz.blastfromthepast.block.signs.SnowyStoneBlock;
 import com.clonz.blastfromthepast.init.ModBlocks;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
@@ -36,7 +36,39 @@ public class ModBlockStateGen extends BlockStateProvider {
         createPsychoBerryBush();
         createSinglePlant(ModBlocks.PSYCHO_BERRY_SPROUT);
         createSnowdoEggs();
+        generateBeastChopsBlockState(ModBlocks.BEAST_CHOPS);
+        generateBeastChopsBlockState(ModBlocks.BEAST_CHOPS_COOKED);
+        generateBeastChopsBlockState(ModBlocks.BEAST_CHOPS_GLAZED);
+        simpleBlock(ModBlocks.SHAGGY_BLOCK.get(), models().cubeBottomTop(ModBlocks.SHAGGY_BLOCK.getId().getPath(), modLoc("block/shaggy_block"), modLoc("block/shaggy_block_bottom"), modLoc("block/shaggy_block_top")));
     }
+
+    public void generateBeastChopsBlockState(DeferredBlock<Block> block) {
+        getVariantBuilder(block.get()).forAllStates(state -> {
+            Direction.Axis axis = state.getValue(RotatedPillarBlock.AXIS);
+            int blockState = state.getValue(BeastChopsBlock.STATES);
+            Direction facing = state.getValue(BlockStateProperties.FACING);
+            String modelPath = block.getId().getPath() + "_" + blockState;
+
+            if(blockState == 4){
+                modelPath = ModBlocks.BEAST_CHOPS.getId().getPath() + "_4";
+            }
+
+            ConfiguredModel.Builder<?> builder = ConfiguredModel.builder()
+                    .modelFile(models().getExistingFile(modLoc(modelPath))
+            );
+
+            if (axis == Direction.Axis.Y) {
+                builder.rotationX(facing == Direction.DOWN ? 180 : 0);
+            } else if (axis == Direction.Axis.Z) {
+                builder.rotationX(90).rotationY(facing == Direction.NORTH ? 0 : 180);
+            } else if (axis == Direction.Axis.X) {
+                builder.rotationX(90).rotationY(facing == Direction.WEST ? 90 : 270);
+            }
+
+            return builder.build();
+        });
+    }
+
 
     private void createSnowdoEggs() {
         BlockModelBuilder three_eggs_smooth = models().withExistingParent("three_eggs_smooth", modLoc("block/snowdo_eggs")).texture("1", modLoc("block/three_eggs_smooth"));

@@ -58,6 +58,45 @@ public class ShapeUtils {
         return rotatedShape;
     }
 
+    public static VoxelShape rotateShape(VoxelShape shape, Direction.Axis axis, Direction facing) {
+        VoxelShape rotatedShape = shape;
+
+        switch (axis) {
+            case X:
+                rotatedShape = rotateYtoX(rotateXtoZ(shape));
+                break;
+            case Z:
+                rotatedShape = rotateYtoX(rotateXtoZ(rotateXtoZ(rotateXtoZ(shape))));
+                break;
+            case Y:
+            default:
+                break;
+        }
+
+        rotatedShape = rotateBasedOnFacing(rotatedShape, axis, facing);
+
+        return rotatedShape;
+    }
+
+    public static VoxelShape rotateBasedOnFacing(VoxelShape shape, Direction.Axis axis, Direction facing) {
+        if (axis == Direction.Axis.Y) {
+            // Vertical blocks do not need facing-based rotation
+            return shape;
+        }
+
+        // Apply rotations for horizontal axes (X or Z)
+        switch (facing) {
+            case NORTH:
+                return rotateXtoZ(rotateXtoZ(shape));
+            case EAST:
+                return rotateXtoZ(shape);
+            case WEST:
+                return rotateXtoZ(rotateXtoZ(rotateXtoZ(shape)));
+            default:
+                return shape;
+        }
+    }
+
     public static VoxelShape rotateXtoZ(VoxelShape shape){
         List<AABB> soureBoxes = shape.toAabbs();
         VoxelShape rotatedShape = Shapes.empty();
@@ -65,6 +104,30 @@ public class ShapeUtils {
             box = new AABB(1 - box.maxZ, box.minY, box.minX, 1 - box.minZ, box.maxY, box.maxX);
 
             rotatedShape = orUnoptimized(rotatedShape, Shapes.create(box));
+        }
+
+        return rotatedShape;
+    }
+
+    public static VoxelShape rotateYtoX(VoxelShape shape) {
+        List<AABB> sourceBoxes = shape.toAabbs();
+        VoxelShape rotatedShape = Shapes.empty();
+
+        for (AABB box : sourceBoxes) {
+            AABB rotatedBox = new AABB(box.minX, 1 - box.maxZ, box.minY, box.maxX, 1 - box.minZ, box.maxY);
+            rotatedShape = Shapes.or(rotatedShape, Shapes.create(rotatedBox));
+        }
+
+        return rotatedShape;
+    }
+
+    public static VoxelShape rotateYtoZ(VoxelShape shape) {
+        List<AABB> sourceBoxes = shape.toAabbs();
+        VoxelShape rotatedShape = Shapes.empty();
+
+        for (AABB box : sourceBoxes) {
+            AABB rotatedBox = new AABB(1 - box.maxX, box.minY, box.minZ, 1 - box.minX, box.maxY, box.maxZ);
+            rotatedShape = Shapes.or(rotatedShape, Shapes.create(rotatedBox));
         }
 
         return rotatedShape;

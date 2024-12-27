@@ -94,6 +94,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     private final AnimatedAttacker.AttackTicker<FrostomperEntity, FrostomperAttackType> attackTicker = new AttackTicker<>(this);
     private int ticksUntilNextCharge;
     private int roarCounter;
+    private int trumpetCounter;
 
     public FrostomperEntity(EntityType<? extends FrostomperEntity> entityType, Level level) {
         super(entityType, level);
@@ -504,6 +505,14 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     public void aiStep() {
         super.aiStep();
         if (this.isAlive()) {
+            if(this.random.nextInt(100) == 0 && this.getTarget() == null && trumpetCounter == 0){
+                playAnimation("trumpet");
+                this.playSound(ModSounds.FROSTOMPER_TRUMPET.get());
+                this.trumpetCounter = 30;
+            }
+            if(trumpetCounter > 0){
+                trumpetCounter--;
+            }
             if (this.horizontalCollision && EventHooks.canEntityGrief(this.level(), this)) {
                 boolean destroyedBlock = false;
                 AABB breakBox = this.getBoundingBox().inflate(0.2);

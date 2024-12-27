@@ -96,7 +96,7 @@ public class SnowdoEggBlock extends Block {
     }
 
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (this.shouldUpdateHatchLevel(level)) {
+        if (this.shouldUpdateHatchLevel(level) && onSuitableBlock(level, pos)) {
             int i = state.getValue(HATCH);
             if (i < 2) {
                 level.playSound(null, pos, SoundEvents.TURTLE_EGG_CRACK, SoundSource.BLOCKS, 0.7F, 0.9F + random.nextFloat() * 0.2F);
@@ -121,22 +121,22 @@ public class SnowdoEggBlock extends Block {
 
     }
 
-/*
-    public static boolean onSand(BlockGetter level, BlockPos pos) {
-        return isSand(level, pos.below());
+
+    public static boolean onSuitableBlock(BlockGetter level, BlockPos pos) {
+        return isSuitableBlock(level, pos.below());
     }
 
-    public static boolean isSand(BlockGetter reader, BlockPos pos) {
-        return reader.getBlockState(pos).is(BlockTags.SAND);
+    public static boolean isSuitableBlock(BlockGetter reader, BlockPos pos) {
+        BlockState state = reader.getBlockState(pos);
+        return state.is(BlockTags.DIRT) || state.is(Blocks.SNOW_BLOCK) || state.is(Blocks.SNOW);
     }
-*/
 
-/*    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        if (*//*onSand(level, pos) && *//*!level.isClientSide) {
-            //level.levelEvent(2012, pos, 15);
+
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+        if (onSuitableBlock(level, pos) && !level.isClientSide) {
+            level.levelEvent(2012, pos, 15);
         }
-
-    }*/
+    }
 
     private boolean shouldUpdateHatchLevel(Level level) {
         return level.random.nextInt(10) == 0;

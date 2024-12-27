@@ -28,7 +28,7 @@ public class SnowdoModel extends AnimatableDucModel<SnowdoEntity> {
     public void setupAnim(@NotNull SnowdoEntity pEntity, float pLimbSwing, float pLimbSwingAmount, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
         super.setupAnim(pEntity, pLimbSwing, pLimbSwingAmount, pAgeInTicks, pNetHeadYaw, pHeadPitch);
 
-        this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.snowdo.walk").animation(), pLimbSwing, pLimbSwingAmount, 10, 2);
+        this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.snowdo.walk").animation(), pLimbSwing, pLimbSwingAmount, 10, 4);
 
         if(!pEntity.isTripped()){
             if(!pEntity.isBaby()){

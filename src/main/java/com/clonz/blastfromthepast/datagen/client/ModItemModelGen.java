@@ -43,6 +43,7 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.PSYCHO_BERRY_ICE_CREAM.get());
         basicItem(ModItems.MELON_ICE_CREAM.get());
         basicItem(ModItems.BEAR_CLAW.get());
+        basicItem(ModItems.SHAGGY_PELT.get());
 
 /*        basicItem(ModItems.FROST_BITE_HELMET.get());
         basicItem(ModItems.FROST_BITE_BOOTS.get());
@@ -56,6 +57,7 @@ public class ModItemModelGen extends ItemModelProvider {
         registerWoodGroup(ModBlocks.CEDAR);
         registerStoneGroup(ModBlocks.PERMAFROST);
         createWithParent(ModBlocks.SAPPY_CEDAR_LOG);
+        createWithParent(ModBlocks.SHAGGY_BLOCK);
         singleTextureDoublePlantBlock(ModBlocks.WHITE_DELPHINIUM, true);
         singleTextureDoublePlantBlock(ModBlocks.BLUE_DELPHINIUM, true);
         singleTextureDoublePlantBlock(ModBlocks.VIOLET_DELPHINIUM, true);

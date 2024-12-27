@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "blastfromthepast:block/shaggy_block_bottom",
+    "side": "blastfromthepast:block/shaggy_block",
+    "top": "blastfromthepast:block/shaggy_block_top"
+  }
+}

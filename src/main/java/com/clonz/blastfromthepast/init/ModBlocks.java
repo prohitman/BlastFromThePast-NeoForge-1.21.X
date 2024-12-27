@@ -50,7 +50,7 @@ public class ModBlocks {
             () -> new BeastChopsBlock(BlockBehaviour.Properties.of().forceSolidOn().strength(0.5F).sound(SoundType.WOOL).pushReaction(PushReaction.DESTROY)).setLevelAndSaturation(8, 12F), new Item.Properties().stacksTo(1));
 
     public static final DeferredBlock<Block> BEAST_CHOPS_GLAZED = createRegistry("beast_chops_glazed",
-            () -> new BeastChopsBlock(BlockBehaviour.Properties.of().forceSolidOn().strength(0.5F).sound(SoundType.WOOL).pushReaction(PushReaction.DESTROY)).setLevelAndSaturation(8, 12F), new Item.Properties().stacksTo(1));
+            () -> new BeastChopsBlock(BlockBehaviour.Properties.of().forceSolidOn().strength(0.5F).sound(SoundType.WOOL).pushReaction(PushReaction.DESTROY)).setLevelAndSaturation(8, 20F), new Item.Properties().stacksTo(1));
     public static final DeferredBlock<Block> SNOWDO_EGG = createRegistry("snowdo_egg",
             () -> new SnowdoEggBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.TURTLE_EGG).noOcclusion()), new Item.Properties());
 
