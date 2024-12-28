@@ -41,7 +41,7 @@ public class GlacerosModel extends AnimatableDucModel<GlacerosEntity> {
         if (pEntity.isPanicking() || pEntity.isRunning()){
             this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.glaceros.flee").animation(), pLimbSwing, pLimbSwingAmount, 1, 2);
         } else {
-            this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.glaceros.walk").animation(), pLimbSwing, pLimbSwingAmount, 1, 2);
+            this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.glaceros.walk").animation(), pLimbSwing, pLimbSwingAmount, 3, 3);
         }
 
         ((Ducling) getAnyDescendantWithName("neck").orElseThrow()).xRot = (pHeadPitch + (pEntity.isSparring() ? 90 : 0)) * ((float)Math.PI / 180F);

@@ -56,14 +56,13 @@ public class ModItems {
             () -> new DeferredSpawnEggItem(ModEntities.SNOWDO, 0x74a3af, 0xcdc9df, new Item.Properties()));
 
     public static final DeferredItem<Item> SPEARTOOTH_SPAWN_EGG = ITEMS.register("speartooth_tiger_spawn_egg",
-            () -> new DeferredSpawnEggItem(ModEntities.SPEARTOOTH, 0x74a3af, 0xcdc9df, new Item.Properties()));
-
+            () -> new DeferredSpawnEggItem(ModEntities.SPEARTOOTH, 0xBADFE2, 0x574F93, new Item.Properties()));
 
     public static final DeferredItem<Item> BURREL_SPAWN_EGG = ITEMS.register("burrel_spawn_egg",
-            () -> new DeferredSpawnEggItem(ModEntities.BURREL, 0x74a3af, 0xcdc9df, new Item.Properties()));
+            () -> new DeferredSpawnEggItem(ModEntities.BURREL, 0xC06F42, 0x57341D, new Item.Properties()));
 
     public static final DeferredItem<Item> FROSTOMPER_SPAWN_EGG = register("frostomper_spawn_egg",
-            () -> new DeferredSpawnEggItem(ModEntities.FROSTOMPER, 0x74a3af, 0xcdc9df, new Item.Properties()));
+            () -> new DeferredSpawnEggItem(ModEntities.FROSTOMPER, 0xBBC9D5, 0x646CD1, new Item.Properties()));
 
     public static final DeferredItem<Item> CEDAR_BOAT = register("cedar_boat", () -> new BFTPBoatItem(false, BFTPBoat.BoatType.CEDAR, (new Item.Properties()).stacksTo(1)));
     public static final DeferredItem<Item> CEDAR_CHEST_BOAT = register("cedar_chest_boat", () -> new BFTPBoatItem(true, BFTPBoat.BoatType.CEDAR, (new Item.Properties()).stacksTo(1)));
@@ -81,7 +80,7 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
 
     public static final DeferredItem<Item> PSYCHO_BEAR_SPAWN_EGG = register("psycho_bear_spawn_egg",
-            () -> new DeferredSpawnEggItem(ModEntities.PSYCHO_BEAR, 0x74a3af, 0xcdc9df, new Item.Properties()));
+            () -> new DeferredSpawnEggItem(ModEntities.PSYCHO_BEAR, 0x141418, 0xB432D0, new Item.Properties()));
 
     private static DeferredItem<Item> registerIceCream(String name) {
         return register(name, () -> new Item(new Item.Properties().stacksTo(16).food(ModFoods.BOWL_ICE_CREAM)));

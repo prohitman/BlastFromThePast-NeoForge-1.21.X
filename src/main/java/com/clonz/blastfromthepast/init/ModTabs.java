@@ -26,9 +26,9 @@ public class ModTabs {
                         output.accept(ModItems.SNOWDO_SPAWN_EGG.get());
                         output.accept(ModItems.FROSTOMPER_SPAWN_EGG.get());
                         output.accept(ModItems.PSYCHO_BEAR_SPAWN_EGG.get());
-                        output.accept(ModBlocks.SAPPY_CEDAR_LOG.get());
                         output.accept(ModItems.SPEARTOOTH_SPAWN_EGG.get());
                         output.accept(ModItems.BURREL_SPAWN_EGG.get());
+                        output.accept(ModBlocks.SAPPY_CEDAR_LOG.get());
                         addWoodGroupToTab(output, ModBlocks.CEDAR);
                         output.accept(ModItems.CEDAR_BOAT.get());
                         output.accept(ModItems.CEDAR_CHEST_BOAT.get());

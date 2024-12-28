@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.baby_frostomper.Pose": {
+		"animation.frostomper.Pose": {
 			"loop": true,
 			"bones": {
 				"head": {
@@ -39,7 +39,7 @@
 				}
 			}
 		},
-		"animation.baby_frostomper.idle": {
+		"animation.frostomper.idle": {
 			"loop": true,
 			"animation_length": 2,
 			"bones": {
@@ -112,7 +112,7 @@
 				}
 			}
 		},
-		"animation.baby_frostomper.walk": {
+		"animation.frostomper.walk": {
 			"loop": true,
 			"animation_length": 1.5,
 			"bones": {
@@ -528,7 +528,7 @@
 				}
 			}
 		},
-		"animation.baby_frostomper.run": {
+		"animation.frostomper.run": {
 			"loop": true,
 			"animation_length": 0.5,
 			"bones": {
@@ -872,7 +872,7 @@
 				}
 			}
 		},
-		"animation.baby_frostomper.tail": {
+		"animation.frostomper.tail": {
 			"animation_length": 1.25,
 			"bones": {
 				"tail": {
@@ -905,7 +905,7 @@
 				}
 			}
 		},
-		"animation.baby_frostomper.noise": {
+		"animation.frostomper.trumpet": {
 			"animation_length": 0.4167,
 			"bones": {
 				"head": {

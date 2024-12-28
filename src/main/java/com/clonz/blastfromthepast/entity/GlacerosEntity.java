@@ -90,7 +90,7 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
 
     public void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new GlacerosAlertPanicGoal(this, 2.0));
+        this.goalSelector.addGoal(1, new GlacerosAlertPanicGoal(this, 2.5));
         this.goalSelector.addGoal(3, new FollowParentGoal(this, 1.4));
         this.goalSelector.addGoal(4, new BreedGoal(this, 1.1));
         this.goalSelector.addGoal(5, new TemptGoal(this, 1, itemStack -> itemStack.is(this.getVariant().getDelphinium().asItem()) ,false));
@@ -151,7 +151,7 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
             if(!glacerosEntities.isEmpty()){
                 for(GlacerosEntity glaceros : glacerosEntities){
                     glaceros.setPanicking(true);
-                    glaceros.alertCooldown = 40 + glaceros.getRandom().nextInt(20);
+                    glaceros.alertCooldown = 150 + glaceros.getRandom().nextInt(100);
                 }
             }
         }

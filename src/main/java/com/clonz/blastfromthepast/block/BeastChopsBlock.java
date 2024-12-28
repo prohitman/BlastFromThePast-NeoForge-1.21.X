@@ -127,10 +127,10 @@ public class BeastChopsBlock extends RotatedPillarBlock {
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.getItem() == ModItems.SAP_BALL.get()) {
-            if (this != ModBlocks.BEAST_CHOPS_COOKED.get() && state.getValue(STATES) != 0) {
+            if (this != ModBlocks.BEAST_CHOPS_COOKED.get() || state.getValue(STATES) == 4) {
                 return ItemInteractionResult.FAIL;
             } else {
-                level.setBlock(pos, ModBlocks.BEAST_CHOPS_GLAZED.get().defaultBlockState().setValue(FACING, state.getValue(FACING)).setValue(STATES, state.getValue(STATES)), 3);
+                level.setBlock(pos, ModBlocks.BEAST_CHOPS_GLAZED.get().defaultBlockState().setValue(FACING, state.getValue(FACING)).setValue(AXIS, state.getValue(AXIS)).setValue(STATES, state.getValue(STATES)), 3);
                 if (!player.isCreative()) {
                     itemStack.shrink(1);
                 }
@@ -175,7 +175,10 @@ public class BeastChopsBlock extends RotatedPillarBlock {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(AXIS, context.getClickedFace().getAxis());
+        return this.defaultBlockState()
+                .setValue(FACING, context.getClickedFace().getAxis() == Direction.Axis.X ? context.getClickedFace().getOpposite()
+                        : context.getClickedFace())
+                .setValue(AXIS, context.getClickedFace().getAxis());
     }
 
     @Override

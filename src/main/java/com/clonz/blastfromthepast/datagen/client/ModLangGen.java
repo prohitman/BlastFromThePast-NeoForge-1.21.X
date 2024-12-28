@@ -41,10 +41,13 @@ public class ModLangGen extends LanguageProvider {
         addItem(ModItems.SNOWDO_SPAWN_EGG);
         addItem(ModItems.FROSTOMPER_SPAWN_EGG);
         addItem(ModItems.PSYCHO_BEAR_SPAWN_EGG);
+        addItem(ModItems.SPEARTOOTH_SPAWN_EGG);
+        addItem(ModItems.BURREL_SPAWN_EGG);
         addItem(ModItems.CEDAR_BOAT);
         addItem(ModItems.CEDAR_CHEST_BOAT);
-        addItem(ModItems.SPEARTOOTH_SPAWN_EGG);
         addItem(ModItems.SHAGGY_PELT);
+        addItem(ModItems.SPEARTOOTH);
+        addItem(ModItems.ICE_SPEAR);
 
         addItem(ModItems.FROST_BITE_HELMET);
         addItem(ModItems.FROST_BITE_CHESTPLATE);

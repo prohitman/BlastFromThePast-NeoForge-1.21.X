@@ -369,7 +369,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
                 this.animateWhen("sleep", activeAttackType == null && this.getSleepState() == TransitioningState.ACTIVE);
                 this.animateWhen("sleep_end", activeAttackType == null && this.getSleepState() == TransitioningState.ACTIVE_TO_INACTIVE);
                 this.animateWhen("back_scratch_start", activeAttackType == null && this.getBackScratchState() == TransitioningState.INACTIVE_TO_ACTIVE);
-                this.animateWhen("back_scratch", activeAttackType == null && this.getBackScratchState() == TransitioningState.ACTIVE);
+                this.animateWhen("back_scratch_loop", activeAttackType == null && this.getBackScratchState() == TransitioningState.ACTIVE);
                 this.animateWhen("back_scratch_stop", activeAttackType == null && this.getBackScratchState() == TransitioningState.ACTIVE_TO_INACTIVE);
             }
         }

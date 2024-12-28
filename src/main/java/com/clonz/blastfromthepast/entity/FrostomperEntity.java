@@ -82,7 +82,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     private static final int CHARGE_ATTACK_COOLDOWN = 900;
     private static final int FLAG_ROARING = 128;
     private static final UniformInt CHARGE_ATTACK_DURATION = UniformInt.of(Mth.floor(20 / 0.3F), Mth.floor(25 / 0.3F)); // Distances in blocks divided by Frostomper's base speed of 0.3 blocks/tick
-    public static final int MAX_TRUMPET_TICKS = Mth.floor(0.4167F * 20);
+    public static final int MAX_TRUMPET_TICKS = Mth.floor(1.5F * 20);
     private final Lazy<Map<String, AnimationState>> babyAnimations = Lazy.of(() -> FrostomperModel.createStateMap(BABY_ANIMATION));
     private final Lazy<Map<String, AnimationState>> adultAnimations = Lazy.of(() -> FrostomperModel.createStateMap(ADULT_ANIMATION));
     protected static final TargetingConditions PARENT_TARGETING = TargetingConditions.forNonCombat()
@@ -461,9 +461,9 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         FrostomperAttackType activeAttackType = this.getActiveAttackType();
         if (this.level().isClientSide()) {
             this.animateWhen("idle", !this.isMoving(this) && this.onGround() && activeAttackType == null);
-            this.animateWhen("noise", this.isRoaring());
+            this.animateWhen("trumpet", this.isRoaring());
             if(!this.isBaby()){
-                this.animateWhen("double_stomp", activeAttackType == FrostomperAttackType.DOUBLE_STOMP);
+                this.animateWhen("crush", activeAttackType == FrostomperAttackType.DOUBLE_STOMP);
                 this.animateWhen("stomp", activeAttackType == FrostomperAttackType.SINGLE_STOMP && !this.isLeftHanded());
                 this.animateWhen("stomp_flipped", activeAttackType == FrostomperAttackType.SINGLE_STOMP && this.isLeftHanded());
                 this.animateWhen("fling", activeAttackType == FrostomperAttackType.FLING);
@@ -485,6 +485,15 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             this.roarCounter = 0;
             this.setRoaring(false);
         }
+        if(!this.level().isClientSide){
+            if(this.random.nextInt(500) == 0 && this.canRoar() && trumpetCounter == 0){
+                this.roarIfPossible();
+                this.trumpetCounter = 200 + this.level().random.nextInt(200);
+            }
+            if(trumpetCounter > 0){
+                trumpetCounter--;
+            }
+        }
     }
 
     @Override
@@ -505,14 +514,6 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     public void aiStep() {
         super.aiStep();
         if (this.isAlive()) {
-            if(this.random.nextInt(100) == 0 && this.getTarget() == null && trumpetCounter == 0){
-                playAnimation("trumpet");
-                this.playSound(ModSounds.FROSTOMPER_TRUMPET.get());
-                this.trumpetCounter = 30;
-            }
-            if(trumpetCounter > 0){
-                trumpetCounter--;
-            }
             if (this.horizontalCollision && EventHooks.canEntityGrief(this.level(), this)) {
                 boolean destroyedBlock = false;
                 AABB breakBox = this.getBoundingBox().inflate(0.2);
