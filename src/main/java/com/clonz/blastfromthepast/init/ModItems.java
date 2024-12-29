@@ -56,7 +56,7 @@ public class ModItems {
             () -> new DeferredSpawnEggItem(ModEntities.SNOWDO, 0x74a3af, 0xcdc9df, new Item.Properties()));
 
     public static final DeferredItem<Item> SPEARTOOTH_SPAWN_EGG = ITEMS.register("speartooth_tiger_spawn_egg",
-            () -> new DeferredSpawnEggItem(ModEntities.SPEARTOOTH, 0xBADFE2, 0x574F93, new Item.Properties()));
+            () -> new DeferredSpawnEggItem(ModEntities.SPEARTOOTH, 0xBADFE2, 0x8278CE, new Item.Properties()));
 
     public static final DeferredItem<Item> BURREL_SPAWN_EGG = ITEMS.register("burrel_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.BURREL, 0xC06F42, 0x57341D, new Item.Properties()));

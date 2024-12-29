@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.datagen.server;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
 import net.minecraft.core.HolderLookup;
@@ -86,6 +87,29 @@ public class ModEntityLootGen extends EntityLootSubProvider {
                         .setRolls(ConstantValue.exactly(1.0F))
                         .add(
                                 LootItem.lootTableItem(Items.FEATHER)
+                                        .setWeight(3)
+                                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F)))
+                                        .apply(EnchantedCountIncreaseFunction.lootingMultiplier(this.registries, UniformGenerator.between(0.0F, 1.0F))))
+                ));
+        this.add(ModEntities.FROSTOMPER.get(), LootTable.lootTable()
+                .withPool(LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .add(
+                                LootItem.lootTableItem(ModBlocks.BEAST_CHOPS)
+                                        .setWeight(3)
+                                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 3.0F)))
+                                        .apply(EnchantedCountIncreaseFunction.lootingMultiplier(this.registries, UniformGenerator.between(0.0F, 1.0F))))
+                ).withPool(LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .add(
+                                LootItem.lootTableItem(ModItems.SHAGGY_PELT)
+                                        .setWeight(3)
+                                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 6.0F)))
+                                        .apply(EnchantedCountIncreaseFunction.lootingMultiplier(this.registries, UniformGenerator.between(0.0F, 1.0F))))
+                ).withPool(LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .add(
+                                LootItem.lootTableItem(ModBlocks.BEASTLY_FEMUR)
                                         .setWeight(3)
                                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F)))
                                         .apply(EnchantedCountIncreaseFunction.lootingMultiplier(this.registries, UniformGenerator.between(0.0F, 1.0F))))

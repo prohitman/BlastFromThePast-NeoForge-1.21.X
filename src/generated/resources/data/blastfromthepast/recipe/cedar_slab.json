@@ -1,16 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "boat",
+  "category": "building",
   "key": {
     "#": {
-      "item": "blastfromthepast:cedar_planks"
+      "item": "blastfromthepast:cedar"
     }
   },
   "pattern": [
-    "# #",
     "###"
   ],
   "result": {
-    "item": "blastfromthepast:cedar_boat"
+    "count": 6,
+    "id": "blastfromthepast:cedar_slab"
   }
 }

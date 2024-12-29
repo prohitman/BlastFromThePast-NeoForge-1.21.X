@@ -1,16 +1,18 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "boat",
+  "category": "redstone",
   "key": {
     "#": {
-      "id": "blastfromthepast:shaggy_pelt"
+      "item": "blastfromthepast:cedar"
     }
   },
   "pattern": [
     "##",
+    "##",
     "##"
   ],
   "result": {
-    "id": "blastfromthepast:shaggy_block"
+    "count": 3,
+    "id": "blastfromthepast:cedar_door"
   }
 }
