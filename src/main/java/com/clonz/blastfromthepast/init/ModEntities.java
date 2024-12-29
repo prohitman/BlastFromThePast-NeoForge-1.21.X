@@ -8,6 +8,7 @@ import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
 import com.clonz.blastfromthepast.entity.boats.BFTPChestBoat;
 import com.clonz.blastfromthepast.entity.burrel.Burrel;
+import com.clonz.blastfromthepast.entity.projectile.ThrownIceSpear;
 import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
 import com.clonz.blastfromthepast.util.HitboxHelper;
 import net.minecraft.core.registries.Registries;
@@ -47,6 +48,9 @@ public class ModEntities {
 
     public static final DeferredHolder<EntityType<?>, EntityType<Burrel>> BURREL = registerMob("burrel", Burrel::new
             , 1.0F, 1.0F, 0x302220, 0xACACAC);
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ThrownIceSpear>> ICE_SPEAR = ENTITIES.register("ice_spear",
+            () -> EntityType.Builder.<ThrownIceSpear>of(ThrownIceSpear::new, MobCategory.MISC).sized(0.5F, 0.5F).clientTrackingRange(4).updateInterval(20).build("ice_spear"));
 
 
     public static final DeferredHolder<EntityType<?>, EntityType<BFTPBoat>> BFTPBOAT = ENTITIES.register("boat", () -> EntityType.Builder

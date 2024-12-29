@@ -1,5 +1,7 @@
 package com.clonz.blastfromthepast.item;
 
+import com.clonz.blastfromthepast.entity.projectile.ThrownIceSpear;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -20,7 +22,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.ThrownTrident;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ProjectileItem;
@@ -32,10 +33,12 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class IceSpear extends Item implements ProjectileItem {
 
@@ -46,7 +49,9 @@ public class IceSpear extends Item implements ProjectileItem {
     public static ItemAttributeModifiers createAttributes() {
         return ItemAttributeModifiers.builder().add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, 8.0, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND).add(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, -2.9000000953674316, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND).build();
     }
-
+    public static Tool createToolProperties() {
+        return new Tool(List.of(), 1.0F, 2);
+    }
     public boolean canAttackBlock(BlockState state, Level level, BlockPos pos, Player player) {
         return !player.isCreative();
     }
@@ -69,7 +74,7 @@ public class IceSpear extends Item implements ProjectileItem {
                     if (!level.isClientSide) {
                         stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(entityLiving.getUsedItemHand()));
                         if (f == 0.0F) {
-                            ThrownTrident throwntrident = new ThrownTrident(level, player, stack);
+                            ThrownIceSpear throwntrident = new ThrownIceSpear(level, player, stack);
                             throwntrident.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 2.5F, 1.0F);
                             if (player.hasInfiniteMaterials()) {
                                 throwntrident.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
@@ -106,7 +111,6 @@ public class IceSpear extends Item implements ProjectileItem {
                 }
             }
         }
-
     }
 
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
@@ -138,7 +142,7 @@ public class IceSpear extends Item implements ProjectileItem {
     }
 
     public Projectile asProjectile(Level level, Position pos, ItemStack stack, Direction direction) {
-        ThrownTrident throwntrident = new ThrownTrident(level, pos.x(), pos.y(), pos.z(), stack.copyWithCount(1));
+        ThrownIceSpear throwntrident = new ThrownIceSpear(level, pos.x(), pos.y(), pos.z(), stack.copyWithCount(1));
         throwntrident.pickup = AbstractArrow.Pickup.ALLOWED;
         return throwntrident;
     }

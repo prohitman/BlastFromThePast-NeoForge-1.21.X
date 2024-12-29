@@ -3,13 +3,16 @@ package com.clonz.blastfromthepast;
 import com.clonz.blastfromthepast.client.models.*;
 import com.clonz.blastfromthepast.client.models.boats.BFTPBoatModel;
 import com.clonz.blastfromthepast.client.models.boats.BFTPChestBoatModel;
+import com.clonz.blastfromthepast.client.models.item.IceSpearModel;
 import com.clonz.blastfromthepast.client.renderers.*;
 import com.clonz.blastfromthepast.client.renderers.boat.BFTPBoatRenderer;
+import com.clonz.blastfromthepast.client.renderers.projectile.ThrownIceSpearRenderer;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
 import com.clonz.blastfromthepast.entity.burrel.Burrel;
 import com.clonz.blastfromthepast.entity.pack.EntityPacks;
+import com.clonz.blastfromthepast.entity.projectile.ThrownIceSpear;
 import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
 import com.clonz.blastfromthepast.init.*;
 import com.mojang.logging.LogUtils;
@@ -18,6 +21,8 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -94,20 +99,27 @@ public class BlastFromThePast {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-            EntityRenderers.register(ModEntities.GLACEROS.get(), GlacerosRenderer::new);
-            EntityRenderers.register(ModEntities.SNOWDO.get(), SnowdoRenderer::new);
-            EntityRenderers.register(ModEntities.FROSTOMPER.get(), FrostomperRenderer::new);
-            EntityRenderers.register(ModEntities.PSYCHO_BEAR.get(), PsychoBearRenderer::new);
-            EntityRenderers.register(ModEntities.SPEARTOOTH.get(), SpeartoothTigerRenderer::new);
-            EntityRenderers.register(ModEntities.BURREL.get(), BurrelRenderer::new);
-            EntityRenderers.register(ModEntities.BFTPBOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, false)));
-            EntityRenderers.register(ModEntities.BFTPCHEST_BOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, true)));
-            BlockEntityRenderers.register(ModBlockEntities.SIGN.get(), SignRenderer::new);
-            BlockEntityRenderers.register(ModBlockEntities.HANGING_SIGN.get(), HangingSignRenderer::new);
+            event.enqueueWork(() -> {
+                EntityRenderers.register(ModEntities.GLACEROS.get(), GlacerosRenderer::new);
+                EntityRenderers.register(ModEntities.SNOWDO.get(), SnowdoRenderer::new);
+                EntityRenderers.register(ModEntities.FROSTOMPER.get(), FrostomperRenderer::new);
+                EntityRenderers.register(ModEntities.PSYCHO_BEAR.get(), PsychoBearRenderer::new);
+                EntityRenderers.register(ModEntities.SPEARTOOTH.get(), SpeartoothTigerRenderer::new);
+                EntityRenderers.register(ModEntities.BURREL.get(), BurrelRenderer::new);
+                EntityRenderers.register(ModEntities.BFTPBOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, false)));
+                EntityRenderers.register(ModEntities.BFTPCHEST_BOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, true)));
+                EntityRenderers.register(ModEntities.ICE_SPEAR.get(), ThrownIceSpearRenderer::new);
+                BlockEntityRenderers.register(ModBlockEntities.SIGN.get(), SignRenderer::new);
+                BlockEntityRenderers.register(ModBlockEntities.HANGING_SIGN.get(), HangingSignRenderer::new);
+
+                ItemProperties.register(ModItems.ICE_SPEAR.get(), ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "throwing"), (stack, level, living, j) ->
+                        living != null && living.isUsingItem() && living.getUseItem() == stack ? 1.0F : 0.0F);
+            });
         }
 
         @SubscribeEvent
         public static void registerLayers(final EntityRenderersEvent.RegisterLayerDefinitions event) {
+            event.registerLayerDefinition(IceSpearModel.LOCATION, () -> BaseDucModel.getLakeDefinition(ThrownIceSpear.LOCATION));
             event.registerLayerDefinition(GlacerosModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(GlacerosEntity.LOCATION));
             event.registerLayerDefinition(GlacerosModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.GLACEROS.getId().withPrefix("baby_")));
             event.registerLayerDefinition(SnowdoModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.SNOWDO.getId().withPrefix("baby_")));

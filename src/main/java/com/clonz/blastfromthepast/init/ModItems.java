@@ -4,11 +4,10 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
 import com.clonz.blastfromthepast.item.BFTPBoatItem;
 import com.clonz.blastfromthepast.item.FrostbiteArmor;
+import com.clonz.blastfromthepast.item.IceSpear;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemNameBlockItem;
-import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.*;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -87,7 +86,13 @@ public class ModItems {
     }
 
 
-    public static final DeferredItem<Item> ICE_SPEAR = ITEMS.register("ice_spear", () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> ICE_SPEAR = ITEMS.register("ice_spear", () ->
+            new IceSpear(new Item.Properties()
+                    .stacksTo(1)
+                    .rarity(Rarity.EPIC)
+                    .durability(250)
+                    .attributes(IceSpear.createAttributes())
+                    .component(DataComponents.TOOL, IceSpear.createToolProperties())));
 
     public static final DeferredItem<Item> SPEARTOOTH = ITEMS.register("speartooth", () -> new Item(new Item.Properties()));
 
