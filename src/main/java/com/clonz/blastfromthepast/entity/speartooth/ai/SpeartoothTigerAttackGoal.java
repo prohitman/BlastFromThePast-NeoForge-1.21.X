@@ -1,3 +1,4 @@
+/*
 package com.clonz.blastfromthepast.entity.speartooth.ai;
 
 import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
@@ -48,4 +49,4 @@ public class SpeartoothTigerAttackGoal extends MeleeAttackGoal {
         this.speartoothTiger.setAggressionVar(0);
     }
 
-}
+}*/

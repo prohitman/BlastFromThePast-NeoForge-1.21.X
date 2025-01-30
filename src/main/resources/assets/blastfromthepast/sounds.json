@@ -8,6 +8,39 @@
       }
     ]
   },
+  "speartooth_death": {
+    "subtitle": "sounds.blastfromthepast.speartooth_death",
+    "sounds": [
+      "blastfromthepast:speartooth_death"
+    ]
+  },
+  "speartooth_hurt": {
+    "subtitle": "sounds.blastfromthepast.speartooth_hurt",
+    "sounds": [
+      "blastfromthepast:speartooth_hurt_0",
+      "blastfromthepast:speartooth_hurt_1"
+    ]
+  },
+  "speartooth_idle": {
+    "subtitle": "sounds.blastfromthepast.speartooth_idle",
+    "sounds": [
+      "blastfromthepast:speartooth_idle_0",
+      "blastfromthepast:speartooth_idle_1",
+      "blastfromthepast:speartooth_idle_2"
+    ]
+  },
+  "speartooth_roar": {
+    "subtitle": "sounds.blastfromthepast.speartooth_roar",
+    "sounds": [
+      "blastfromthepast:speartooth_roar"
+    ]
+  },
+  "speartooth_yawn": {
+    "subtitle": "sounds.blastfromthepast.speartooth_yawn",
+    "sounds": [
+      "blastfromthepast:speartooth_yawn"
+    ]
+  },
   "glaceros_death": {
     "subtitle": "sounds.blastfromthepast.glaceros_death",
     "sounds": [

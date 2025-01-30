@@ -1,3 +1,4 @@
+/*
 package com.clonz.blastfromthepast.client.models;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
@@ -43,4 +44,4 @@ public class SpeartoothTigerModel extends AnimatableDucModel<SpeartoothTiger> {
         ((Ducling) getAnyDescendantWithName("mane").orElseThrow()).xRot = pHeadPitch * ((float) Math.PI / 180F);
         ((Ducling) getAnyDescendantWithName("mane").orElseThrow()).yRot = pNetHeadYaw * ((float) Math.PI / 180F);
     }
-}
+}*/

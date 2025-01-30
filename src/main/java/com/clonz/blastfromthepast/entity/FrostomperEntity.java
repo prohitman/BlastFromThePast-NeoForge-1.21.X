@@ -14,10 +14,12 @@ import com.clonz.blastfromthepast.entity.ai.goal.pack.PackHurtByTargetGoal;
 import com.clonz.blastfromthepast.entity.misc.AnimatedAttacker;
 import com.clonz.blastfromthepast.entity.misc.ChargeForward;
 import com.clonz.blastfromthepast.entity.misc.OverrideAnimatedAttacker;
+import com.clonz.blastfromthepast.entity.misc.StateValue;
 import com.clonz.blastfromthepast.entity.pack.EntityPack;
 import com.clonz.blastfromthepast.entity.ai.navigation.BFTPGroundPathNavigation;
 import com.clonz.blastfromthepast.entity.pack.EntityPackAgeableMobData;
 import com.clonz.blastfromthepast.entity.pack.EntityPackHolder;
+import com.clonz.blastfromthepast.init.ModDataSerializers;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModSounds;
 import com.clonz.blastfromthepast.init.ModTags;
@@ -69,14 +71,16 @@ import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.EventHooks;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 import java.util.function.Predicate;
-
+@ParametersAreNonnullByDefault
 public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel>, EntityPackHolder<FrostomperEntity>, OverrideAnimatedAttacker<FrostomperEntity, FrostomperEntity.FrostomperAttackType>, ChargeForward, Roaring {
     public static final DucAnimation ADULT_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId());
     public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId().withPrefix("baby_"));
     public static final EntityDimensions BABY_FROSTOMPER_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(28.0F), HitboxHelper.pixelsToBlocks(22.0F));
     private static final EntityDataAccessor<OptionalInt> DATA_ACTIVE_ATTACK_TYPE = SynchedEntityData.defineId(FrostomperEntity.class, EntityDataSerializers.OPTIONAL_UNSIGNED_INT);
+    private static final EntityDataAccessor<IdleState> DATA_IDLE_STATE = SynchedEntityData.defineId(FrostomperEntity.class, ModDataSerializers.FROSTOMPER_IDLE_STATE.get());
     private static final EntityDataAccessor<Boolean> DATA_CHARGING_FORWARD = SynchedEntityData.defineId(FrostomperEntity.class, EntityDataSerializers.BOOLEAN);
     private static final double PARENT_TARGETING_DISTANCE = 16.0D;
     private static final int CHARGE_ATTACK_COOLDOWN = 900;
@@ -95,6 +99,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     private int ticksUntilNextCharge;
     private int roarCounter;
     private int trumpetCounter;
+    private int idleAnimationTimer = -1;
 
     public FrostomperEntity(EntityType<? extends FrostomperEntity> entityType, Level level) {
         super(entityType, level);
@@ -253,6 +258,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         if(this.isBaby()){
             this.setAge(AgeableMob.BABY_START_AGE * 3);
         }
+        this.idleAnimationTimer = IdleState.NONE.animationTime();
+
         return spawnData;
     }
 
@@ -412,6 +419,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         super.defineSynchedData(builder);
         builder.define(DATA_ACTIVE_ATTACK_TYPE, OptionalInt.empty());
         builder.define(DATA_CHARGING_FORWARD, false);
+        builder.define(DATA_IDLE_STATE, IdleState.NONE);
     }
 
     @Override
@@ -458,6 +466,18 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     public void tick() {
         super.tick();
 
+        if (this.isAlive() && !this.isBaby()) {
+            if (idleAnimationTimer <= -1) {
+                IdleState newState = this.getEntityData().get(DATA_IDLE_STATE) == IdleState.NONE
+                        ? (this.random.nextBoolean() ? IdleState.EARS : IdleState.TAIL)
+                        : IdleState.NONE;
+                this.getEntityData().set(DATA_IDLE_STATE, newState);
+                idleAnimationTimer = newState.animationTime();
+            } else {
+                idleAnimationTimer--;
+            }
+        }
+
         FrostomperAttackType activeAttackType = this.getActiveAttackType();
         if (this.level().isClientSide()) {
             this.animateWhen("idle", !this.isMoving(this) && this.onGround() && activeAttackType == null);
@@ -468,6 +488,9 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 this.animateWhen("stomp_flipped", activeAttackType == FrostomperAttackType.SINGLE_STOMP && this.isLeftHanded());
                 this.animateWhen("fling", activeAttackType == FrostomperAttackType.FLING);
                 this.animateWhen("charge", activeAttackType == FrostomperAttackType.CHARGE);
+                IdleState idleState = this.getEntityData().get(DATA_IDLE_STATE);
+                this.animateWhen("tail", idleState == IdleState.TAIL);
+                this.animateWhen("ears", idleState == IdleState.EARS);
             }
         }
         if (!this.canRotateHead()) {
@@ -876,6 +899,29 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             }
 
             return values()[pOrdinal];
+        }
+    }
+
+    public enum IdleState implements StateValue {
+        NONE(0, -1),
+        EARS(1, 22),
+        TAIL(2, 25);
+
+        private final int id;
+        private final int animationTime;
+
+        IdleState(int id, int animationTime) {
+            this.id = id;
+            this.animationTime = animationTime;
+        }
+
+        @Override
+        public int id() {
+            return id;
+        }
+
+        public int animationTime() {
+            return animationTime != -1 ? animationTime : 300 + (int) (Math.random() * 300);
         }
     }
 }

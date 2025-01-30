@@ -2,23 +2,25 @@ package com.clonz.blastfromthepast.events;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
-import com.clonz.blastfromthepast.entity.SnowdoEntity;
+import com.clonz.blastfromthepast.entity.HollowEntity;
+import com.clonz.blastfromthepast.entity.TarArrow;
+import com.clonz.blastfromthepast.init.ModItems;
 import com.clonz.blastfromthepast.init.ModSounds;
-import com.clonz.blastfromthepast.network.RiddenEntityPayload;
-import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundEvents;
+import com.clonz.blastfromthepast.util.EntityHelper;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.phys.HitResult;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.ArrowLooseEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
-
-import java.util.Optional;
 
 @EventBusSubscriber(modid = BlastFromThePast.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class NeoForgeEvents {
@@ -41,14 +43,24 @@ public class NeoForgeEvents {
         }
     }
 
-    @SubscribeEvent
-    public static void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
-        Player player = event.getEntity();
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onPlayerDeath(LivingDeathEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            if (EntityHelper.shouldCreateHollow(player)) {
+                ItemStack idol = EntityHelper.getIdolOfRetrievalInHand(player);
+                if (idol != null) {
+                    idol.shrink(1);
+                }
+                HollowEntity hollow = HollowEntity.create(player);
+                player.serverLevel().addFreshEntity(hollow);
+            }
+        }
+    }
 
-        if (player.getFirstPassenger() instanceof SnowdoEntity snowdo && player.getMainHandItem().isEmpty() && event.getLevel().isClientSide()) {
-            snowdo.setRiddenPlayer(Optional.empty());
-            snowdo.stopRiding();
-            PacketDistributor.sendToServer(new RiddenEntityPayload(snowdo.getId()));
+    @SubscribeEvent
+    public static void onArrowHit(ProjectileImpactEvent event) {
+        if (event.getRayTraceResult().getType() == HitResult.Type.BLOCK && event.getProjectile() instanceof TarArrow) {
+            event.setCanceled(true);
         }
     }
 }

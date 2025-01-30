@@ -16,8 +16,9 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.concurrent.CompletableFuture;
-
+@ParametersAreNonnullByDefault
 public class ModBlockTagsGen extends BlockTagsProvider {
     public ModBlockTagsGen(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
         super(output, lookupProvider, BlastFromThePast.MODID, existingFileHelper);
@@ -42,6 +43,9 @@ public class ModBlockTagsGen extends BlockTagsProvider {
                 .add(ModBlocks.BLUE_DELPHINIUM.get())
                 .add(ModBlocks.PINK_DELPHINIUM.get())
                 .add(ModBlocks.VIOLET_DELPHINIUM.get());
+
+        tag(BlockTags.MINEABLE_WITH_SHOVEL)
+                .add(ModBlocks.TAR.get());
     }
 
     private void loadStoneGroupBlockTags(BFTPStoneGroup stoneGroup){

@@ -27,5 +27,8 @@ public class ModEntityTagsGen extends EntityTypeTagsProvider {
                 .addTag(Tags.EntityTypes.BOSSES)
                 .add(ModEntities.FROSTOMPER.get())
                 .add(EntityType.CREEPER);
+
+        tag(EntityTypeTags.ARROWS)
+                .add(ModEntities.TAR_ARROW.get());
     }
 }

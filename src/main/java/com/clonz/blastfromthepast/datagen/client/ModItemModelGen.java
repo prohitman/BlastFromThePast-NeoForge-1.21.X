@@ -47,10 +47,12 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.BEAR_CLAW.get());
         basicItem(ModItems.SHAGGY_PELT.get());
 
-/*        basicItem(ModItems.FROST_BITE_HELMET.get());
+        basicItem(ModItems.IDOL_OF_RETRIEVAL.get());
+
+        basicItem(ModItems.FROST_BITE_HELMET.get());
         basicItem(ModItems.FROST_BITE_BOOTS.get());
         basicItem(ModItems.FROST_BITE_CHESTPLATE.get());
-        basicItem(ModItems.FROST_BITE_LEGGINGS.get());*/
+        basicItem(ModItems.FROST_BITE_LEGGINGS.get());
 
         //Blocks
         registerWoodGroup(ModBlocks.CEDAR);
@@ -65,6 +67,7 @@ public class ModItemModelGen extends ItemModelProvider {
         withExistingParent(ModBlocks.PSYCHO_BERRY_BUSH.getId().getPath(), modLoc("block/grown_psycho_berry_bush"));
         singleTexturePlantBlock(ModBlocks.PSYCHO_BERRY_SPROUT);
         singleTextureBlock(ModBlocks.SNOWDO_EGG);
+        createWithParent(ModBlocks.TAR);
     }
 
     private void registerStoneGroup(BFTPStoneGroup stoneGroup){

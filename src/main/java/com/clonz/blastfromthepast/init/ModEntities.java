@@ -1,20 +1,18 @@
 package com.clonz.blastfromthepast.init;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.entity.FrostomperEntity;
-import com.clonz.blastfromthepast.entity.GlacerosEntity;
-import com.clonz.blastfromthepast.entity.PsychoBearEntity;
-import com.clonz.blastfromthepast.entity.SnowdoEntity;
+import com.clonz.blastfromthepast.entity.*;
 import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
 import com.clonz.blastfromthepast.entity.boats.BFTPChestBoat;
 import com.clonz.blastfromthepast.entity.burrel.Burrel;
 import com.clonz.blastfromthepast.entity.projectile.ThrownIceSpear;
-import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
+import com.clonz.blastfromthepast.entity.speartooth.SpeartoothEntity;
 import com.clonz.blastfromthepast.util.HitboxHelper;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -43,7 +41,7 @@ public class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<FrostomperEntity>> FROSTOMPER = registerMob("frostomper", FrostomperEntity::new,
             HitboxHelper.pixelsToBlocks(77.0F), HitboxHelper.pixelsToBlocks(70.0F), 0x302219, 0xACACAC);
 
-    public static final DeferredHolder<EntityType<?>, EntityType<SpeartoothTiger>> SPEARTOOTH = registerMob("speartooth_tiger", SpeartoothTiger::new
+    public static final DeferredHolder<EntityType<?>, EntityType<SpeartoothEntity>> SPEARTOOTH = registerMob("speartooth", SpeartoothEntity::new
             , 1.0F, 1.0F, 0x302220, 0xACACAC);
 
     public static final DeferredHolder<EntityType<?>, EntityType<Burrel>> BURREL = registerMob("burrel", Burrel::new
@@ -68,17 +66,30 @@ public class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<PsychoBearEntity>> PSYCHO_BEAR = registerMob("psycho_bear", PsychoBearEntity::new,
             HitboxHelper.pixelsToBlocks(53.0F), HitboxHelper.pixelsToBlocks(33.0F), 0x302219, 0xACACAC);
 
+    public static final DeferredHolder<EntityType<?>, EntityType<HollowEntity>> HOLLOW = ENTITIES.register("hollow", () -> EntityType.Builder
+            .of(HollowEntity::new, MobCategory.MISC)
+            .sized(1.3F, 2.3F)
+            .clientTrackingRange(10)
+            .build(getName("hollow")));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<TarArrow>> TAR_ARROW = ENTITIES.register("tar_arrow", () -> EntityType.Builder
+            .<TarArrow>of(TarArrow::new, MobCategory.MISC)
+            .sized(0.5F, 0.5F)
+            .clientTrackingRange(4)
+            .build(getName("tar_arrow")));
+
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> GlacerosEntity.init());
         event.enqueueWork(() -> SnowdoEntity.init());
-        event.enqueueWork(() -> SpeartoothTiger.init());
+        event.enqueueWork(() -> SpeartoothEntity.init());
         event.enqueueWork(() -> Burrel.init());
         event.enqueueWork(() -> {
             GlacerosEntity.init();
             SnowdoEntity.init();
             FrostomperEntity.init();
             PsychoBearEntity.init();
+            HollowEntity.init();
         });
     }
 
@@ -86,10 +97,12 @@ public class ModEntities {
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(ModEntities.GLACEROS.get(), GlacerosEntity.createAttributes().build());
         event.put(ModEntities.SNOWDO.get(), SnowdoEntity.createAttributes().build());
-        event.put(ModEntities.SPEARTOOTH.get(), SpeartoothTiger.createAttributes().build());
+        event.put(ModEntities.SPEARTOOTH.get(), SpeartoothEntity.createAttributes().build());
         event.put(ModEntities.BURREL.get(), Burrel.createAttributes().build());
         event.put(ModEntities.FROSTOMPER.get(), FrostomperEntity.createAttributes().build());
         event.put(ModEntities.PSYCHO_BEAR.get(), PsychoBearEntity.createAttributes().build());
+        event.put(ModEntities.HOLLOW.get(), HollowEntity.createLivingAttributes().add(Attributes.MAX_HEALTH, 200F).add(Attributes.GRAVITY, 0).build());
+
     }
 
     private static String getName(String name) {

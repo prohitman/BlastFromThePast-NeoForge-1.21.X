@@ -1,4 +1,4 @@
-// 1.21	2024-12-28T00:32:51.8765503	Block States: blastfromthepast
+// 1.21	2025-01-29T18:52:19.5498381	Block States: blastfromthepast
 2f3623eec46863ba6d6137d6dd2159dbcadef567 assets/blastfromthepast/blockstates/beastly_femur.json
 900c3496d5f9301513c5184bedade0034efd0c3a assets/blastfromthepast/blockstates/beast_chops.json
 f92a3bd9703a3a01c097b733a2c1d9dace46dbb3 assets/blastfromthepast/blockstates/beast_chops_cooked.json
@@ -45,6 +45,7 @@ b818e3575dc9c933a33f372884fd1871de7254af assets/blastfromthepast/blockstates/psy
 038dd270966e69f23ffab417418f133fbc13aac8 assets/blastfromthepast/blockstates/snowdo_egg.json
 4add5ff6c52ee0281cada91806ed1c4428bf5dde assets/blastfromthepast/blockstates/stripped_cedar_log.json
 783199db90b40607134aaeeeb25d0e1b414045ea assets/blastfromthepast/blockstates/stripped_cedar_wood.json
+3242e1879b5e0fe28fb97a29467f7d2273454bdb assets/blastfromthepast/blockstates/tar.json
 3e686306b0de47f15363bc479ac39311c51ec45b assets/blastfromthepast/blockstates/violet_delphinium.json
 b521a7d2bd7dd328ad76d893854801b8b6f740a8 assets/blastfromthepast/blockstates/white_delphinium.json
 5f820e1f0753f188333773410c32aa05c0f56ba9 assets/blastfromthepast/models/block/blue_delphinium_bottom.json

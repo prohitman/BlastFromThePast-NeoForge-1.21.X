@@ -1,3 +1,4 @@
+/*
 package com.clonz.blastfromthepast.entity.speartooth.ai;
 
 import com.clonz.blastfromthepast.entity.speartooth.SpeartoothTiger;
@@ -43,4 +44,4 @@ public class SpeartoothTigerBehaveRandom extends Goal {
             }
         }
     }
-}
+}*/

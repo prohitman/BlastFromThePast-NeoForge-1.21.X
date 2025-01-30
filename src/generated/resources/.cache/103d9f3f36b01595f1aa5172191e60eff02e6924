@@ -1,7 +1,9 @@
-// 1.21	2024-12-18T23:01:30.0005314	Registries
-744223ffd6dafaabb3b0e2735839b0aa72353aa9 data/blastfromthepast/worldgen/biome/frostbite_forest.json
+// 1.21	2025-01-30T14:42:05.8166092	Registries
+79eb10d0ea0b721c15d19f75f4ff99fda5d174b8 data/blastfromthepast/worldgen/biome/frostbite_forest.json
 4f4c1792d62f23f1b300c64c05f3220d3f5d339e data/blastfromthepast/worldgen/biome/frostbite_river.json
 74c854dc79fe25b28124dc69fb68188e9532dc3c data/blastfromthepast/worldgen/configured_feature/frostbite_forest_flowers.json
+7a0b16a3fe2175bf101688a8612fc599475a6453 data/blastfromthepast/worldgen/configured_feature/tar_pit.json
 ba3f4dcfa1784640e1d1570bf1101abfd4c78f29 data/blastfromthepast/worldgen/configured_feature/trees_frostbite_forest.json
 c706ee1f0201302588eb7f86ddbdd6ccbb4272c5 data/blastfromthepast/worldgen/placed_feature/frostbite_forest_flowers.json
+83c1edc8372c4afaa41c76bf537b94817b283db5 data/blastfromthepast/worldgen/placed_feature/tar_pit.json
 25a18707e4f80a7aa60b25798a2fb8f1577804de data/blastfromthepast/worldgen/placed_feature/trees_frostbite_forest.json

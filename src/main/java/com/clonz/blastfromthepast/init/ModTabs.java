@@ -19,7 +19,7 @@ public class ModTabs {
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> BLAST_FROM_THE_PAST =
             CREATIVE_TABS.register("blastfromthepast", () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.blastfromthepast")).withTabsBefore(CreativeModeTabs.COMBAT)
-                    .icon(() -> ModItems.RAW_VENISON.get().getDefaultInstance())
+                    .icon(() -> ModBlocks.SNOWDO_EGG.get().asItem().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.BLIZZARD_REVELRY_DISC.get());
                         output.accept(ModItems.GLACEROS_SPAWN_EGG.get());
@@ -50,6 +50,8 @@ public class ModTabs {
                         output.accept(ModItems.MELON_ICE_CREAM.get());
                         output.accept(ModBlocks.SNOWDO_EGG.get());
                         output.accept(ModItems.BEAR_CLAW.get());
+                        output.accept(ModItems.IDOL_OF_RETRIEVAL.get());
+                        output.accept(ModBlocks.TAR.get());
                         output.accept(ModBlocks.VIOLET_DELPHINIUM);
                         output.accept(ModBlocks.WHITE_DELPHINIUM);
                         output.accept(ModBlocks.BLUE_DELPHINIUM);
@@ -63,9 +65,9 @@ public class ModTabs {
                         output.accept(ModItems.SHAGGY_PELT.get());
                         output.accept(ModBlocks.SHAGGY_BLOCK.get());
                         output.accept(ModItems.FROST_BITE_HELMET);
-                        output.accept(ModItems.FROST_BITE_BOOTS);
                         output.accept(ModItems.FROST_BITE_CHESTPLATE);
                         output.accept(ModItems.FROST_BITE_LEGGINGS);
+                        output.accept(ModItems.FROST_BITE_BOOTS);
 
                         addStoneGroupToTab(output, ModBlocks.PERMAFROST);
                     }).build());

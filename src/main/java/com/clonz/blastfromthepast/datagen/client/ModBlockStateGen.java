@@ -10,6 +10,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
@@ -40,6 +41,24 @@ public class ModBlockStateGen extends BlockStateProvider {
         generateBeastChopsBlockState(ModBlocks.BEAST_CHOPS_COOKED);
         generateBeastChopsBlockState(ModBlocks.BEAST_CHOPS_GLAZED);
         simpleBlock(ModBlocks.SHAGGY_BLOCK.get(), models().cubeBottomTop(ModBlocks.SHAGGY_BLOCK.getId().getPath(), modLoc("block/shaggy_block"), modLoc("block/shaggy_block_bottom"), modLoc("block/shaggy_block_top")));
+        generateTarModel();
+    }
+
+    public void generateTarModel(){
+        ModelFile.ExistingModelFile tar = models().getExistingFile(BlastFromThePast.location("tar"));
+        ModelFile.ExistingModelFile tar_cover = models().getExistingFile(BlastFromThePast.location("tar_cover"));
+
+        getVariantBuilder(ModBlocks.TAR.get()).forAllStates(state -> {
+            boolean cover = state.getValue(TarBlock.COVER);
+            ModelFile.ExistingModelFile modelFile = tar;
+            if(cover){
+                modelFile = tar_cover;
+            }
+
+            return ConfiguredModel.builder()
+                    .modelFile(modelFile)
+                    .build();
+        });
     }
 
     public void generateBeastChopsBlockState(DeferredBlock<Block> block) {

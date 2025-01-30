@@ -8,19 +8,28 @@
     "defaultRequire": 1
   },
   "mixins": [
+    "AbstractArrowMixin",
     "AbstractChestedHorseAccessor",
     "BreedGoalAccessor",
     "ContainerOpenersCounterMixin",
+    "DecoratedPotPatternsMixin",
+    "EntityMixin",
     "FollowParentGoalAccessor",
     "GoalAccessor",
+    "IBlockExtensionMixin",
     "LivingEntityAccessor",
     "MeleeAttackGoalAccessor",
     "MoveToBlockGoalAccessor",
     "PathAccessor",
     "ServerPlayerAccessor",
-    "WalkNodeEvaluatorAccess"
+    "WalkNodeEvaluatorAccess",
+    "PlayerMixin"
   ],
   "client": [
-    "client.HumanoidModelMixin"
+    "client.HumanoidModelMixin",
+    "client.CameraMixin",
+    "client.FogRendererMixin",
+    "client.FogTypeMixin",
+    "client.PlayerModelMixin"
   ]
 }

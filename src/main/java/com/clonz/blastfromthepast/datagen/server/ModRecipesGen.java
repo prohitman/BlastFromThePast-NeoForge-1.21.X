@@ -3,6 +3,7 @@ package com.clonz.blastfromthepast.datagen.server;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModItems;
+import com.clonz.blastfromthepast.init.ModTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
@@ -35,6 +36,50 @@ public class ModRecipesGen extends RecipeProvider {
                 .pattern("ss")
                 .pattern("ss")
                 .unlockedBy("shaggy_pelt", has(ModItems.SHAGGY_PELT))
+                .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.IDOL_OF_RETRIEVAL)
+                .define('A', ModTags.Items.GLACEROS_ANTLERS)
+                .define('S', ModItems.SAP_BALL)
+                .define('T', ModBlocks.TAR)
+                .pattern("ASA")
+                .pattern("TTT")
+                .pattern(" T ")
+                .unlockedBy("tar", has(ModBlocks.TAR))
+                .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.FROST_BITE_BOOTS)
+                .define('X', ModItems.SHAGGY_PELT)
+                .define('C', ModItems.BEAR_CLAW)
+                .pattern("X X")
+                .pattern("X X")
+                .pattern("C C")
+                .unlockedBy("has_shaggy_pelt", has(ModItems.SHAGGY_PELT))
+                .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.FROST_BITE_CHESTPLATE)
+                .define('X', ModItems.SHAGGY_PELT)
+                .pattern("X X")
+                .pattern("XXX")
+                .pattern("XXX")
+                .unlockedBy("has_shaggy_pelt", has(ModItems.SHAGGY_PELT))
+                .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.FROST_BITE_LEGGINGS)
+                .define('X', ModItems.SHAGGY_PELT)
+                .pattern("XXX")
+                .pattern("X X")
+                .pattern("X X")
+                .unlockedBy("has_shaggy_pelt", has(ModItems.SHAGGY_PELT))
+                .save(recipeOutput);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.FROST_BITE_HELMET)
+                .define('X', ModItems.SHAGGY_PELT)
+                .define('A', ModTags.Items.GLACEROS_ANTLERS)
+                .pattern("A A")
+                .pattern("XXX")
+                .pattern("X X")
+                .unlockedBy("has_shaggy_pelt", has(ModItems.SHAGGY_PELT))
                 .save(recipeOutput);
     }
 

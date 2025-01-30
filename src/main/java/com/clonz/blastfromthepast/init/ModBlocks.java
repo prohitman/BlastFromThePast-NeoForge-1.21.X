@@ -54,6 +54,9 @@ public class ModBlocks {
     public static final DeferredBlock<Block> SNOWDO_EGG = createRegistry("snowdo_egg",
             () -> new SnowdoEggBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.TURTLE_EGG).noOcclusion()), new Item.Properties());
 
+    public static final DeferredBlock<Block> TAR = createRegistry("tar",
+            () -> new TarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.POWDER_SNOW).mapColor(MapColor.COLOR_BLACK).strength(4F).sound(SoundType.SLIME_BLOCK)), new Item.Properties());
+
     public static <T extends Block> DeferredBlock<T> createRegistry(String name, Supplier<T> block, Item.Properties properties) {
         DeferredBlock<T> object = BLOCKS.register(name, block);
         ModItems.ITEMS.register(name, () -> new BlockItem(object.get(), properties));

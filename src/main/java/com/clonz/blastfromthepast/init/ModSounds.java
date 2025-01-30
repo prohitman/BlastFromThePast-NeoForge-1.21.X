@@ -58,6 +58,11 @@ public class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_SLASH = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_slash");
     public static final DeferredHolder<SoundEvent, SoundEvent> PSYCHO_BEAR_SNORE = registerSoundEventForEntityType(ModEntities.PSYCHO_BEAR, "_snore");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> SPEARTOOTH_DEATH = registerSoundEventForEntityType(ModEntities.SPEARTOOTH, "_death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SPEARTOOTH_HURT = registerSoundEventForEntityType(ModEntities.SPEARTOOTH, "_hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SPEARTOOTH_IDLE = registerSoundEventForEntityType(ModEntities.SPEARTOOTH, "_idle");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SPEARTOOTH_ROAR = registerSoundEventForEntityType(ModEntities.SPEARTOOTH, "_roar");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SPEARTOOTH_YAWN = registerSoundEventForEntityType(ModEntities.SPEARTOOTH, "_yawn");
 
     private static ResourceKey<JukeboxSong> registerSong(String name) {
          return ResourceKey.create(Registries.JUKEBOX_SONG, ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, name));

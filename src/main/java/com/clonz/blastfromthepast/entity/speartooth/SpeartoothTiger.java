@@ -1,3 +1,4 @@
+/*
 package com.clonz.blastfromthepast.entity.speartooth;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
@@ -165,36 +166,44 @@ public class SpeartoothTiger extends TamableAnimal implements Animatable<Spearto
         }
     }
 
-    /**
+    */
+/**
      * @return the model location
-     */
+     *//*
+
     @Override
     public ResourceLocation getModelLocation() {
         return null;
     }
 
-    /**
+    */
+/**
      * @return the DucAnimation
-     */
+     *//*
+
     @Override
     public DucAnimation getAnimation() {
         return ANIMATION;
     }
 
-    /**
+    */
+/**
      * @return Get a lazy with all animations and their keys.
-     */
+     *//*
+
     @Override
     public Lazy<Map<String, AnimationState>> getAnimations() {
         return animations;
     }
 
-    /**
+    */
+/**
      * get the animation state for a key.
      *
      * @param animation animation key
      * @return the animation state corresponding to the key.
-     */
+     *//*
+
     @Override
     public Optional<AnimationState> getAnimationState(String animation) {
         return Optional.ofNullable(getAnimations().get().get("animation.speartooth_tiger" + animation));
@@ -299,6 +308,4 @@ public class SpeartoothTiger extends TamableAnimal implements Animatable<Spearto
     }
 
 
-}
-
-
+}*/

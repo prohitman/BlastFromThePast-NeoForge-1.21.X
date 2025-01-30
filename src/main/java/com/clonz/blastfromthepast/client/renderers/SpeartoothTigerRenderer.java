@@ -1,3 +1,4 @@
+/*
 package com.clonz.blastfromthepast.client.renderers;
 
 import com.clonz.blastfromthepast.client.models.SpeartoothTigerModel;
@@ -40,4 +41,4 @@ public class SpeartoothTigerRenderer extends MobRenderer<SpeartoothTiger, Speart
             return NORMAL;
         }
     }
-}
+}*/
