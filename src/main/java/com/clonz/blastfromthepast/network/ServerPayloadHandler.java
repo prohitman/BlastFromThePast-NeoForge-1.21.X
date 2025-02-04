@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.network;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.entity.Burrel;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
@@ -24,6 +25,18 @@ public class ServerPayloadHandler {
             }
             context.player().level().playSound(null, context.player().blockPosition(), SoundEvents.GENERIC_SMALL_FALL, SoundSource.PLAYERS, 1, 1);
 
+        }).exceptionally(e -> {
+            context.disconnect(Component.literal(BlastFromThePast.MODID + " Networking Failed"));
+            return null;
+        });
+    }
+
+    public static void handleBurrelEatPayload(final BurrelEatPayload payload, final IPayloadContext context) {
+        context.enqueueWork(() -> {
+            Entity riding = context.player().level().getEntity(payload.entityId());
+            if (riding instanceof Burrel burrel) {
+                burrel.eatState.startIfStopped(burrel.tickCount);
+            }
         }).exceptionally(e -> {
             context.disconnect(Component.literal(BlastFromThePast.MODID + " Networking Failed"));
             return null;

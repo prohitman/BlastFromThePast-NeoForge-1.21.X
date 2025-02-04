@@ -64,6 +64,11 @@ public class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> SPEARTOOTH_ROAR = registerSoundEventForEntityType(ModEntities.SPEARTOOTH, "_roar");
     public static final DeferredHolder<SoundEvent, SoundEvent> SPEARTOOTH_YAWN = registerSoundEventForEntityType(ModEntities.SPEARTOOTH, "_yawn");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> BURREL_DEATH = registerSoundEventForEntityType(ModEntities.BURREL, "_death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BURREL_HURT = registerSoundEventForEntityType(ModEntities.BURREL, "_hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BURREL_IDLE = registerSoundEventForEntityType(ModEntities.BURREL, "_idle");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BURREL_EAT = registerSoundEventForEntityType(ModEntities.BURREL, "_eat");
+
     private static ResourceKey<JukeboxSong> registerSong(String name) {
          return ResourceKey.create(Registries.JUKEBOX_SONG, ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, name));
     }

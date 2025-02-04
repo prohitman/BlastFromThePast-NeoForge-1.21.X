@@ -41,6 +41,35 @@
       "blastfromthepast:speartooth_yawn"
     ]
   },
+  "burrel_death": {
+    "subtitle": "sounds.blastfromthepast.burrel_death",
+    "sounds": [
+      "blastfromthepast:burrel_death_0",
+      "blastfromthepast:burrel_death_1",
+      "blastfromthepast:burrel_death_2"
+    ]
+  },
+  "burrel_hurt": {
+    "subtitle": "sounds.blastfromthepast.burrel_hurt",
+    "sounds": [
+      "blastfromthepast:burrel_hurt_0",
+      "blastfromthepast:burrel_hurt_1"
+    ]
+  },
+  "burrel_idle": {
+    "subtitle": "sounds.blastfromthepast.burrel_idle",
+    "sounds": [
+      "blastfromthepast:burrel_idle_0",
+      "blastfromthepast:burrel_idle_1"
+    ]
+  },
+  "burrel_eat": {
+    "subtitle": "sounds.blastfromthepast.burrel_eat",
+    "sounds": [
+      "blastfromthepast:burrel_eat_0",
+      "blastfromthepast:burrel_eat_1"
+    ]
+  },
   "glaceros_death": {
     "subtitle": "sounds.blastfromthepast.glaceros_death",
     "sounds": [

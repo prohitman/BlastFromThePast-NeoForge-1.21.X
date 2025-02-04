@@ -1,5 +1,6 @@
 package com.clonz.blastfromthepast.datagen.server;
 
+import com.clonz.blastfromthepast.block.BFTPBlockGroup;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModItems;
@@ -30,6 +31,8 @@ public class ModRecipesGen extends RecipeProvider {
         woodGroup(recipeOutput, ModBlocks.CEDAR);
         woodenBoat(recipeOutput, ModItems.CEDAR_BOAT, ModBlocks.CEDAR.BLOCK);
         chestBoat(recipeOutput, ModItems.CEDAR_CHEST_BOAT, ModItems.CEDAR_BOAT);
+        blockGroup(recipeOutput, ModBlocks.SNOW_BRICK);
+        blockGroup(recipeOutput, ModBlocks.ICE_BRICK);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.SHAGGY_BLOCK)
                 .define('s', ModItems.SHAGGY_PELT)
@@ -100,6 +103,12 @@ public class ModRecipesGen extends RecipeProvider {
         ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, group.BLOCK, 4).requires(group.STRIPPED_LOG).unlockedBy(getHasName(group.STRIPPED_LOG), has(group.BLOCK)).save(pRecipeOutput, "cedar_from_stripped_log");
         ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, group.BLOCK, 4).requires(group.WOOD).unlockedBy(getHasName(group.WOOD), has(group.BLOCK)).save(pRecipeOutput, "cedar_from_wood");
         ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, group.BLOCK, 4).requires(group.STRIPPED_WOOD).unlockedBy(getHasName(group.STRIPPED_WOOD), has(group.BLOCK)).save(pRecipeOutput, "cedar_from_stripped_wood");
+    }
+
+    private void blockGroup(RecipeOutput pRecipeOutput, BFTPBlockGroup group) {
+        stairBuilder(group.STAIRS, Ingredient.of(group.BLOCK)).unlockedBy(getHasName(group.BLOCK), has(group.BLOCK)).save(pRecipeOutput);
+        slab(pRecipeOutput, RecipeCategory.BUILDING_BLOCKS, group.SLAB, group.BLOCK);
+        wall(pRecipeOutput, RecipeCategory.BUILDING_BLOCKS, group.WALL, group.BLOCK);
     }
 
     private static void createIceCream(RecipeOutput recipeOutput, ItemLike iceCream, ItemLike mainIngredient) {

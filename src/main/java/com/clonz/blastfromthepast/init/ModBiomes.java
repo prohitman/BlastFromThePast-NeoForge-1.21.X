@@ -54,9 +54,12 @@ public class ModBiomes {
     public static Biome frostbiteForest(HolderGetter<PlacedFeature> placedFeatures, HolderGetter<ConfiguredWorldCarver<?>> worldCarvers) {
         MobSpawnSettings.Builder mobspawnsettings$builder = new MobSpawnSettings.Builder();
         BiomeDefaultFeatures.farmAnimals(mobspawnsettings$builder);
-        mobspawnsettings$builder.addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.WOLF, 8, 4, 4))
-                .addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.RABBIT, 4, 2, 3))
-                .addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.FOX, 8, 2, 4));
+        mobspawnsettings$builder.addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(ModEntities.BURREL.get(), 8, 1, 2))
+                .addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(ModEntities.SNOWDO.get(), 8, 2, 5))
+                .addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(ModEntities.GLACEROS.get(), 8, 3, 7))
+                .addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(ModEntities.SPEARTOOTH.get(), 8, 3, 6))
+                .addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(ModEntities.PSYCHO_BEAR.get(), 8, 1, 1))
+                .addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(ModEntities.FROSTOMPER.get(), 8, 1, 6));
         BiomeDefaultFeatures.commonSpawns(mobspawnsettings$builder);
         BiomeGenerationSettings.Builder biomeGenBuilder = new BiomeGenerationSettings.Builder(placedFeatures, worldCarvers);
         globalOverworldGeneration(biomeGenBuilder);
@@ -85,7 +88,7 @@ public class ModBiomes {
 
     private static void addFrostbiteForestTrees(BiomeGenerationSettings.Builder biomegenerationsettings$builder) {
         biomegenerationsettings$builder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
-                ModPlacedFeatures.TREES_FROSTBITE_FOREST);
+                ModPlacedFeatures.CEDAR_TREE);
     }
 
     private static void addFrostbiteForestFlowers(BiomeGenerationSettings.Builder biomegenerationsettings$builder) {

@@ -1,7 +1,7 @@
 package com.clonz.blastfromthepast.client.models;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.entity.burrel.Burrel;
+import com.clonz.blastfromthepast.entity.Burrel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.itskillerluc.duclib.client.model.AnimatableDucModel;
@@ -16,6 +16,7 @@ import java.util.Set;
 public class BurrelModel extends AnimatableDucModel<Burrel> {
 
     public static final ModelLayerLocation LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "burrel"), "burrel");
+    public static final ModelLayerLocation BABY_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "baby_burrel"), "baby_burrel");
 
     public BurrelModel(Ducling ducling) {
         super(ducling, RenderType::entityCutoutNoCull);
@@ -32,8 +33,10 @@ public class BurrelModel extends AnimatableDucModel<Burrel> {
         this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.burrel.walk").animation(), pLimbSwing, pLimbSwingAmount, 2, 1);
         this.animate(pEntity.idleState, pEntity.getAnimation().getAnimations().get("animation.burrel.idle").animation(), pAgeInTicks);
         this.animate(pEntity.climbingState, pEntity.getAnimation().getAnimations().get("animation.burrel.climb").animation(), pAgeInTicks);
+        this.animate(pEntity.eatState, pEntity.getAnimation().getAnimations().get("animation.burrel.eat").animation(), pAgeInTicks);
+        this.animate(pEntity.sleepState, pEntity.getAnimation().getAnimations().get("animation.burrel.sleep").animation(), pAgeInTicks);
+        this.animate(pEntity.lookState, pEntity.getAnimation().getAnimations().get("animation.burrel.look").animation(), pAgeInTicks);
     }
-
 
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {

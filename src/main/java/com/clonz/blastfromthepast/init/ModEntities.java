@@ -4,7 +4,7 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.*;
 import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
 import com.clonz.blastfromthepast.entity.boats.BFTPChestBoat;
-import com.clonz.blastfromthepast.entity.burrel.Burrel;
+import com.clonz.blastfromthepast.entity.Burrel;
 import com.clonz.blastfromthepast.entity.projectile.ThrownIceSpear;
 import com.clonz.blastfromthepast.entity.speartooth.SpeartoothEntity;
 import com.clonz.blastfromthepast.util.HitboxHelper;

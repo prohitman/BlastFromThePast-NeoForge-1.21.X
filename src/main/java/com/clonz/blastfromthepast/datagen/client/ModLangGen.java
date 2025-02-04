@@ -1,12 +1,12 @@
 package com.clonz.blastfromthepast.datagen.client;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.block.BFTPBlockGroup;
 import com.clonz.blastfromthepast.block.BFTPStoneGroup;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
-import com.clonz.blastfromthepast.init.ModSounds;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -17,9 +17,6 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import org.codehaus.plexus.util.StringUtils;
-
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
 
 public class ModLangGen extends LanguageProvider {
 
@@ -68,7 +65,6 @@ public class ModLangGen extends LanguageProvider {
         addBlock(ModBlocks.BEAST_CHOPS_GLAZED);
         addBlock(ModBlocks.SHAGGY_BLOCK);
         addItem(ModItems.BEAR_CLAW);
-        addItem(ModItems.IDOL_OF_RETRIEVAL);
 
         //Blocks
         addBlock(ModBlocks.SAPPY_CEDAR_LOG);
@@ -83,6 +79,9 @@ public class ModLangGen extends LanguageProvider {
         addBlock(ModBlocks.PSYCHO_BERRY_SPROUT);
         addBlock(ModBlocks.SNOWDO_EGG);
         addBlock(ModBlocks.TAR);
+        addBlock(ModBlocks.PINECONE);
+        registerBlockGroup(ModBlocks.ICE_BRICK);
+        registerBlockGroup(ModBlocks.SNOW_BRICK);
 
         //Entities
         addEntity(ModEntities.GLACEROS);
@@ -91,30 +90,8 @@ public class ModLangGen extends LanguageProvider {
         addEntity(ModEntities.PSYCHO_BEAR);
         addEntity(ModEntities.SPEARTOOTH);
         addEntity(ModEntities.BURREL);
-        addEntity(ModEntities.HOLLOW);
-
-        add("enchantment.blastfromthepast.tar_marcher", "Tar Marcher");
-
-        addSounds();
 
         add("itemGroup." + BlastFromThePast.MODID, "Blast From The Past");
-    }
-
-    private void addSounds() {
-        Class<ModSounds> sounds = ModSounds.class;
-        Arrays.stream(sounds.getFields()).forEach(field -> {
-            if (Modifier.isStatic(field.getModifiers()) && field.getType().equals(DeferredHolder.class)) {
-                try {
-                    addSound((DeferredHolder<?, ?>) field.get(null));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    private void addSound(DeferredHolder<?, ?> holder) {
-        add("sound." + BlastFromThePast.MODID + holder.getId().getPath(), StringUtils.capitaliseAllWords(holder.getId().getPath().replaceAll("_", " ")));
     }
 
     private void addBlock(DeferredBlock<? extends Block> key) {
@@ -172,4 +149,10 @@ public class ModLangGen extends LanguageProvider {
         addBlock(woodGroup.HANGING_SIGN);
     }
 
+    private void registerBlockGroup(BFTPBlockGroup stoneGroup){
+        addBlock(stoneGroup.BLOCK);
+        addBlock(stoneGroup.WALL);
+        addBlock(stoneGroup.STAIRS);
+        addBlock(stoneGroup.SLAB);
+    }
 }

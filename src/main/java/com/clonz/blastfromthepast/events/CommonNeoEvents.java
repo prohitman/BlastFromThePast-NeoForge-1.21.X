@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.events;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.network.BurrelEatPayload;
 import com.clonz.blastfromthepast.network.RiddenEntityPayload;
 import com.clonz.blastfromthepast.network.ServerPayloadHandler;
 import com.clonz.blastfromthepast.worldgen.biome.BFTPOverworldRegion;
@@ -42,6 +43,7 @@ public class CommonNeoEvents {
                 RiddenEntityPayload.STREAM_CODEC,
                 ServerPayloadHandler::handleRiddenEntityPayload
         );
+        registrar.playToClient(BurrelEatPayload.TYPE, BurrelEatPayload.STREAM_CODEC, ServerPayloadHandler::handleBurrelEatPayload);
     }
 
     public static void registerFlammables(){

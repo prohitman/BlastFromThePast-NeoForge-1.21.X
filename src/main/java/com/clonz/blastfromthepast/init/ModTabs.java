@@ -1,5 +1,6 @@
 package com.clonz.blastfromthepast.init;
 
+import com.clonz.blastfromthepast.block.BFTPBlockGroup;
 import com.clonz.blastfromthepast.block.BFTPStoneGroup;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import net.minecraft.core.registries.Registries;
@@ -32,6 +33,7 @@ public class ModTabs {
                         addWoodGroupToTab(output, ModBlocks.CEDAR);
                         output.accept(ModItems.CEDAR_BOAT.get());
                         output.accept(ModItems.CEDAR_CHEST_BOAT.get());
+                        output.accept(ModBlocks.PINECONE.asItem());
                         output.accept(ModItems.RAW_VENISON.get());
                         output.accept(ModItems.COOKED_VENISON.get());
                         output.accept(ModItems.STRAIGHT_GLACEROS_ANTLERS);
@@ -70,12 +72,21 @@ public class ModTabs {
                         output.accept(ModItems.FROST_BITE_BOOTS);
 
                         addStoneGroupToTab(output, ModBlocks.PERMAFROST);
+                        addBlockGroupToTab(output, ModBlocks.SNOW_BRICK);
+                        addBlockGroupToTab(output, ModBlocks.ICE_BRICK);
                     }).build());
 
     private static void addStoneGroupToTab(CreativeModeTab.Output output, BFTPStoneGroup stoneGroup) {
         for (DeferredBlock<?> deferredBlock : stoneGroup.blocks) {
             output.accept(deferredBlock);
         }
+    }
+
+    private static void addBlockGroupToTab(CreativeModeTab.Output output, BFTPBlockGroup blockGroup) {
+        output.accept(blockGroup.BLOCK);
+        output.accept(blockGroup.SLAB);
+        output.accept(blockGroup.STAIRS);
+        output.accept(blockGroup.WALL);
     }
 
     private static void addWoodGroupToTab(CreativeModeTab.Output output, BFTPWoodGroup woodGroup) {

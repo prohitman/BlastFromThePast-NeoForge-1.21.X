@@ -76,7 +76,7 @@
     [
       "minecraft:glow_lichen",
       "minecraft:patch_large_fern",
-      "blastfromthepast:trees_frostbite_forest",
+      "blastfromthepast:cedar_placed",
       "blastfromthepast:frostbite_forest_flowers",
       "minecraft:patch_grass_taiga_2",
       "minecraft:brown_mushroom_taiga",
@@ -128,21 +128,39 @@
         "weight": 8
       },
       {
-        "type": "minecraft:wolf",
-        "maxCount": 4,
-        "minCount": 4,
+        "type": "blastfromthepast:burrel",
+        "maxCount": 2,
+        "minCount": 1,
         "weight": 8
       },
       {
-        "type": "minecraft:rabbit",
-        "maxCount": 3,
+        "type": "blastfromthepast:snowdo",
+        "maxCount": 5,
         "minCount": 2,
-        "weight": 4
+        "weight": 8
       },
       {
-        "type": "minecraft:fox",
-        "maxCount": 4,
-        "minCount": 2,
+        "type": "blastfromthepast:glaceros",
+        "maxCount": 7,
+        "minCount": 3,
+        "weight": 8
+      },
+      {
+        "type": "blastfromthepast:speartooth",
+        "maxCount": 6,
+        "minCount": 3,
+        "weight": 8
+      },
+      {
+        "type": "blastfromthepast:psycho_bear",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 8
+      },
+      {
+        "type": "blastfromthepast:frostomper",
+        "maxCount": 6,
+        "minCount": 1,
         "weight": 8
       }
     ],

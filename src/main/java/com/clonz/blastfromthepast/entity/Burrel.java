@@ -1,8 +1,13 @@
-package com.clonz.blastfromthepast.entity.burrel;
+package com.clonz.blastfromthepast.entity;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.client.models.BurrelModel;
-import com.clonz.blastfromthepast.init.ModItems;
+import com.clonz.blastfromthepast.entity.ai.navigation.AzureNavigation;
+import com.clonz.blastfromthepast.entity.ai.goal.burrel.*;
+import com.clonz.blastfromthepast.init.ModBlocks;
+import com.clonz.blastfromthepast.init.ModEntities;
+import com.clonz.blastfromthepast.init.ModSounds;
+import com.clonz.blastfromthepast.network.BurrelEatPayload;
 import io.github.itskillerluc.duclib.client.animation.DucAnimation;
 import io.github.itskillerluc.duclib.entity.Animatable;
 import net.minecraft.core.BlockPos;
@@ -13,24 +18,29 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.ai.navigation.WallClimberNavigation;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.Lazy;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -39,22 +49,31 @@ import java.util.Optional;
 public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
 
     public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "burrel");
+    public static final ResourceLocation BABY_LOCATION = ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "baby_burrel");
 
     private static final EntityDataAccessor<Integer> TYPES = SynchedEntityData.defineId(Burrel.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> BABY = SynchedEntityData.defineId(Burrel.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> SLEEPING = SynchedEntityData.defineId(Burrel.class, EntityDataSerializers.BOOLEAN);
 
-    private static final EntityDataAccessor<Byte> CLIMBING = SynchedEntityData.defineId(Burrel.class, EntityDataSerializers.BYTE);
+    private static final EntityDataAccessor<Boolean> WANTS_TO_BE_ON_GROUND = SynchedEntityData.defineId(Burrel.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> CLIMBING = SynchedEntityData.defineId(Burrel.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Direction> ATTACHED_FACE = SynchedEntityData.defineId(Burrel.class, EntityDataSerializers.DIRECTION);
     private static final Direction[] POSSIBLE_DIRECTIONS = new Direction[]{Direction.DOWN, Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
 
     public static final DucAnimation ANIMATION = DucAnimation.create(LOCATION);
 
+    public BlockPos targetTree;
+
+    private float wantsToBeOnGroundTicks = 0;
     public float attachChangeProgress = 0F;
     public float prevAttachChangeProgress = 0F;
     public Direction prevAttachDir = Direction.DOWN;
     private final Lazy<Map<String, AnimationState>> animations = Lazy.of(() -> BurrelModel.createStateMap(getAnimation()));
     public AnimationState idleState = new AnimationState();
     public AnimationState climbingState = new AnimationState();
+    public AnimationState eatState = new AnimationState();
+    public AnimationState sleepState = new AnimationState();
+    public AnimationState lookState = new AnimationState();
 
     public Burrel(EntityType<? extends TamableAnimal> entityType, Level level) {
         super(entityType, level);
@@ -66,24 +85,21 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
     @Override
     public void registerGoals() {
         super.registerGoals();
+        this.goalSelector.addGoal(0, new PanicGoal(this, 1.5));
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new BurrelGoToTrees(this, 1.2D));
-        this.goalSelector.addGoal(2, new BurrelClimbTree(this));
-        this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 1.0));
-        this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 5.0F));
+        this.goalSelector.addGoal(1, new BurrelSleepGoal(this));
+        this.goalSelector.addGoal(2, new BurrelEatGoal(this));
+        this.goalSelector.addGoal(2, new BurrelClimbTreeGoal(this));
+        this.goalSelector.addGoal(3, new BurrelGoToTreesGoal(this, 1.2D));
+        this.goalSelector.addGoal(4, new BurrelRandomStrollGoal(this, 1.0));
+        this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 5.0F));
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
-        this.goalSelector.addGoal(6, new FollowOwnerGoal(this, 1.0, 10.0F, 2.0F));
         this.goalSelector.addGoal(7, new BreedGoal(this, 1.0));
     }
 
     @Override
     protected PathNavigation createNavigation(Level level) {
-        return new WallClimberNavigation(this, level) {
-            @Override
-            protected boolean canUpdatePath() {
-                return super.canUpdatePath() || ((Burrel) mob).isBesideClimbableBlock() || ((Burrel) mob).jumping;
-            }
-        };
+        return new AzureNavigation(this, level);
     }
 
     @Override
@@ -109,14 +125,29 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
             attachChangeProgress = 1F;
         }
         this.prevAttachDir = this.getAttachmentFacing();
-
         if (this.level().isClientSide()) {
             this.idleState.animateWhen(!this.isMoving(this), this.tickCount);
-            this.climbingState.animateWhen(this.isMoving(this) && this.isBesideClimbableBlock(), this.tickCount);
+            this.climbingState.animateWhen(this.isBesideClimbableBlock(), this.tickCount);
+            this.sleepState.animateWhen(this.isSleeping(), this.tickCount);
+            if (!this.climbingState.isStarted() && !this.sleepState.isStarted() && this.wantsToBeOnGround() && this.random.nextIntBetweenInclusive(1, 500) == 1) {
+                this.idleState.stop();
+                this.lookState.startIfStopped(this.tickCount);
+            }
         }
         Vec3 vector3d = this.getDeltaMovement();
         if (!this.level().isClientSide()) {
-            this.setBesideClimbableBlock(this.horizontalCollision);
+            if (this.level().isNight()) {
+                this.setWantsToBeOnGround(false);
+                wantsToBeOnGroundTicks = 0;
+            }
+            else {
+                if (this.wantsToBeOnGround()) wantsToBeOnGroundTicks += 1;
+                if (wantsToBeOnGroundTicks >= 4800) this.setWantsToBeOnGround(false);
+                if (!this.wantsToBeOnGround() && random.nextIntBetweenInclusive(1, 6000) == 1) {
+                    wantsToBeOnGroundTicks = 0;
+                    this.setWantsToBeOnGround(true);
+                }
+            }
             if (this.onGround() || this.isInWater() || this.isInLava()) {
                 this.setDirectionFacing(Direction.DOWN);
             } else {
@@ -134,7 +165,6 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
                 this.entityData.set(ATTACHED_FACE, closesDistance > this.getBbWidth() * 0.5F + 0.7F ? Direction.DOWN : closestDirection);
             }
         }
-        boolean flag = false;
         if (this.getAttachmentFacing() != Direction.DOWN) {
             if (!this.horizontalCollision && this.getAttachmentFacing() != Direction.UP) {
                 Vec3 vec3 = Vec3.atLowerCornerOf(this.getAttachmentFacing().getNormal());
@@ -146,6 +176,35 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
             this.setDeltaMovement(vector3d.multiply(0.6D, 0.4D, 0.6D));
         }
 
+        if (random.nextIntBetweenInclusive(1, 2000) == 1) this.makeSound(ModSounds.BURREL_IDLE.get());
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.BURREL_DEATH.get();
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSource) {
+        return ModSounds.BURREL_HURT.get();
+    }
+
+    @Override
+    public InteractionResult mobInteract(Player player, InteractionHand hand) {
+        ItemStack itemStack = player.getItemInHand(hand);
+        if (isFood(itemStack)) {
+            if (!isBaby()) {
+                this.setInLove(player);
+            }
+            if (!level().isClientSide) {
+                this.makeSound(ModSounds.BURREL_EAT.get());
+                PacketDistributor.sendToPlayersTrackingEntity(this, new BurrelEatPayload(this.getId()));
+                this.getNavigation().stop();
+            }
+            itemStack.consume(1, this);
+            return InteractionResult.CONSUME;
+        }
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -158,9 +217,14 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
         super.defineSynchedData(builder);
         builder.define(BABY, false);
         builder.define(TYPES, 0);
-        builder.define(CLIMBING, (byte) 0);
+        builder.define(CLIMBING, false);
         builder.define(ATTACHED_FACE, Direction.DOWN);
+        builder.define(WANTS_TO_BE_ON_GROUND, false);
+        builder.define(SLEEPING, false);
     }
+
+    @Override
+    protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {}
 
     public void setDirectionFacing(Direction directionFacing) {
         this.entityData.set(ATTACHED_FACE, directionFacing);
@@ -176,18 +240,19 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
     }
 
     public boolean isBesideClimbableBlock() {
-        return (this.entityData.get(CLIMBING) & 1) != 0;
+        return this.entityData.get(CLIMBING);
     }
 
     public void setBesideClimbableBlock(boolean climbing) {
-        byte b0 = this.entityData.get(CLIMBING);
-        if (climbing) {
-            b0 = (byte) (b0 | 1);
-        } else {
-            b0 = (byte) (b0 & -2);
-        }
+        this.entityData.set(CLIMBING, climbing);
+    }
 
-        this.entityData.set(CLIMBING, b0);
+    public boolean wantsToBeOnGround() {
+        return this.entityData.get(WANTS_TO_BE_ON_GROUND);
+    }
+
+    public void setWantsToBeOnGround(boolean bool) {
+        this.entityData.set(WANTS_TO_BE_ON_GROUND, bool);
     }
 
     public boolean isBaby() {
@@ -210,17 +275,23 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
         return this.random.nextFloat() < 0.05F;
     }
 
+    public boolean isSleeping() {
+        return this.entityData.get(SLEEPING);
+    }
+
+    public void setSleeping(boolean bool) {
+        this.entityData.set(SLEEPING, bool);
+    }
+
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
         SpawnGroupData sg = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
-        RandomSource randomSource = level.getRandom();
         if (!(sg instanceof BurrelGroupData)) {
-            boolean baby = getSpawnBabyChance(randomSource);
-            int variant = this.random.nextInt(2);
-            sg = new BurrelGroupData(baby, variant);
+            int variant = 0;
+            if (random.nextIntBetweenInclusive(1, 5) == 5) variant = 1;
+            sg = new BurrelGroupData(false, variant);
         }
 
-        this.setBaby(((BurrelGroupData) sg).baby);
         this.setTypes(((BurrelGroupData) sg).variant);
 
         return sg;
@@ -268,13 +339,15 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
 
     @Override
     public boolean isFood(ItemStack itemStack) {
-        return itemStack.is(ModItems.COOKED_VENISON.get());
+        return itemStack.is(ModBlocks.PINECONE.asItem());
     }
 
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel serverLevel, AgeableMob ageableMob) {
-        return null;
+        Burrel burrel = new Burrel(ModEntities.BURREL.get(), serverLevel);
+        burrel.setBaby(true);
+        return burrel;
     }
 
     public static AttributeSupplier.Builder createAttributes() {

@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.datagen.server;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.block.BFTPBlockGroup;
 import com.clonz.blastfromthepast.block.BFTPStoneGroup;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
@@ -46,6 +47,9 @@ public class ModBlockTagsGen extends BlockTagsProvider {
 
         tag(BlockTags.MINEABLE_WITH_SHOVEL)
                 .add(ModBlocks.TAR.get());
+
+        loadBlockGroupBlockTags(ModBlocks.ICE_BRICK);
+        loadBlockGroupBlockTags(ModBlocks.SNOW_BRICK);
     }
 
     private void loadStoneGroupBlockTags(BFTPStoneGroup stoneGroup){
@@ -108,5 +112,16 @@ public class ModBlockTagsGen extends BlockTagsProvider {
                 .add(woodGroup.TRAPDOOR.get());
         tag(BlockTags.WOODEN_STAIRS)
                 .add(woodGroup.STAIRS.get());
+    }
+
+    private void loadBlockGroupBlockTags(BFTPBlockGroup blockGroup){
+        tag(BlockTags.STAIRS)
+                .add(blockGroup.STAIRS.get());
+
+        tag(BlockTags.WALLS)
+                .add(blockGroup.WALL.get());
+
+        tag(BlockTags.SLABS)
+                .add(blockGroup.SLAB.get());
     }
 }

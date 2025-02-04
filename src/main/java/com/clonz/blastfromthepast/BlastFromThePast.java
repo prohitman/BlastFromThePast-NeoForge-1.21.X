@@ -10,7 +10,7 @@ import com.clonz.blastfromthepast.client.renderers.projectile.ThrownIceSpearRend
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
-import com.clonz.blastfromthepast.entity.burrel.Burrel;
+import com.clonz.blastfromthepast.entity.Burrel;
 import com.clonz.blastfromthepast.entity.pack.EntityPacks;
 import com.clonz.blastfromthepast.entity.projectile.ThrownIceSpear;
 import com.clonz.blastfromthepast.events.CuriosCompat;
@@ -71,6 +71,7 @@ public class BlastFromThePast {
         ModArmorMaterials.ARMOR_MATERIAL.register(modEventBus);
         ModFeatures.FEATURES.register(modEventBus);
         ModDataSerializers.DATA_SERIALIZERS.register(modEventBus);
+        ModFoliageTypes.FOLIAGE_PLACER_TYPES.register(modEventBus);
 
         if (CURIOS_LOADED) {
             NeoForge.EVENT_BUS.register(CuriosCompat.class);
@@ -141,6 +142,7 @@ public class BlastFromThePast {
             event.registerLayerDefinition(SpeartoothModel.ADULT_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.SPEARTOOTH.getId()));
             event.registerLayerDefinition(SpeartoothModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.SPEARTOOTH.getId().withPrefix("baby_")));
             event.registerLayerDefinition(BurrelModel.LOCATION, () -> BaseDucModel.getLakeDefinition(Burrel.LOCATION));
+            event.registerLayerDefinition(BurrelModel.BABY_LOCATION, () -> BaseDucModel.getLakeDefinition(Burrel.BABY_LOCATION));
             event.registerLayerDefinition(PsychoBearModel.ADULT_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.PSYCHO_BEAR.getId()));
             event.registerLayerDefinition(PsychoBearModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.PSYCHO_BEAR.getId().withPrefix("baby_")));
             event.registerLayerDefinition(HollowModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.HOLLOW.getId()));

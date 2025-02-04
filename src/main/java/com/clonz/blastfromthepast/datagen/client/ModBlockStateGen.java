@@ -42,6 +42,8 @@ public class ModBlockStateGen extends BlockStateProvider {
         generateBeastChopsBlockState(ModBlocks.BEAST_CHOPS_GLAZED);
         simpleBlock(ModBlocks.SHAGGY_BLOCK.get(), models().cubeBottomTop(ModBlocks.SHAGGY_BLOCK.getId().getPath(), modLoc("block/shaggy_block"), modLoc("block/shaggy_block_bottom"), modLoc("block/shaggy_block_top")));
         generateTarModel();
+        registerBlockGroup(ModBlocks.SNOW_BRICK);
+        registerBlockGroup(ModBlocks.ICE_BRICK);
     }
 
     public void generateTarModel(){
@@ -183,7 +185,9 @@ public class ModBlockStateGen extends BlockStateProvider {
 
     private void registerWoodGroup(BFTPWoodGroup group){
         simpleBlock(group.BLOCK.get());
-        simpleBlock(group.LEAVES.get());
+        if (group != ModBlocks.CEDAR) {
+            simpleBlock(group.LEAVES.get());
+        }
         logBlock(group.LOG.get());
         logBlock(group.STRIPPED_LOG.get());
         axisBlock(group.WOOD.get(), this.blockTexture(group.LOG.get()), this.blockTexture(group.LOG.get()));
@@ -200,6 +204,13 @@ public class ModBlockStateGen extends BlockStateProvider {
         buttonBlock(group.BUTTON.get(), this.blockTexture(group.BLOCK.get()));
         signBlock(group.SIGN.get(), group.WALL_SIGN.get(), this.blockTexture(group.BLOCK.get()));
         hangingSign(group.HANGING_SIGN, group.HANGING_SIGN_WALL, this.blockTexture(group.STRIPPED_LOG.get()));
+    }
+
+    private void registerBlockGroup(BFTPBlockGroup blockGroup){
+        simpleBlock(blockGroup.BLOCK.get());
+        stairsBlock(blockGroup.STAIRS.get(), this.blockTexture(blockGroup.BLOCK.get()));
+        slabBlock(blockGroup.SLAB.get(), this.blockTexture(blockGroup.BLOCK.get()), this.blockTexture(blockGroup.BLOCK.get()));
+        wallBlock(blockGroup.WALL.get(), this.blockTexture(blockGroup.BLOCK.get()));
     }
 
     private void hangingSign(DeferredBlock<CeilingHangingSignBlock> hangingSignBlock, DeferredBlock<WallHangingSignBlock> wallHangingSignBlock, ResourceLocation texture){

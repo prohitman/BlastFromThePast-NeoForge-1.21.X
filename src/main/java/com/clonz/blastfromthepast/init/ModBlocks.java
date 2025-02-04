@@ -4,10 +4,7 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.block.*;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DoublePlantBlock;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
@@ -22,6 +19,9 @@ public class ModBlocks {
 
     public static final BFTPWoodGroup CEDAR = new BFTPWoodGroup("cedar",  MapColor.COLOR_BROWN, new Item.Properties(), BLOCKS);
     public static final BFTPStoneGroup PERMAFROST = new BFTPStoneGroup("permafrost",  MapColor.STONE, new Item.Properties());
+
+    public static final DeferredBlock<Block> PINECONE = createRegistry("pinecone",
+            () -> new PineconeBlock(ModTreeGrowers.CEDAR, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_SAPLING)), new Item.Properties());
 
     public static final DeferredBlock<Block> SHAGGY_BLOCK = createRegistry("shaggy_block",
             () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.WHITE_WOOL)), new Item.Properties());
@@ -56,6 +56,9 @@ public class ModBlocks {
 
     public static final DeferredBlock<Block> TAR = createRegistry("tar",
             () -> new TarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.POWDER_SNOW).mapColor(MapColor.COLOR_BLACK).strength(4F).sound(SoundType.SLIME_BLOCK)), new Item.Properties());
+
+    public static final BFTPBlockGroup SNOW_BRICK = new BFTPBlockGroup("snow_brick", MapColor.SNOW, BlockBehaviour.Properties.ofFullCopy(Blocks.SNOW_BLOCK), new Item.Properties());
+    public static final BFTPBlockGroup ICE_BRICK = new BFTPBlockGroup("ice_brick", MapColor.ICE, BlockBehaviour.Properties.ofFullCopy(Blocks.ICE), new Item.Properties());
 
     public static <T extends Block> DeferredBlock<T> createRegistry(String name, Supplier<T> block, Item.Properties properties) {
         DeferredBlock<T> object = BLOCKS.register(name, block);

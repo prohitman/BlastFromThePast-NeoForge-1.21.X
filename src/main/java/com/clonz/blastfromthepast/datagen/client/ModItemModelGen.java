@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.datagen.client;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.block.BFTPBlockGroup;
 import com.clonz.blastfromthepast.block.BFTPStoneGroup;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
@@ -68,6 +69,8 @@ public class ModItemModelGen extends ItemModelProvider {
         singleTexturePlantBlock(ModBlocks.PSYCHO_BERRY_SPROUT);
         singleTextureBlock(ModBlocks.SNOWDO_EGG);
         createWithParent(ModBlocks.TAR);
+        registerBlockGroup(ModBlocks.SNOW_BRICK);
+        registerBlockGroup(ModBlocks.ICE_BRICK);
     }
 
     private void registerStoneGroup(BFTPStoneGroup stoneGroup){
@@ -98,7 +101,6 @@ public class ModItemModelGen extends ItemModelProvider {
 
     }
 
-
     private void registerWoodGroup(BFTPWoodGroup woodGroup){
         createWithParent(woodGroup.BLOCK);
         createWithParent(woodGroup.LOG);
@@ -117,6 +119,14 @@ public class ModItemModelGen extends ItemModelProvider {
         singleTextureBlock(woodGroup.DOOR);
         basicItem(woodGroup.SIGN_ITEM.get());
         basicItem(woodGroup.HANGING_SIGN_ITEM.get());
+    }
+
+    private void registerBlockGroup(BFTPBlockGroup blockGroup){
+        createWithParent(blockGroup.BLOCK);
+        createWithParent(blockGroup.STAIRS);
+        createWithParent(blockGroup.SLAB);
+        withExistingParent(blockGroup.WALL.getId().getPath(), mcLoc("block/wall_inventory"))
+                .texture("wall", modLoc("block/" + blockGroup.WALL.getId().getPath().replaceAll("_wall", "")));
     }
 
     private void createWithParent(DeferredBlock<? extends Block> key) {

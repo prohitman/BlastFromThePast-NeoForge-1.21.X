@@ -81,7 +81,21 @@ public class BFTPWoodGroup {
         WALL_SIGN = blockRegister.register(name + "_wall_sign", () -> new BFTPWallSignBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_WALL_SIGN).mapColor(color), woodType));
         HANGING_SIGN = blockRegister.register(name + "_hanging_sign", () -> new BFTPCeilingHangingSignBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_HANGING_SIGN).mapColor(color), woodType));
         HANGING_SIGN_WALL = blockRegister.register(name + "_hanging_wall_sign", () -> new BFTPWallHangingSignBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_WALL_HANGING_SIGN).mapColor(color), woodType));
-        LEAVES = blockRegister.register(name + "_leaves", BFTPWoodGroup::leaves);
+        if (name.equals("cedar")) LEAVES = blockRegister.register("cedar_leaves", () -> new CedarLeavesBlock(
+                BlockBehaviour.Properties.of()
+                        .mapColor(MapColor.PLANT)
+                        .strength(0.2F)
+                        .randomTicks()
+                        .sound(SoundType.GRASS)
+                        .noOcclusion()
+                        .isValidSpawn((pState, pLevel, pPos, pValue) -> pValue == EntityType.OCELOT || pValue == EntityType.PARROT)
+                        .isSuffocating(((pState, pLevel, pPos) -> false))
+                        .isViewBlocking(((pState, pLevel, pPos) -> false))
+                        .ignitedByLava()
+                        .pushReaction(PushReaction.DESTROY)
+                        .isRedstoneConductor(((pState, pLevel, pPos) -> false))
+        ));
+        else LEAVES = blockRegister.register(name + "_leaves", BFTPWoodGroup::leaves);
 
         ModItems.register(name, () -> new BlockItem(BLOCK.get(), empty));
         ModItems.register(name + "_slab", () -> new BlockItem(SLAB.get(), empty));
