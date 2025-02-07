@@ -289,7 +289,7 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
         if (!(sg instanceof BurrelGroupData)) {
             int variant = 0;
             if (random.nextIntBetweenInclusive(1, 5) == 5) variant = 1;
-            sg = new BurrelGroupData(false, variant);
+            sg = new BurrelGroupData(variant);
         }
 
         this.setTypes(((BurrelGroupData) sg).variant);
@@ -361,12 +361,11 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
     public static void init() {
     }
 
-    public static class BurrelGroupData implements SpawnGroupData {
-        public final boolean baby;
+    public static class BurrelGroupData extends AgeableMobGroupData {
         public final int variant;
 
-        public BurrelGroupData(boolean baby, int variant) {
-            this.baby = baby;
+        public BurrelGroupData(int variant) {
+            super(false);
             this.variant = variant;
         }
 
