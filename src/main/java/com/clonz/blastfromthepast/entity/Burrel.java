@@ -131,8 +131,11 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
         if (partyBurrel) {
             if (this.level().isClientSide) {
                 this.danceState.animateWhen(this.partyBurrel, this.tickCount);
-            } else {
-                this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 1, 255, false, false, false));
+            }
+        }
+        else {
+            if (this.level().isClientSide) {
+                this.danceState.stop();
             }
         }
         super.aiStep();
