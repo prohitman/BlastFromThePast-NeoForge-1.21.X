@@ -32,10 +32,11 @@ public class BurrelModel extends AnimatableDucModel<Burrel> {
         super.setupAnim(pEntity, pLimbSwing, pLimbSwingAmount, pAgeInTicks, pNetHeadYaw, pHeadPitch);
         this.animateWalk(pEntity.getAnimation().getAnimations().get("animation.burrel.walk").animation(), pLimbSwing, pLimbSwingAmount, 2, 1);
         this.animate(pEntity.idleState, pEntity.getAnimation().getAnimations().get("animation.burrel.idle").animation(), pAgeInTicks);
+        this.animate(pEntity.lookState, pEntity.getAnimation().getAnimations().get("animation.burrel.look").animation(), pAgeInTicks);
         this.animate(pEntity.climbingState, pEntity.getAnimation().getAnimations().get("animation.burrel.climb").animation(), pAgeInTicks);
+        this.animate(pEntity.danceState, pEntity.getAnimation().getAnimations().get("animation.burrel.dance").animation(), pAgeInTicks);
         this.animate(pEntity.eatState, pEntity.getAnimation().getAnimations().get("animation.burrel.eat").animation(), pAgeInTicks);
         this.animate(pEntity.sleepState, pEntity.getAnimation().getAnimations().get("animation.burrel.sleep").animation(), pAgeInTicks);
-        this.animate(pEntity.lookState, pEntity.getAnimation().getAnimations().get("animation.burrel.look").animation(), pAgeInTicks);
     }
 
     @Override

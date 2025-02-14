@@ -1,14 +1,10 @@
 package com.clonz.blastfromthepast.entity.ai.goal.burrel;
 
 import com.clonz.blastfromthepast.entity.Burrel;
-import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
 
 public class BurrelClimbTreeGoal extends Goal {
     private final Burrel burrel;
@@ -29,7 +25,23 @@ public class BurrelClimbTreeGoal extends Goal {
 
     @Override
     public void start() {
-        desiredYrot = lookAngle(EntityAnchorArgument.Anchor.FEET, new Vec3(burrel.targetTree.getX() + 0.5, burrel.getY(), burrel.targetTree.getZ() + 0.5)).y;
+        BlockPos blockPos = burrel.blockPosition();
+        if (blockPos.east().equals(burrel.targetTree)) {
+            desiredYrot = -90;
+        }
+        else if (blockPos.west().equals(burrel.targetTree)) {
+            desiredYrot = 90;
+        }
+        else if (blockPos.north().equals(burrel.targetTree)) {
+            desiredYrot = 0;
+        }
+        else if (blockPos.south().equals(burrel.targetTree)) {
+            desiredYrot = 180;
+        }
+        else {
+            stop();
+            return;
+        }
         burrel.setYRot(desiredYrot);
     }
 
@@ -53,15 +65,6 @@ public class BurrelClimbTreeGoal extends Goal {
             burrel.setPos(pos.getCenter().subtract(0, 0.5, 0));
             stop();
         }
-    }
-
-    public Vec2 lookAngle(EntityAnchorArgument.Anchor anchor, Vec3 target) {
-        Vec3 vec3 = anchor.apply(burrel);
-        double d = target.x - vec3.x;
-        double e = target.y - vec3.y;
-        double f = target.z - vec3.z;
-        double g = Math.sqrt(d * d + f * f);
-        return new Vec2(Mth.wrapDegrees((float)(-(Mth.atan2(e, g) * 57.2957763671875))), Mth.wrapDegrees((float)(Mth.atan2(f, d) * 57.2957763671875) - 90.0F));
     }
 
     @Override

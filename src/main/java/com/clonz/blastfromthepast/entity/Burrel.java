@@ -26,6 +26,8 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -36,6 +38,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
@@ -67,6 +70,9 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
     private float wantsToBeOnGroundTicks = 0;
     public float attachChangeProgress = 0F;
     public float prevAttachChangeProgress = 0F;
+    private boolean partyBurrel;
+    @javax.annotation.Nullable
+    private BlockPos jukebox;
     public Direction prevAttachDir = Direction.DOWN;
     private final Lazy<Map<String, AnimationState>> animations = Lazy.of(() -> BurrelModel.createStateMap(getAnimation()));
     public AnimationState idleState = new AnimationState();
@@ -74,6 +80,7 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
     public AnimationState eatState = new AnimationState();
     public AnimationState sleepState = new AnimationState();
     public AnimationState lookState = new AnimationState();
+    public AnimationState danceState = new AnimationState();
 
     public Burrel(EntityType<? extends TamableAnimal> entityType, Level level) {
         super(entityType, level);
@@ -112,6 +119,29 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putByte("attachface", (byte) this.entityData.get(ATTACHED_FACE).get3DDataValue());
+    }
+
+    @Override
+    public void aiStep() {
+        if (this.jukebox == null || !this.jukebox.closerToCenterThan(this.position(), 3.46) || !this.level().getBlockState(this.jukebox).is(Blocks.JUKEBOX)) {
+            this.partyBurrel = false;
+            this.jukebox = null;
+        }
+
+        if (partyBurrel) {
+            if (this.level().isClientSide) {
+                this.danceState.animateWhen(this.partyBurrel, this.tickCount);
+            } else {
+                this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 1, 255, false, false, false));
+            }
+        }
+        super.aiStep();
+    }
+
+    @Override
+    public void setRecordPlayingNearby(BlockPos pos, boolean isPartying) {
+        this.jukebox = pos;
+        this.partyBurrel = isPartying;
     }
 
     @Override
@@ -198,7 +228,6 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
             }
             if (!level().isClientSide) {
                 this.makeSound(ModSounds.BURREL_EAT.get());
-                PacketDistributor.sendToPlayersTrackingEntity(this, new BurrelEatPayload(this.getId()));
                 this.getNavigation().stop();
             }
             itemStack.consume(1, this);
@@ -221,6 +250,13 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
         builder.define(ATTACHED_FACE, Direction.DOWN);
         builder.define(WANTS_TO_BE_ON_GROUND, false);
         builder.define(SLEEPING, false);
+    }
+
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        this.jukebox = null;
+        this.partyBurrel = false;
+        return super.hurt(source, amount);
     }
 
     @Override

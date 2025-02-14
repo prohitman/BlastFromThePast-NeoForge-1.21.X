@@ -35,7 +35,7 @@ public class ServerPayloadHandler {
         context.enqueueWork(() -> {
             Entity riding = context.player().level().getEntity(payload.entityId());
             if (riding instanceof Burrel burrel) {
-                burrel.eatState.startIfStopped(burrel.tickCount);
+                burrel.eatState.start(burrel.tickCount);
             }
         }).exceptionally(e -> {
             context.disconnect(Component.literal(BlastFromThePast.MODID + " Networking Failed"));

@@ -4,6 +4,8 @@ import com.clonz.blastfromthepast.entity.Burrel;
 import com.clonz.blastfromthepast.init.ModItems;
 import com.clonz.blastfromthepast.init.ModSounds;
 import com.clonz.blastfromthepast.network.BurrelEatPayload;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -23,6 +25,7 @@ public class BurrelEatGoal extends TargetGoal {
 
     @Override
     public boolean canUse() {
+        if (burrel.hasEffect(MobEffects.MOVEMENT_SLOWDOWN) && burrel.getEffect(MobEffects.MOVEMENT_SLOWDOWN).getDuration() <= 40) return false;
         findTarget();
         return itemTarget != null;
     }
@@ -47,6 +50,7 @@ public class BurrelEatGoal extends TargetGoal {
             PacketDistributor.sendToPlayersTrackingEntity(burrel, new BurrelEatPayload(burrel.getId()));
             itemTarget.discard();
             burrel.getNavigation().stop();
+            burrel.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 255, false, false, false));
         }
     }
 
@@ -62,6 +66,8 @@ public class BurrelEatGoal extends TargetGoal {
                     PacketDistributor.sendToPlayersTrackingEntity(burrel, new BurrelEatPayload(burrel.getId()));
                     burrel.getNavigation().stop();
                     entry.discard();
+                    burrel.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 255, false, false, false));
+                    return;
                 }
                 else if (targetCandidate == null || entityDistance < distance) {
                     targetCandidate = entry;

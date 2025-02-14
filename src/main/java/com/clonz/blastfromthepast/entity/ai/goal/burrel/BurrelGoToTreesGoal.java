@@ -28,7 +28,7 @@ public class BurrelGoToTreesGoal extends Goal {
     @Override
     public boolean canUse() {
         if (burrel.isBaby()) return false;
-        if (burrel.isBesideClimbableBlock() || burrel.getNavigation().isInProgress() || burrel.isPanicking()
+        if (burrel.isBesideClimbableBlock() || burrel.wantsToBeOnGround() || burrel.getNavigation().isInProgress() || burrel.isPanicking()
         || burrel.level().getBlockState(burrel.blockPosition().below()).is(BlockTags.LEAVES)) return false;
         BlockPos burrelPos = burrel.blockPosition();
         for (int x = -10; x <= 10; x++) {
@@ -139,8 +139,8 @@ public class BurrelGoToTreesGoal extends Goal {
     @Override
     public boolean canContinueToUse() {
         BlockPos treePos = target;
-        return !(treePos == null || this.burrel.isBesideClimbableBlock() || this.burrel.getNavigation().isDone()
-                || this.burrel.distanceToSqr(treePos.getX(), treePos.getY(), treePos.getZ()) <= 2 || burrel.isPanicking());
+        return !(burrel.targetTree == null || treePos == null || this.burrel.isBesideClimbableBlock() || this.burrel.getNavigation().isDone()
+                || this.burrel.distanceToSqr(treePos.getX(), treePos.getY(), treePos.getZ()) <= 2 || burrel.isPanicking() || burrel.wantsToBeOnGround());
     }
 
     @Override
