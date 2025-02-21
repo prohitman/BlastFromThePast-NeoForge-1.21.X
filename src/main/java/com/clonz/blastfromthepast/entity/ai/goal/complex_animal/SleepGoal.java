@@ -9,9 +9,9 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import java.util.EnumSet;
 
 public class SleepGoal<T extends Mob & ComplexAnimal> extends Goal {
-    private static final int WAIT_TIME_BEFORE_SLEEP = reducedTickDelay(140);
-    private final T mob;
-    private int countdown;
+    public static final int WAIT_TIME_BEFORE_SLEEP = reducedTickDelay(340);
+    protected final T mob;
+    protected int countdown;
 
     public SleepGoal(T mob) {
         this.mob = mob;
@@ -21,7 +21,7 @@ public class SleepGoal<T extends Mob & ComplexAnimal> extends Goal {
 
     @Override
     public boolean canUse() {
-        return this.mob.xxa == 0.0F && this.mob.yya == 0.0F && this.mob.zza == 0.0F && (this.canSleep() /*|| this.mob.isSleeping()*/);
+        return this.mob.xxa == 0.0F && this.mob.yya == 0.0F && (this.canSleep() /*|| this.mob.isSleeping()*/);
     }
 
     @Override

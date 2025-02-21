@@ -771,7 +771,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
 
     @Override
     public boolean canSleep() {
-        return this.level().isNight() && this.hasShelter() && !this.alertable() && !this.isInPowderSnow && this.getTarget() == null && this.getLastDamageSource() == null;
+        return this.level().isNight() && /* Moved from SleepGoal */ this.zza == 0.0F  && this.hasShelter() && !this.alertable() && !this.isInPowderSnow && this.getTarget() == null && this.getLastDamageSource() == null;
     }
 
     @Override

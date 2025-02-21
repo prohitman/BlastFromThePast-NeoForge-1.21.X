@@ -98,6 +98,7 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, An
         int i = 0;
 
         this.goalSelector.addGoal(i++, new FloatGoal(this));
+        this.goalSelector.addGoal(i++, new SpeartoothSleepGoal(this));
         this.goalSelector.addGoal(i++, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(i++, new SpeartoothRetreatGoal(this,1.7f, 1.9f));
         this.goalSelector.addGoal(i++, new RoarAtTargetGoal<>(this, 3));
