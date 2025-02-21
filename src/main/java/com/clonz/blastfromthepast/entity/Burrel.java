@@ -159,10 +159,10 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
         }
         this.prevAttachDir = this.getAttachmentFacing();
         if (this.level().isClientSide()) {
-            this.idleState.animateWhen(!this.isMoving(this), this.tickCount);
+            this.idleState.animateWhen(!this.isMoving(this) && !this.isSleeping(), this.tickCount);
             this.climbingState.animateWhen(this.isBesideClimbableBlock(), this.tickCount);
             this.sleepState.animateWhen(this.isSleeping(), this.tickCount);
-            if (!this.climbingState.isStarted() && !this.sleepState.isStarted() && this.wantsToBeOnGround() && this.random.nextIntBetweenInclusive(1, 500) == 1) {
+            if (!this.climbingState.isStarted() && !this.isSleeping() && this.wantsToBeOnGround() && this.random.nextIntBetweenInclusive(1, 500) == 1) {
                 this.idleState.stop();
                 this.lookState.startIfStopped(this.tickCount);
             }
@@ -209,7 +209,7 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
             this.setDeltaMovement(vector3d.multiply(0.6D, 0.4D, 0.6D));
         }
 
-        if (random.nextIntBetweenInclusive(1, 2000) == 1) this.makeSound(ModSounds.BURREL_IDLE.get());
+        if (!this.isSleeping() && random.nextIntBetweenInclusive(1, 2000) == 1) this.makeSound(ModSounds.BURREL_IDLE.get());
     }
 
     @Override
