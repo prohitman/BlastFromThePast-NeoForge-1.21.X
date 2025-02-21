@@ -4,7 +4,7 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.client.models.SpeartoothModel;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.Roaring;
-import com.clonz.blastfromthepast.entity.ai.goal.complex_animal.SleepGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.roar.RoarAtTargetGoal;
 import com.clonz.blastfromthepast.entity.misc.ComplexAnimal;
 import com.clonz.blastfromthepast.entity.misc.StateValue;
 import com.clonz.blastfromthepast.entity.speartooth.ai.*;
@@ -83,7 +83,6 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, An
         super(entityType, level);
         this.xpReward = 5;
         this.setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
-        this.setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
     }
 
     @Override
@@ -101,6 +100,7 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, An
         this.goalSelector.addGoal(i++, new FloatGoal(this));
         this.goalSelector.addGoal(i++, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(i++, new SpeartoothRetreatGoal(this,1.7f, 1.9f));
+        this.goalSelector.addGoal(i++, new RoarAtTargetGoal<>(this, 3));
 
         SpeartoothPounceTargetGoal pounceGoal = new SpeartoothPounceTargetGoal(this, 0.5F);
 
@@ -114,9 +114,8 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, An
         this.goalSelector.addGoal(i++, new FollowOwnerGoal(this, 1.25f, 8.0F, 2.0F));
         this.goalSelector.addGoal(i++, new TemptGoal(this, 1.25F, this::isTemptItem, false));
 
-        this.goalSelector.addGoal(i++, new SleepGoal<>(this));
-        this.goalSelector.addGoal(i++, new WaterAvoidingRandomStrollGoal(this, 1.0F));
         this.goalSelector.addGoal(i++, new SpeartoothTigerIdleGoal(this));
+        this.goalSelector.addGoal(i++, new WaterAvoidingRandomStrollGoal(this, 1.0F));
         this.goalSelector.addGoal(i++, new LookAtPlayerGoal(this, Player.class, 5.0F));
         this.goalSelector.addGoal(i++, new RandomLookAroundGoal(this));
 
@@ -274,6 +273,11 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, An
         ItemStack itemstack = player.getItemInHand(hand);
         if (!this.level().isClientSide) {
             if (this.isTame()) {
+                if (hand == InteractionHand.MAIN_HAND && this.isOwnedBy(player) && this.isSleeping()) {
+                    this.setSleeping(false);
+                    this.setOrderedToSit(false);
+                    return InteractionResult.SUCCESS_NO_ITEM_USED;
+                }
                 if (this.isFood(itemstack) && this.getHealth() < this.getMaxHealth()) {
                     FoodProperties foodproperties = itemstack.getFoodProperties(this);
                     float f = foodproperties != null ? (float) foodproperties.nutrition() : 1.0F;
@@ -285,7 +289,7 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, An
                 if (this.isBaby() || itemstack.is(ModItems.RAW_VENISON)) {
                     return super.mobInteract(player, hand);
                 } else if (this.isOwnedBy(player) && !this.isBaby() /* Baby speartooth doesn't have a sitting animation */) {
-                    if (!this.level().isClientSide && hand == InteractionHand.MAIN_HAND) {
+                    if (hand == InteractionHand.MAIN_HAND) {
                         this.setOrderedToSit(!this.isOrderedToSit());
 //                        Minecraft.getInstance().player.sendSystemMessage(Component.literal((this.level().isClientSide ? "[Client] " : "[Server] ") + this + " is now " + (this.isOrderedToSit() ? "sitting" : "standing")));
                         this.jumping = false;
@@ -306,7 +310,7 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, An
                 return super.mobInteract(player, hand);
             }
         }
-        return InteractionResult.PASS;
+        return InteractionResult.SUCCESS_NO_ITEM_USED;
     }
 
     @Override
@@ -478,7 +482,11 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, An
 
     @Override
     public boolean canSleep() {
-        return this.level().isNight() && !this.isInPowderSnow && this.getTarget() == null && this.getLastDamageSource() == null;
+        // Don't sleep if tamed and not sitting
+        if (this.isTame() && !(this.isOrderedToSit() || this.isSleeping())) {
+            return false;
+        }
+        return this.level().isNight() && !this.isInPowderSnow && this.getLastDamageSource() == null && !this.isInPowderSnow && this.getTarget() == null && this.getLastDamageSource() == null;
     }
 
     @Override
