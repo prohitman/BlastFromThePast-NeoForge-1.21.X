@@ -32,6 +32,12 @@ public class ModEntities {
         return entityType;
     }
 
+    public static <T extends Mob> DeferredHolder<EntityType<?>, EntityType<T>> registerMobWithEyeHeight(String name, EntityType.EntityFactory<T> entity,
+                                                                                           float width, float height, float eyeHeight, int primaryEggColor, int secondaryEggColor) {
+        return ENTITIES.register(name,
+                () -> EntityType.Builder.of(entity, MobCategory.CREATURE).sized(width, height).eyeHeight(eyeHeight).build(name));
+    }
+
     public static final DeferredHolder<EntityType<?>, EntityType<GlacerosEntity>> GLACEROS = registerMob("glaceros", GlacerosEntity::new,
             1f, 2.2f, 0x302219, 0xACACAC);
 
@@ -41,8 +47,8 @@ public class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<FrostomperEntity>> FROSTOMPER = registerMob("frostomper", FrostomperEntity::new,
             HitboxHelper.pixelsToBlocks(77.0F), HitboxHelper.pixelsToBlocks(70.0F), 0x302219, 0xACACAC);
 
-    public static final DeferredHolder<EntityType<?>, EntityType<SpeartoothEntity>> SPEARTOOTH = registerMob("speartooth", SpeartoothEntity::new
-            , 1.0F, 1.0F, 0x302220, 0xACACAC);
+    public static final DeferredHolder<EntityType<?>, EntityType<SpeartoothEntity>> SPEARTOOTH = registerMobWithEyeHeight("speartooth", SpeartoothEntity::new
+            , 0.9F, 1.3F, 1.25F, 0x302220, 0xACACAC);
 
     public static final DeferredHolder<EntityType<?>, EntityType<Burrel>> BURREL = registerMob("burrel", Burrel::new
             , 1.0F, 1.0F, 0x302220, 0xACACAC);
