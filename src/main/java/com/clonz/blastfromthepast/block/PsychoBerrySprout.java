@@ -3,6 +3,7 @@ package com.clonz.blastfromthepast.block;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -45,6 +46,14 @@ public class PsychoBerrySprout extends BushBlock implements IShearable, Bonemeal
     }
     protected VoxelShape getBlockSupportShape(BlockState state, BlockGetter reader, BlockPos pos) {
         return Shapes.empty();
+    }
+
+    @Override
+    protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (!level.isAreaLoaded(pos, 1)) return;
+        if (!state.canSurvive(level, pos)) {
+            level.destroyBlock(pos, true);
+        }
     }
 
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
@@ -114,5 +123,10 @@ public class PsychoBerrySprout extends BushBlock implements IShearable, Bonemeal
             generateRandomBlocksAround(level, pos, state1);
             level.setBlock(pos, state1, 2);
         }
+    }
+
+    @Override
+    protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        return level.getBlockState(pos.below()).isSolidRender(level, pos.below());
     }
 }

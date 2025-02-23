@@ -53,7 +53,6 @@ public class ModBiomes {
 
     public static Biome frostbiteForest(HolderGetter<PlacedFeature> placedFeatures, HolderGetter<ConfiguredWorldCarver<?>> worldCarvers) {
         MobSpawnSettings.Builder mobspawnsettings$builder = new MobSpawnSettings.Builder();
-        BiomeDefaultFeatures.farmAnimals(mobspawnsettings$builder);
         mobspawnsettings$builder.addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(ModEntities.BURREL.get(), 8, 1, 2))
                 .addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(ModEntities.SNOWDO.get(), 8, 2, 5))
                 .addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(ModEntities.GLACEROS.get(), 8, 3, 7))

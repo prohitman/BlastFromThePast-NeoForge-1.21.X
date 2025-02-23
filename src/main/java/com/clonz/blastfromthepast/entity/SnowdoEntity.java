@@ -124,6 +124,7 @@ public class SnowdoEntity extends Animal implements Animatable<SnowdoModel> {
         if(this.getVehicle() instanceof Player){
             if(this.isInWaterOrBubble()){
                 this.stopRiding();
+                this.setRiddenPlayer(Optional.empty());
             }
         }
 
@@ -173,11 +174,17 @@ public class SnowdoEntity extends Animal implements Animatable<SnowdoModel> {
           }
         }
 
-        if(!(this.getVehicle() instanceof Player) && this.getRiddenPlayer().isPresent()){
-            Player player = this.level().getPlayerByUUID(this.getRiddenPlayer().get());
-            if(player != null){
+        Player player = this.getRiddenPlayer().isPresent() ? this.level().getPlayerByUUID(this.getRiddenPlayer().get()) : null;
+
+        if(!(this.getVehicle() instanceof Player) && this.getRiddenPlayer().isPresent()) {
+            if(player != null && !player.isCrouching()){
                 this.startRiding(player);
             }
+        }
+
+        if (player == null || player.isCrouching()) {
+            this.stopRiding();
+            this.setRiddenPlayer(Optional.empty());
         }
     }
 

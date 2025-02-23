@@ -1,5 +1,6 @@
 package com.clonz.blastfromthepast.block;
 
+import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
 import com.mojang.serialization.MapCodec;
@@ -72,6 +73,15 @@ public class PsychoBerryBush extends Block implements SimpleWaterloggedBlock, IS
 
         return state;
     }
+
+    @Override
+    protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (!level.isAreaLoaded(pos, 1)) return;
+        if (!state.canSurvive(level, pos)) {
+            level.destroyBlock(pos, true);
+        }
+    }
+
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         int i = state.getValue(AGE);
         if (i < 1 && level.getRawBrightness(pos.above(), 0) >= 9 && CommonHooks.canCropGrow(level, pos, state, random.nextInt(10) == 0)) {
@@ -147,5 +157,11 @@ public class PsychoBerryBush extends Block implements SimpleWaterloggedBlock, IS
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState fluidstate = context.getLevel().getFluidState(context.getClickedPos());
         return (this.defaultBlockState().setValue(AGE, 0)).setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER);
+    }
+
+    @Override
+    protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+        BlockState blockState = level.getBlockState(pos.below());
+        return blockState.isSolidRender(level, pos.below()) || blockState.is(ModBlocks.PSYCHO_BERRY_BUSH);
     }
 }

@@ -27,7 +27,7 @@ public class ModLangGen extends LanguageProvider {
     @Override
     protected void addTranslations() {
         //Items
-        addItem(ModItems.BLIZZARD_REVELRY_DISC);
+        addItem(ModItems.BLIZZARD_REVELRY_DISC, "Blue is Music Disc and the grey is Gateoh - Blizzard Revelry");
         addItem(ModItems.SAP_BALL);
         addItem(ModItems.RAW_VENISON);
         addItem(ModItems.COOKED_VENISON);

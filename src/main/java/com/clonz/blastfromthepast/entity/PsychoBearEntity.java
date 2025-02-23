@@ -653,6 +653,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
 
     @Override
     protected SoundEvent getAmbientSound() {
+        if (this.isSleeping()) return ModSounds.PSYCHO_BEAR_SNORE.get();
         return ModSounds.PSYCHO_BEAR_IDLE.get();
     }
 

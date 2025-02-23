@@ -46,7 +46,7 @@ public class HitboxAdjustedBreedGoal extends BreedGoal {
         this.animal.getNavigation().moveTo(this.partner, this.access().getSpeedModifier());
         this.access().setLoveTime(this.access().getLoveTime() + 1);
         double distanceToPartnerSqr = HitboxHelper.getDistSqrBetweenHitboxes(this.animal, this.partner);
-        if (this.access().getLoveTime() >= this.adjustedTickDelay(60) && distanceToPartnerSqr < 9.0) {
+        if (this.access().getLoveTime() >= this.adjustedTickDelay(60) && distanceToPartnerSqr < 13.0) {
             this.breed();
         }
 

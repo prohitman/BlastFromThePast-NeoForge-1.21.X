@@ -19,18 +19,16 @@ import com.clonz.blastfromthepast.entity.pack.EntityPack;
 import com.clonz.blastfromthepast.entity.ai.navigation.BFTPGroundPathNavigation;
 import com.clonz.blastfromthepast.entity.pack.EntityPackAgeableMobData;
 import com.clonz.blastfromthepast.entity.pack.EntityPackHolder;
-import com.clonz.blastfromthepast.init.ModDataSerializers;
-import com.clonz.blastfromthepast.init.ModEntities;
-import com.clonz.blastfromthepast.init.ModSounds;
-import com.clonz.blastfromthepast.init.ModTags;
+import com.clonz.blastfromthepast.init.*;
 import com.clonz.blastfromthepast.mixin.AbstractChestedHorseAccessor;
+import com.clonz.blastfromthepast.network.FroststomperCollidePayload;
 import com.clonz.blastfromthepast.util.DebugFlags;
 import com.clonz.blastfromthepast.util.EntityHelper;
 import com.clonz.blastfromthepast.util.HitboxHelper;
+import com.google.common.base.Predicates;
 import io.github.itskillerluc.duclib.client.animation.DucAnimation;
 import io.github.itskillerluc.duclib.entity.Animatable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -69,6 +67,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -86,7 +85,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     private static final int CHARGE_ATTACK_COOLDOWN = 900;
     private static final int FLAG_ROARING = 128;
     private static final UniformInt CHARGE_ATTACK_DURATION = UniformInt.of(Mth.floor(20 / 0.3F), Mth.floor(25 / 0.3F)); // Distances in blocks divided by Frostomper's base speed of 0.3 blocks/tick
-    public static final int MAX_TRUMPET_TICKS = Mth.floor(1.5F * 20);
+    public static final int MAX_TRUMPET_TICKS_ADULT = Mth.floor(1.5F * 20);
+    public static final int MAX_TRUMPET_TICKS_BABY = Mth.floor(0.4167F * 20);
     private final Lazy<Map<String, AnimationState>> babyAnimations = Lazy.of(() -> FrostomperModel.createStateMap(BABY_ANIMATION));
     private final Lazy<Map<String, AnimationState>> adultAnimations = Lazy.of(() -> FrostomperModel.createStateMap(ADULT_ANIMATION));
     protected static final TargetingConditions PARENT_TARGETING = TargetingConditions.forNonCombat()
@@ -100,6 +100,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     private int roarCounter;
     private int trumpetCounter;
     private int idleAnimationTimer = -1;
+    private boolean lastCollide = false;
+    public boolean serverHorizontalCollide = false;
 
     public FrostomperEntity(EntityType<? extends FrostomperEntity> entityType, Level level) {
         super(entityType, level);
@@ -188,6 +190,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             super.doPlayerRide(player);
             if(!this.level().isClientSide){
                 this.setRoaring(false);
+                this.serverHorizontalCollide = false;
             }
         }
     }
@@ -255,8 +258,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             frostomperGroupData.addPackMember(this);
         }
         SpawnGroupData spawnData = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
-        if(this.isBaby()){
-            this.setAge(AgeableMob.BABY_START_AGE * 3);
+        if(this.isBaby()) {
+            this.setAge(AgeableMob.BABY_START_AGE);
         }
         this.idleAnimationTimer = IdleState.NONE.animationTime();
 
@@ -265,7 +268,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     @Override
     public void setBaby(boolean baby) {
-        this.setAge(baby ? AgeableMob.BABY_START_AGE * 3 : 0);
+        this.setAge(baby ? AgeableMob.BABY_START_AGE : 0);
     }
 
     @Override
@@ -319,6 +322,15 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     }
 
     @Override
+    public void move(MoverType type, Vec3 pos) {
+        super.move(type, pos);
+        if (this.hasPassenger(Predicates.alwaysTrue()) && this.lastCollide != this.horizontalCollision) {
+            PacketDistributor.sendToServer(new FroststomperCollidePayload(this.getId(), this.horizontalCollision));
+            this.lastCollide = horizontalCollision;
+        }
+    }
+
+    @Override
     protected boolean handleEating(Player player, ItemStack stack) {
         if (!this.isFood(stack)) {
             return false;
@@ -333,9 +345,9 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 fed = true;
             }
             if (this.isBaby()) {
-                this.level().addParticle(ParticleTypes.HAPPY_VILLAGER, this.getRandomX(1.0), this.getRandomY() + 0.5, this.getRandomZ(1.0), 0.0, 0.0, 0.0);
+                this.level().addParticle(ModParticles.FROSTSTOMPER_GLINT.get(), this.getRandomX(1.0), this.getRandomY() + 0.5, this.getRandomZ(1.0), 0.0, 0.0, 0.0);
                 if (!this.level().isClientSide) {
-                    this.ageUp(10);
+                    this.ageUp(getSpeedUpSecondsWhenFeeding(-this.getAge()), true);
                     fed = true;
                 }
             }
@@ -482,7 +494,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
         if (this.level().isClientSide()) {
             this.animateWhen("idle", !this.isMoving(this) && this.onGround() && activeAttackType == null);
             this.animateWhen("trumpet", this.isRoaring());
-            if(!this.isBaby()){
+            if(!this.isBaby()) {
+                if (activeAttackType == FrostomperAttackType.CHARGE) this.setYBodyRot(this.getYRot());
                 this.animateWhen("crush", activeAttackType == FrostomperAttackType.DOUBLE_STOMP);
                 this.animateWhen("stomp", activeAttackType == FrostomperAttackType.SINGLE_STOMP && !this.isLeftHanded());
                 this.animateWhen("stomp_flipped", activeAttackType == FrostomperAttackType.SINGLE_STOMP && this.isLeftHanded());
@@ -504,7 +517,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 this.level().playSound(null, this.blockPosition(), SoundEvents.CAMEL_DASH_READY, SoundSource.NEUTRAL, 1.0F, 1.0F);
             }
         }
-        if (!this.level().isClientSide && this.roarCounter > 0 && ++this.roarCounter > MAX_TRUMPET_TICKS) {
+        if (!this.level().isClientSide && this.roarCounter > 0 && ++this.roarCounter > (this.isBaby() ? MAX_TRUMPET_TICKS_BABY : MAX_TRUMPET_TICKS_ADULT)) {
             this.roarCounter = 0;
             this.setRoaring(false);
         }
@@ -536,8 +549,8 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     @Override
     public void aiStep() {
         super.aiStep();
-        if (this.isAlive()) {
-            if (this.horizontalCollision && EventHooks.canEntityGrief(this.level(), this)) {
+        if (this.isAlive() && !this.level().isClientSide) {
+            if ((this.horizontalCollision || this.serverHorizontalCollide) && EventHooks.canEntityGrief(this.level(), this)) {
                 boolean destroyedBlock = false;
                 AABB breakBox = this.getBoundingBox().inflate(0.2);
                 Iterator<BlockPos> nearbyBlockPositions = BlockPos.betweenClosed(Mth.floor(breakBox.minX), Mth.floor(breakBox.minY), Mth.floor(breakBox.minZ), Mth.floor(breakBox.maxX), Mth.floor(breakBox.maxY), Mth.floor(breakBox.maxZ)).iterator();

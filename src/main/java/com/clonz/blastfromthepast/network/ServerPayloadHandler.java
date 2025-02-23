@@ -2,6 +2,7 @@ package com.clonz.blastfromthepast.network;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.Burrel;
+import com.clonz.blastfromthepast.entity.FrostomperEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
@@ -36,6 +37,18 @@ public class ServerPayloadHandler {
             Entity riding = context.player().level().getEntity(payload.entityId());
             if (riding instanceof Burrel burrel) {
                 burrel.eatState.start(burrel.tickCount);
+            }
+        }).exceptionally(e -> {
+            context.disconnect(Component.literal(BlastFromThePast.MODID + " Networking Failed"));
+            return null;
+        });
+    }
+
+    public static void handleFroststomperCollidePayload(final FroststomperCollidePayload payload, final IPayloadContext context) {
+        context.enqueueWork(() -> {
+            Entity entity = context.player().level().getEntity(payload.entityId());
+            if (entity instanceof FrostomperEntity frostomperEntity) {
+                frostomperEntity.serverHorizontalCollide = payload.isColliding();
             }
         }).exceptionally(e -> {
             context.disconnect(Component.literal(BlastFromThePast.MODID + " Networking Failed"));

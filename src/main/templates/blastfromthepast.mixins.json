@@ -30,6 +30,8 @@
     "client.CameraMixin",
     "client.FogRendererMixin",
     "client.FogTypeMixin",
-    "client.PlayerModelMixin"
+    "client.PlayerModelMixin",
+    "client.InventoryScreenMixin",
+    "client.GuiGraphicsMixin"
   ]
 }

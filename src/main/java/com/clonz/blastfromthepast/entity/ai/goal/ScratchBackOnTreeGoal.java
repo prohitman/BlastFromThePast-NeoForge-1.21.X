@@ -39,6 +39,7 @@ public class ScratchBackOnTreeGoal<T extends PathfinderMob & BackScratcher> exte
     
     @Override
     public boolean canUse() {
+        if (mob.isSleeping()) return false;
         if (this.nextStartTick <= 0) {
             this.canScratchBack = false;
             this.wantsToScratchBack = this.backScratcher.wantsToScratchBack();
@@ -63,6 +64,7 @@ public class ScratchBackOnTreeGoal<T extends PathfinderMob & BackScratcher> exte
 
     @Override
     public boolean canContinueToUse() {
+        if (mob.isSleeping()) return false;
         if(this.canScratchBack && (this.backScratchCounter > 0 || this.turning)){
             return true;
         }
