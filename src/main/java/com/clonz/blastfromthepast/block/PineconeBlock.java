@@ -28,8 +28,8 @@ public class PineconeBlock extends SaplingBlock {
     public static final MapCodec<PineconeBlock> CODEC = RecordCodecBuilder.mapCodec((p_308831_) -> p_308831_.group(TreeGrower.CODEC.fieldOf("tree").forGetter((p_304527_) -> p_304527_.treeGrower), propertiesCodec()).apply(p_308831_, PineconeBlock::new));
     public static final BooleanProperty HANGING;
 
-    protected static final VoxelShape SHAPE = Block.box(3.0, 0.0, 3.0, 8.0, 4.0, 8.0);
-    protected static final VoxelShape SHAPE_HANGING = Block.box(3.0, 5.0, 3.0, 8.0, 12.0, 8.0);
+    protected static final VoxelShape SHAPE = Block.box(5.0, 0.0, 5.0, 11.0, 4.0, 11.0);
+    protected static final VoxelShape SHAPE_HANGING = Block.box(5.0, 5.0, 5.0, 11.0, 12.0, 11.0);
 
     public MapCodec<PineconeBlock> codec() {
         return CODEC;
