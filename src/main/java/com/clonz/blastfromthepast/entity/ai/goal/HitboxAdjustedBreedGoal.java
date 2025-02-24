@@ -13,7 +13,7 @@ import java.util.List;
 public class HitboxAdjustedBreedGoal extends BreedGoal {
     private static final TargetingConditions PARTNER_TARGETING = TargetingConditions.forNonCombat().ignoreLineOfSight();
     protected boolean testInvisible = true;
-    protected double range = 8.0D;
+    protected double range = 15.0D;
     protected TargetingConditions partnerTargeting = PARTNER_TARGETING.copy();
 
     public HitboxAdjustedBreedGoal(Animal animal, double speedModifier) {

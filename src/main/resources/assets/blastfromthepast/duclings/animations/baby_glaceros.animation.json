@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.baby_glaceros.pose": {
+		"animation.baby_glaceros.Pose": {
 			"loop": true,
 			"bones": {
 				"neck": {

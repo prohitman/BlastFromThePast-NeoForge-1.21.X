@@ -3,9 +3,7 @@ package com.clonz.blastfromthepast.events;
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.client.init.ModLayerLocations;
 import com.clonz.blastfromthepast.client.layers.FrostbiteAntlersLayer;
-import com.clonz.blastfromthepast.init.ModParticles;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.particle.SuspendedTownParticle;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.resources.PlayerSkin;
@@ -16,7 +14,6 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 
 import java.util.function.Function;
 
@@ -55,10 +52,5 @@ public class ClientEvents {
     {
         LivingEntityRenderer<E, M> renderer = event.getRenderer(entityType);
         if (renderer != null) renderer.addLayer(factory.apply(renderer));
-    }
-
-    @SubscribeEvent
-    public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
-        event.registerSpriteSet(ModParticles.FROSTSTOMPER_GLINT.get(), SuspendedTownParticle.HappyVillagerProvider::new);
     }
 }

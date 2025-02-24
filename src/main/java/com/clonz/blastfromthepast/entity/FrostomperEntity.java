@@ -11,6 +11,7 @@ import com.clonz.blastfromthepast.entity.ai.controller.OverridableBodyRotationCo
 import com.clonz.blastfromthepast.entity.ai.controller.OverridableLookControl;
 import com.clonz.blastfromthepast.entity.ai.controller.OverridableMoveControl;
 import com.clonz.blastfromthepast.entity.ai.goal.pack.PackHurtByTargetGoal;
+import com.clonz.blastfromthepast.entity.ai.navigation.AzureNavigation;
 import com.clonz.blastfromthepast.entity.misc.AnimatedAttacker;
 import com.clonz.blastfromthepast.entity.misc.ChargeForward;
 import com.clonz.blastfromthepast.entity.misc.OverrideAnimatedAttacker;
@@ -21,7 +22,7 @@ import com.clonz.blastfromthepast.entity.pack.EntityPackAgeableMobData;
 import com.clonz.blastfromthepast.entity.pack.EntityPackHolder;
 import com.clonz.blastfromthepast.init.*;
 import com.clonz.blastfromthepast.mixin.AbstractChestedHorseAccessor;
-import com.clonz.blastfromthepast.network.FroststomperCollidePayload;
+import com.clonz.blastfromthepast.network.FrostomperCollidePayload;
 import com.clonz.blastfromthepast.util.DebugFlags;
 import com.clonz.blastfromthepast.util.EntityHelper;
 import com.clonz.blastfromthepast.util.HitboxHelper;
@@ -29,6 +30,7 @@ import com.google.common.base.Predicates;
 import io.github.itskillerluc.duclib.client.animation.DucAnimation;
 import io.github.itskillerluc.duclib.entity.Animatable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -197,7 +199,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     @Override
     protected PathNavigation createNavigation(Level level) {
-        return new BFTPGroundPathNavigation(this, level);
+        return new AzureNavigation(this, level);
     }
 
     public int getMaxHeadYRot() {
@@ -325,7 +327,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     public void move(MoverType type, Vec3 pos) {
         super.move(type, pos);
         if (this.hasPassenger(Predicates.alwaysTrue()) && this.lastCollide != this.horizontalCollision) {
-            PacketDistributor.sendToServer(new FroststomperCollidePayload(this.getId(), this.horizontalCollision));
+            PacketDistributor.sendToServer(new FrostomperCollidePayload(this.getId(), this.horizontalCollision));
             this.lastCollide = horizontalCollision;
         }
     }
@@ -345,16 +347,19 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 fed = true;
             }
             if (this.isBaby()) {
-                this.level().addParticle(ModParticles.FROSTSTOMPER_GLINT.get(), this.getRandomX(1.0), this.getRandomY() + 0.5, this.getRandomZ(1.0), 0.0, 0.0, 0.0);
+                this.level().addParticle(ParticleTypes.HAPPY_VILLAGER, this.getRandomX(1.0), this.getRandomY() + 0.5, this.getRandomZ(1.0), 0.0, 0.0, 0.0);
                 if (!this.level().isClientSide) {
                     this.ageUp(getSpeedUpSecondsWhenFeeding(-this.getAge()), true);
                     fed = true;
                 }
             }
-            if (!this.isTamed() && this.getTemper() < this.getMaxTemper() && !this.level().isClientSide) {
+            if (!this.isTamed() && this.getTemper() < this.getMaxTemper() && !this.level().isClientSide && !net.neoforged.neoforge.event.EventHooks.onAnimalTame(this, player)) {
                 this.modifyTemper(10);
                 if (this.getTemper() >= this.getMaxTemper() && this.canBeTamedBy(player) && !EventHooks.onAnimalTame(this, player)) {
                     this.tameWithName(player);
+                }
+                else {
+                    this.level().broadcastEntityEvent(this, (byte)6);
                 }
                 fed = true;
             }
@@ -495,7 +500,9 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             this.animateWhen("idle", !this.isMoving(this) && this.onGround() && activeAttackType == null);
             this.animateWhen("trumpet", this.isRoaring());
             if(!this.isBaby()) {
-                if (activeAttackType == FrostomperAttackType.CHARGE) this.setYBodyRot(this.getYRot());
+                if (!this.canRotateHead()) {
+                    this.setYBodyRot(this.getYRot());
+                }
                 this.animateWhen("crush", activeAttackType == FrostomperAttackType.DOUBLE_STOMP);
                 this.animateWhen("stomp", activeAttackType == FrostomperAttackType.SINGLE_STOMP && !this.isLeftHanded());
                 this.animateWhen("stomp_flipped", activeAttackType == FrostomperAttackType.SINGLE_STOMP && this.isLeftHanded());
@@ -505,9 +512,6 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 this.animateWhen("tail", idleState == IdleState.TAIL);
                 this.animateWhen("ears", idleState == IdleState.EARS);
             }
-        }
-        if (!this.canRotateHead()) {
-            this.clampHeadRotationToBody();
         }
         this.attackTicker.tick();
         // tick charge cooldown

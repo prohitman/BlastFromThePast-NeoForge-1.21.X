@@ -2,7 +2,7 @@ package com.clonz.blastfromthepast.events;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.network.BurrelEatPayload;
-import com.clonz.blastfromthepast.network.FroststomperCollidePayload;
+import com.clonz.blastfromthepast.network.FrostomperCollidePayload;
 import com.clonz.blastfromthepast.network.RiddenEntityPayload;
 import com.clonz.blastfromthepast.network.ServerPayloadHandler;
 import com.clonz.blastfromthepast.worldgen.biome.BFTPOverworldRegion;
@@ -17,7 +17,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import terrablender.api.Regions;
 
@@ -45,7 +44,7 @@ public class CommonNeoEvents {
                 ServerPayloadHandler::handleRiddenEntityPayload
         );
         registrar.playToClient(BurrelEatPayload.TYPE, BurrelEatPayload.STREAM_CODEC, ServerPayloadHandler::handleBurrelEatPayload);
-        registrar.playToServer(FroststomperCollidePayload.TYPE, FroststomperCollidePayload.STREAM_CODEC, ServerPayloadHandler::handleFroststomperCollidePayload);
+        registrar.playToServer(FrostomperCollidePayload.TYPE, FrostomperCollidePayload.STREAM_CODEC, ServerPayloadHandler::handleFroststomperCollidePayload);
     }
 
     public static void registerFlammables(){

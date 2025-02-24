@@ -5,11 +5,9 @@ import com.clonz.blastfromthepast.entity.Burrel;
 import com.clonz.blastfromthepast.entity.FrostomperEntity;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Optional;
@@ -44,7 +42,7 @@ public class ServerPayloadHandler {
         });
     }
 
-    public static void handleFroststomperCollidePayload(final FroststomperCollidePayload payload, final IPayloadContext context) {
+    public static void handleFroststomperCollidePayload(final FrostomperCollidePayload payload, final IPayloadContext context) {
         context.enqueueWork(() -> {
             Entity entity = context.player().level().getEntity(payload.entityId());
             if (entity instanceof FrostomperEntity frostomperEntity) {

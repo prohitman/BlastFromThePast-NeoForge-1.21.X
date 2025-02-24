@@ -15,6 +15,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.EnumSet;
+
 public class BurrelGoToTreesGoal extends Goal {
     private final Burrel burrel;
     private final double speed;
@@ -23,6 +25,7 @@ public class BurrelGoToTreesGoal extends Goal {
     public BurrelGoToTreesGoal(Burrel burrel, double speed) {
         this.burrel = burrel;
         this.speed = speed;
+        this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP));
     }
 
     @Override

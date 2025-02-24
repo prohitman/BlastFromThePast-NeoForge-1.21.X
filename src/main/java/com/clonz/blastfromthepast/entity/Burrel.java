@@ -29,6 +29,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -50,6 +51,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
+    public static final ResourceLocation STEP_ATTRIBUTE = ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "burrel_jump");
 
     public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "burrel");
     public static final ResourceLocation BABY_LOCATION = ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "baby_burrel");
@@ -64,6 +66,7 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
     private static final Direction[] POSSIBLE_DIRECTIONS = new Direction[]{Direction.DOWN, Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
 
     public static final DucAnimation ANIMATION = DucAnimation.create(LOCATION);
+    public static final DucAnimation BABY_ANIMATION = DucAnimation.create(BABY_LOCATION);
 
     public BlockPos targetTree;
 
@@ -87,6 +90,7 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
         this.xpReward = 5;
         this.setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
         this.setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
+        this.getAttribute(Attributes.STEP_HEIGHT).addOrReplacePermanentModifier(new AttributeModifier(STEP_ATTRIBUTE, 0.6, AttributeModifier.Operation.ADD_VALUE));
     }
 
     @Override
@@ -349,6 +353,7 @@ public class Burrel extends TamableAnimal implements Animatable<BurrelModel> {
      */
     @Override
     public DucAnimation getAnimation() {
+        if (this.isBaby()) return BABY_ANIMATION;
         return ANIMATION;
     }
 

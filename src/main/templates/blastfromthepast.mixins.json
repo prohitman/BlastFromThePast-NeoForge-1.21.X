@@ -31,7 +31,6 @@
     "client.FogRendererMixin",
     "client.FogTypeMixin",
     "client.PlayerModelMixin",
-    "client.InventoryScreenMixin",
-    "client.GuiGraphicsMixin"
+    "client.InventoryScreenMixin"
   ]
 }

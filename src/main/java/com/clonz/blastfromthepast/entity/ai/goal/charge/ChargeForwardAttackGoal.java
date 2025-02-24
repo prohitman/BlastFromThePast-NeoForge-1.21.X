@@ -26,11 +26,6 @@ public class ChargeForwardAttackGoal<T extends PathfinderMob & ChargeForward> ex
     }
 
     @Override
-    public boolean requiresUpdateEveryTick() {
-        return true;
-    }
-
-    @Override
     public boolean canUse() {
         return this.mob.isChargingForward();
     }

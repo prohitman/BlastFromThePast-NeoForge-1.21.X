@@ -28,6 +28,7 @@ public class ModLangGen extends LanguageProvider {
     protected void addTranslations() {
         //Items
         addItem(ModItems.BLIZZARD_REVELRY_DISC, "Music Disc");
+        addItem(ModItems.IDOL_OF_RETRIEVAL, "Idol of Retrieval");
         addItem(ModItems.SAP_BALL);
         addItem(ModItems.RAW_VENISON);
         addItem(ModItems.COOKED_VENISON);
@@ -92,6 +93,7 @@ public class ModLangGen extends LanguageProvider {
         addEntity(ModEntities.BURREL);
 
         add("itemGroup." + BlastFromThePast.MODID, "Blast From The Past");
+        add("enchantment.blastfromthepast.tar_marcher", "Tar Marcher");
     }
 
     private void addBlock(DeferredBlock<? extends Block> key) {

@@ -6,10 +6,12 @@ import com.clonz.blastfromthepast.init.ModSounds;
 import com.clonz.blastfromthepast.network.BurrelEatPayload;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.EnumSet;
 import java.util.List;
 
 public class BurrelEatGoal extends TargetGoal {
@@ -21,6 +23,7 @@ public class BurrelEatGoal extends TargetGoal {
     public BurrelEatGoal(Burrel burrel) {
         super(burrel, true);
         this.burrel = burrel;
+        this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP));
     }
 
     @Override

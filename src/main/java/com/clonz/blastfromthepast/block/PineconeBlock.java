@@ -20,11 +20,16 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.common.util.TriState;
 
 public class PineconeBlock extends SaplingBlock {
     public static final MapCodec<PineconeBlock> CODEC = RecordCodecBuilder.mapCodec((p_308831_) -> p_308831_.group(TreeGrower.CODEC.fieldOf("tree").forGetter((p_304527_) -> p_304527_.treeGrower), propertiesCodec()).apply(p_308831_, PineconeBlock::new));
     public static final BooleanProperty HANGING;
+
+    protected static final VoxelShape SHAPE = Block.box(3.0, 0.0, 3.0, 8.0, 4.0, 8.0);
+    protected static final VoxelShape SHAPE_HANGING = Block.box(3.0, 5.0, 3.0, 8.0, 12.0, 8.0);
 
     public MapCodec<PineconeBlock> codec() {
         return CODEC;
@@ -41,6 +46,12 @@ public class PineconeBlock extends SaplingBlock {
 
     protected boolean mayPlaceOn(BlockState state, BlockGetter level, BlockPos pos) {
         return super.mayPlaceOn(state, level, pos) || state.is(Blocks.CLAY);
+    }
+
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (isHanging(state)) return SHAPE_HANGING;
+        return SHAPE;
     }
 
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {

@@ -344,10 +344,12 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     @Override
     public void tick() {
         super.tick();
-        LivingEntity target = this.getTarget();
         if (this.isEffectiveAi()) {
             boolean inWater = this.isInWater();
-            if (inWater || target != null || this.level().isThundering()) {
+            if (this.getTarget() != null && this.isSleeping()) {
+                this.setTarget(null);
+            }
+            if (inWater || this.level().isThundering()) {
                 this.setSleeping(false);
             }
 

@@ -72,7 +72,6 @@ public class BlastFromThePast {
         ModFeatures.FEATURES.register(modEventBus);
         ModDataSerializers.DATA_SERIALIZERS.register(modEventBus);
         ModFoliageTypes.FOLIAGE_PLACER_TYPES.register(modEventBus);
-        ModParticles.PARTICLES.register(modEventBus);
 
         if (CURIOS_LOADED) {
             NeoForge.EVENT_BUS.register(CuriosCompat.class);

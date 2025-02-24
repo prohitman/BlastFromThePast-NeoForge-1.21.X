@@ -46,7 +46,6 @@ public class ModTabs {
                         output.accept(ModItems.SAP_BALL.get());
                         output.accept(ModItems.PSYCHO_BERRY.get());
                         output.accept(ModBlocks.PSYCHO_BERRY_BUSH);
-                        output.accept(ModBlocks.PSYCHO_BERRY_SPROUT);
                         output.accept(ModItems.SAP_ICE_CREAM.get());
                         output.accept(ModItems.PSYCHO_BERRY_ICE_CREAM.get());
                         output.accept(ModItems.MELON_ICE_CREAM.get());
