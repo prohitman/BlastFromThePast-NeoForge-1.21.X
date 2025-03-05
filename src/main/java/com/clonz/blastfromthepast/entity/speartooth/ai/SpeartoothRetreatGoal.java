@@ -1,13 +1,7 @@
 package com.clonz.blastfromthepast.entity.speartooth.ai;
 
-import java.util.EnumSet;
-import java.util.Objects;
-import java.util.function.Predicate;
-import javax.annotation.Nullable;
-
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.speartooth.SpeartoothEntity;
-import com.clonz.blastfromthepast.util.EntityHelper;
 import com.clonz.blastfromthepast.util.HitboxHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -19,6 +13,10 @@ import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.loading.FMLEnvironment;
+
+import javax.annotation.Nullable;
+import java.util.EnumSet;
+import java.util.function.Predicate;
 
 public class SpeartoothRetreatGoal extends Goal {
     protected final SpeartoothEntity tiger;

@@ -19,8 +19,6 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.awt.*;
-
 public class BFTPWoodGroup {
     public final DeferredBlock<Block> BLOCK;
     public final DeferredBlock<SlabBlock> SLAB;

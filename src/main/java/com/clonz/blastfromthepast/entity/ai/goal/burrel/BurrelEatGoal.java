@@ -1,26 +1,24 @@
 package com.clonz.blastfromthepast.entity.ai.goal.burrel;
 
-import com.clonz.blastfromthepast.entity.Burrel;
+import com.clonz.blastfromthepast.entity.BurrelEntity;
 import com.clonz.blastfromthepast.init.ModItems;
 import com.clonz.blastfromthepast.init.ModSounds;
-import com.clonz.blastfromthepast.network.BurrelEatPayload;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.EnumSet;
 import java.util.List;
 
 public class BurrelEatGoal extends TargetGoal {
 
-    private final Burrel burrel;
+    private final BurrelEntity burrel;
     private int unseenTicks;
     ItemEntity itemTarget;
 
-    public BurrelEatGoal(Burrel burrel) {
+    public BurrelEatGoal(BurrelEntity burrel) {
         super(burrel, true);
         this.burrel = burrel;
         this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP));
@@ -50,7 +48,7 @@ public class BurrelEatGoal extends TargetGoal {
         float entityDistance = burrel.distanceTo(itemTarget);
         if (entityDistance < 1.5) {
             burrel.makeSound(ModSounds.BURREL_EAT.get());
-            PacketDistributor.sendToPlayersTrackingEntity(burrel, new BurrelEatPayload(burrel.getId()));
+            burrel.triggerAnim("second", "eat");
             itemTarget.discard();
             burrel.getNavigation().stop();
             burrel.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 255, false, false, false));
@@ -66,7 +64,7 @@ public class BurrelEatGoal extends TargetGoal {
                 float entityDistance = burrel.distanceTo(entry);
                 if (entityDistance < 1.5) {
                     burrel.makeSound(ModSounds.BURREL_EAT.get());
-                    PacketDistributor.sendToPlayersTrackingEntity(burrel, new BurrelEatPayload(burrel.getId()));
+                    burrel.triggerAnim("second", "eat");
                     burrel.getNavigation().stop();
                     entry.discard();
                     burrel.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 255, false, false, false));

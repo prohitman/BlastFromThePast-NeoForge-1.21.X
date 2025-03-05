@@ -1,6 +1,6 @@
 package com.clonz.blastfromthepast.entity.ai.goal.burrel;
 
-import com.clonz.blastfromthepast.entity.Burrel;
+import com.clonz.blastfromthepast.entity.BurrelEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
@@ -12,9 +12,9 @@ import net.minecraft.world.phys.Vec3;
 import javax.annotation.Nullable;
 
 public class BurrelRandomStrollGoal extends WaterAvoidingRandomStrollGoal {
-    private final Burrel burrel;
+    private final BurrelEntity burrel;
 
-    public BurrelRandomStrollGoal(Burrel mob, double speedModifier) {
+    public BurrelRandomStrollGoal(BurrelEntity mob, double speedModifier) {
         super(mob, speedModifier);
         this.burrel = mob;
     }

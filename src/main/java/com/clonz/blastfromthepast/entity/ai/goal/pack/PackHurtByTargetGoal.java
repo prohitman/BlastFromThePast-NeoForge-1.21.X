@@ -3,7 +3,9 @@ package com.clonz.blastfromthepast.entity.ai.goal.pack;
 import com.clonz.blastfromthepast.entity.pack.EntityPack;
 import com.clonz.blastfromthepast.entity.pack.EntityPackHolder;
 import com.clonz.blastfromthepast.mixin.HurtByTargetGoalAccessor;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.phys.AABB;
 

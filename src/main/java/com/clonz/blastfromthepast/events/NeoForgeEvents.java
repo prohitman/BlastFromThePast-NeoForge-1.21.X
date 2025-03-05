@@ -4,7 +4,6 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.HollowEntity;
 import com.clonz.blastfromthepast.entity.TarArrow;
-import com.clonz.blastfromthepast.init.ModItems;
 import com.clonz.blastfromthepast.init.ModSounds;
 import com.clonz.blastfromthepast.util.EntityHelper;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,14 +11,12 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.player.ArrowLooseEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 @EventBusSubscriber(modid = BlastFromThePast.MODID, bus = EventBusSubscriber.Bus.GAME)

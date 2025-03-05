@@ -1,7 +1,5 @@
 package com.clonz.blastfromthepast.entity;
 
-import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.client.models.GlacerosModel;
 import com.clonz.blastfromthepast.datagen.server.ModEntityLootGen;
 import com.clonz.blastfromthepast.entity.ai.goal.EatDelphiniumGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.GlacerosAlertPanicGoal;
@@ -11,14 +9,11 @@ import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
 import com.clonz.blastfromthepast.init.ModSounds;
-import io.github.itskillerluc.duclib.client.animation.DucAnimation;
-import io.github.itskillerluc.duclib.entity.Animatable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.DamageTypeTags;
@@ -42,20 +37,20 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.util.Lazy;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.IntFunction;
 
-public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>, VariantHolder<GlacerosEntity.Variant> {
-    public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "glaceros");
-    public static final DucAnimation ANIMATION = DucAnimation.create(LOCATION);
-    private final Lazy<Map<String, AnimationState>> animations = Lazy.of(() -> GlacerosModel.createStateMap(getAnimation()));
+public class GlacerosEntity extends Animal implements GeoEntity, VariantHolder<GlacerosEntity.Variant> {
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.INT);
     public  static final EntityDataAccessor<Boolean> PANICKING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
     public  static final EntityDataAccessor<Boolean> EATING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
@@ -71,14 +66,20 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
     public int sparringCooldown = 150 + this.getRandom().nextInt(50);
     public int chargeTimer;
 
+    public static final RawAnimation IDLE = RawAnimation.begin().then("animation.glaceros.idle", Animation.LoopType.DEFAULT);
+    public static final RawAnimation EAT = RawAnimation.begin().then("animation.glaceros.eat", Animation.LoopType.DEFAULT);
+    public static final RawAnimation CHARGE = RawAnimation.begin().then("animation.glaceros.charge", Animation.LoopType.DEFAULT);
+    public static final RawAnimation CHARGE_PREPARE = RawAnimation.begin().then("animation.glaceros.charge_prepare", Animation.LoopType.DEFAULT);
+    public static final RawAnimation TAIL = RawAnimation.begin().then("animation.glaceros.tail", Animation.LoopType.DEFAULT);
+    public static final RawAnimation WALK = RawAnimation.begin().then("animation.glaceros.walk", Animation.LoopType.DEFAULT);
+    public static final RawAnimation FLEE = RawAnimation.begin().then("animation.glaceros.run", Animation.LoopType.DEFAULT);
+
     public GlacerosEntity(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
         this.xpReward = 5;
         this.setPathfindingMalus(PathType.DAMAGE_FIRE, -1.0F);
         this.setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
     }
-
-    public static void init(){}
 
     public static AttributeSupplier.Builder createAttributes() {
         return Animal.createMobAttributes()
@@ -90,8 +91,8 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
 
     public void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new GlacerosAlertPanicGoal(this, 2.5));
-        this.goalSelector.addGoal(3, new FollowParentGoal(this, 1.4));
+        this.goalSelector.addGoal(1, new GlacerosAlertPanicGoal(this, 3.5));
+        this.goalSelector.addGoal(3, new FollowParentGoal(this, 1));
         this.goalSelector.addGoal(4, new BreedGoal(this, 1.1));
         this.goalSelector.addGoal(5, new TemptGoal(this, 1, itemStack -> itemStack.is(this.getVariant().getDelphinium().asItem()) ,false));
         this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 1.0));
@@ -131,6 +132,27 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         } else {
             return Variant.BROAD;
         }
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<GeoAnimatable>(this, "main", 5, state -> {
+            if (this.isRushing()) return state.setAndContinue(CHARGE);
+            if (this.isCharging()) return state.setAndContinue(CHARGE_PREPARE);
+            if (this.isEating()) return state.setAndContinue(EAT);
+            if (!state.isMoving() && onGround()) return state.setAndContinue(IDLE);
+            if (isPanicking() || isRunning()) return state.setAndContinue(FLEE);
+            if (getDeltaMovement().horizontalDistanceSqr() > 1.0E-6D) return state.setAndContinue(WALK);
+            return PlayState.STOP;
+        })).add(new AnimationController<GeoAnimatable>(this, "second", 5, state -> PlayState.STOP)
+                .triggerableAnim("tail", TAIL));
+    }
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 
     static class GlacerosGroupData extends AgeableMob.AgeableMobGroupData {
@@ -176,22 +198,12 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
 
     public void tick() {
         super.tick();
-        if (level().isClientSide()) {
-            animateWhen("idle", !isMoving(this) && onGround());
-            animateWhen("eat", this.isEating());
-            if(this.getRandom().nextInt(this.isBaby() ? 30 : 100) == 0){
-                playAnimation("tail");
-            }
-            animateWhen("charge_prepare", this.isCharging());
-            animateWhen("charge", this.isRushing());
-        }
-
 
         if(sparringCooldown > 0){
             sparringCooldown--;
         }
 
-        if(!level().isClientSide){
+        if (!level().isClientSide) {
             if(alertCooldown != 0){
                 alertCooldown--;
             } else {
@@ -216,6 +228,10 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
                     this.setSheared(false);
                 }
             }
+
+            if (!this.isPanicking() && this.getRandom().nextInt(this.isBaby() ? 30 : 100) == 0){
+                triggerAnim("second", "tail");
+            }
         }
     }
 
@@ -238,31 +254,6 @@ public class GlacerosEntity extends Animal implements Animatable<GlacerosModel>,
         }
 
         return child;
-    }
-
-    @Override
-    public ResourceLocation getModelLocation() {
-        return null;
-    }
-
-    @Override
-    public DucAnimation getAnimation() {
-        return ANIMATION;
-    }
-
-    @Override
-    public Lazy<Map<String, AnimationState>> getAnimations() {
-        return animations;
-    }
-
-    @Override
-    public Optional<AnimationState> getAnimationState(String animation) {
-        return Optional.ofNullable(getAnimations().get().get("animation.glaceros." + animation));
-    }
-
-    @Override
-    public int tickCount() {
-        return tickCount;
     }
 
     @Override

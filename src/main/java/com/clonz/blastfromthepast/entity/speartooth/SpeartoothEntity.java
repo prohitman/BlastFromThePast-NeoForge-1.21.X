@@ -1,7 +1,6 @@
 package com.clonz.blastfromthepast.entity.speartooth;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.client.models.SpeartoothModel;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.Roaring;
 import com.clonz.blastfromthepast.entity.ai.goal.roar.RoarAtTargetGoal;
@@ -10,8 +9,6 @@ import com.clonz.blastfromthepast.entity.misc.StateValue;
 import com.clonz.blastfromthepast.entity.speartooth.ai.*;
 import com.clonz.blastfromthepast.init.*;
 import com.clonz.blastfromthepast.util.EntityHelper;
-import io.github.itskillerluc.duclib.client.animation.DucAnimation;
-import io.github.itskillerluc.duclib.entity.Animatable;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.Util;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -33,7 +30,7 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
-import net.minecraft.world.entity.animal.*;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.Creeper;
@@ -46,30 +43,41 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.util.Lazy;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, Animatable<SpeartoothModel>, Roaring /*, OverrideAnimatedAttacker<SpeartoothEntity, AAAAAAAAAAAAAAAAASpeartoothAttackType> */ {
-
-    public static final DucAnimation ADULT_ANIMATION = DucAnimation.create(ModEntities.SPEARTOOTH.getId());
-    public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.SPEARTOOTH.getId().withPrefix("baby_"));
-    private final Lazy<Map<String, AnimationState>> babyAnimations = Lazy.of(() -> SpeartoothModel.createStateMap(BABY_ANIMATION));
-    private final Lazy<Map<String, AnimationState>> adultAnimations = Lazy.of(() -> SpeartoothModel.createStateMap(ADULT_ANIMATION));
-
+public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, GeoEntity, Roaring /*, OverrideAnimatedAttacker<SpeartoothEntity, AAAAAAAAAAAAAAAAASpeartoothAttackType> */ {
     private static final EntityDimensions BABY_DIMENSIONS = ModEntities.SPEARTOOTH.get().getDimensions().scale(0.5F).withEyeHeight(0.55F);
 
     protected static final EntityDataAccessor<State> STATE = SynchedEntityData.defineId(SpeartoothEntity.class, ModDataSerializers.SPEARTOOTH_STATE.get());
     protected static final EntityDataAccessor<Texture> TEXTURE = SynchedEntityData.defineId(SpeartoothEntity.class, ModDataSerializers.SPEARTOOTH_TEXTURE.get());
 
     protected static final EntityDataAccessor<Integer> AGGRESSION_VAR = SynchedEntityData.defineId(SpeartoothEntity.class, EntityDataSerializers.INT);
+
+    public static final RawAnimation IDLE = RawAnimation.begin().then("animation.speartooth.idle", Animation.LoopType.DEFAULT);
+    public static final RawAnimation SLEEP = RawAnimation.begin().then("animation.speartooth.sleep", Animation.LoopType.DEFAULT);
+    public static final RawAnimation COLD = RawAnimation.begin().then("animation.speartooth.cold", Animation.LoopType.DEFAULT);
+    public static final RawAnimation DANCE = RawAnimation.begin().then("animation.speartooth.dance", Animation.LoopType.DEFAULT);
+    public static final RawAnimation NOISE = RawAnimation.begin().then("animation.speartooth.noise", Animation.LoopType.DEFAULT);
+    public static final RawAnimation EAR = RawAnimation.begin().then("animation.speartooth.ear", Animation.LoopType.DEFAULT);
+    public static final RawAnimation STRETCH = RawAnimation.begin().then("animation.speartooth.stretch", Animation.LoopType.DEFAULT);
+    public static final RawAnimation SIT = RawAnimation.begin().then("animation.speartooth.sit", Animation.LoopType.DEFAULT);
+    public static final RawAnimation STALK = RawAnimation.begin().then("animation.speartooth.stalk", Animation.LoopType.DEFAULT);
+    public static final RawAnimation BITE = RawAnimation.begin().then("animation.speartooth.bite", Animation.LoopType.DEFAULT);
+    public static final RawAnimation ROAR = RawAnimation.begin().then("animation.speartooth.roar", Animation.LoopType.DEFAULT);
+    public static final RawAnimation LUNGE = RawAnimation.begin().then("animation.speartooth.lunge", Animation.LoopType.DEFAULT);
+    public static final RawAnimation WALK = RawAnimation.begin().then("animation.speartooth.walk", Animation.LoopType.DEFAULT);
+    public static final RawAnimation RUN = RawAnimation.begin().then("animation.speartooth.run", Animation.LoopType.DEFAULT);
 
     @Nullable
     public UUID lastPouncedAt;
@@ -158,25 +166,7 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, An
     public void tick() {
         super.tick();
         State state = this.getState();
-        if (this.level().isClientSide) {
-//            Minecraft.getInstance().gui.setOverlayMessage(Component.literal(new Object().hashCode() + " : " + this.getState()), false);
-            this.animateWhen("idle",  state != State.SLEEP && state != State.COLD && !this.isMoving(this) && this.onGround());
-            this.animateWhen("sleep", state == State.SLEEP);
-
-            if (this.isBaby()) {
-                this.animateWhen("cold", state == State.COLD);
-            } else {
-                this.animateWhen("dance", state == State.DANCE);
-                this.animateWhen("noise", state == State.NOISE);
-                this.animateWhen("ear", state == State.EAR);
-                this.animateWhen("stretch", state == State.STRETCH);
-                this.animateWhen("sit", state == State.SIT);
-                this.animateWhen("stalk", state == State.STALK);
-                this.animateWhen("bite", state == State.BITE);
-                this.animateWhen("roar", state == State.ROAR);
-                this.animateWhen("lunge", state == State.LUNGE);
-            }
-        } else {
+        if (!this.level().isClientSide) {
             if (this.getTexture() == Texture.STALKING && state != State.STALK) {
                 this.setTexture(Texture.DEFAULT);
             }
@@ -199,46 +189,6 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, An
     public boolean isIdle() {
         State state = this.getState();
         return state == State.IDLE || state == State.NOISE || state == State.EAR || state == State.STRETCH || state == State.COLD;
-    }
-
-    /**
-     * @return the model location
-     */
-    @Override
-    public ResourceLocation getModelLocation() {
-        return null;
-    }
-
-    /**
-     * @return the DucAnimation
-     */
-    @Override
-    public DucAnimation getAnimation() {
-        return this.isBaby() ? BABY_ANIMATION : ADULT_ANIMATION;
-    }
-
-    /**
-     * @return Get a lazy with all animations and their keys.
-     */
-    @Override
-    public Lazy<Map<String, AnimationState>> getAnimations() {
-        return this.isBaby() ? this.babyAnimations : this.adultAnimations;
-    }
-
-    /**
-     * get the animation state for a key.
-     *
-     * @param animation animation key
-     * @return the animation state corresponding to the key.
-     */
-    @Override
-    public Optional<AnimationState> getAnimationState(String animation) {
-        return Optional.ofNullable(getAnimations().get().get((this.isBaby() ? "animation.baby_speartooth." : "animation.speartooth.") + animation));
-    }
-
-    @Override
-    public int tickCount() {
-        return this.tickCount;
     }
 
     @Override
@@ -264,9 +214,6 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, An
         builder = builder.add(Attributes.FOLLOW_RANGE, 64);
         builder = builder.add(Attributes.ATTACK_DAMAGE, 6);
         return builder;
-    }
-
-    public static void init() {
     }
 
     @Override
@@ -543,6 +490,41 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, An
     @Override
     public void setRoaring(boolean roaring) {
         this.setState(roaring ? State.ROAR : State.IDLE);
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<GeoAnimatable>(this, "main", 5, state1 -> {
+            State state = this.getState();
+            if (state == State.SLEEP) return state1.setAndContinue(SLEEP);
+
+            if (this.isBaby()) {
+                if (state == State.COLD) return state1.setAndContinue(COLD);
+            } else {
+                if (state == State.DANCE) return state1.setAndContinue(DANCE);
+                if (state == State.NOISE) return state1.setAndContinue(NOISE);
+                if (state == State.EAR) return state1.setAndContinue(EAR);
+                if (state == State.STRETCH) return state1.setAndContinue(STRETCH);
+                if (state == State.SIT) return state1.setAndContinue(SIT);
+                if (state == State.STALK) return state1.setAndContinue(STALK);
+                if (state == State.BITE) return state1.setAndContinue(BITE);
+                if (state == State.ROAR) return state1.setAndContinue(ROAR);
+                if (state == State.LUNGE) return state1.setAndContinue(LUNGE);
+            }
+            if (state != State.SLEEP && state != State.COLD && !state1.isMoving() && this.onGround()) return state1.setAndContinue(IDLE);
+            if (state1.isMoving()) {
+                if (!this.isBaby() && this.shouldRun()) return state1.setAndContinue(RUN);
+                return state1.setAndContinue(WALK);
+            }
+            return PlayState.STOP;
+        }));
+    }
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 
     public enum Texture implements StateValue {

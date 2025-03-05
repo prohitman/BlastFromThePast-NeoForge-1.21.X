@@ -1,17 +1,20 @@
 package com.clonz.blastfromthepast.entity.ai.goal.burrel;
 
-import com.clonz.blastfromthepast.entity.Burrel;
+import com.clonz.blastfromthepast.entity.BurrelEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.EnumSet;
+
 public class BurrelClimbTreeGoal extends Goal {
-    private final Burrel burrel;
+    private final BurrelEntity burrel;
     private float desiredYrot;
 
-    public BurrelClimbTreeGoal(Burrel burrel) {
+    public BurrelClimbTreeGoal(BurrelEntity burrel) {
         this.burrel = burrel;
+        this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP));
     }
 
     @Override

@@ -2,22 +2,20 @@ package com.clonz.blastfromthepast.entity;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.access.PlayerBFTPDataAccess;
-import com.clonz.blastfromthepast.client.models.HollowModel;
 import com.clonz.blastfromthepast.entity.misc.TransitioningState;
 import com.clonz.blastfromthepast.events.CuriosCompat;
 import com.clonz.blastfromthepast.init.ModDataSerializers;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.util.DebugFlags;
 import com.clonz.blastfromthepast.util.EntityHelper;
-import io.github.itskillerluc.duclib.client.animation.DucAnimation;
-import io.github.itskillerluc.duclib.entity.Animatable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -26,22 +24,26 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.util.FakePlayer;
-import net.neoforged.neoforge.common.util.Lazy;
 import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class HollowEntity extends LivingEntity implements Animatable<HollowModel> {
-    public static final DucAnimation ANIMATION = DucAnimation.create(ModEntities.HOLLOW.getId());
-    private final Lazy<Map<String, AnimationState>> ANIMATIONS = Lazy.of(() -> HollowModel.createStateMap(getAnimation()));
-    private final String ANIMATION_PREFIX = "animation." + ModEntities.HOLLOW.getId().getPath() + ".";
+public class HollowEntity extends LivingEntity implements GeoEntity {
     private static final EntityDataAccessor<TransitioningState> STATE = SynchedEntityData.defineId(HollowEntity.class, ModDataSerializers.TRANSITIONING_STATE.get());
     @Nullable
     private StoredInventory storedInventory;
@@ -49,30 +51,13 @@ public class HollowEntity extends LivingEntity implements Animatable<HollowModel
     private Player trackedPlayer;
     private int transitionTicks = -1;
 
+    public static final RawAnimation IDLE = RawAnimation.begin().then("animation.hollow.idle", Animation.LoopType.DEFAULT);
+    public static final RawAnimation IDLE_ORBLESS = RawAnimation.begin().then("animation.hollow.idle_orbless", Animation.LoopType.DEFAULT);
+    public static final RawAnimation ORB_SPAWN = RawAnimation.begin().then("animation.hollow.orb_spawn", Animation.LoopType.DEFAULT);
+    public static final RawAnimation ORB_DESPAWN = RawAnimation.begin().then("animation.hollow.orb_despawn", Animation.LoopType.DEFAULT);
+
     public HollowEntity(EntityType<? extends HollowEntity> hollowEntityEntityType, Level level) {
         super(hollowEntityEntityType, level);
-    }
-
-    public static void init() {}
-
-    @Override
-    public ResourceLocation getModelLocation() {
-        return null;
-    }
-
-    @Override
-    public DucAnimation getAnimation() {
-        return ANIMATION;
-    }
-
-    @Override
-    public Lazy<Map<String, AnimationState>> getAnimations() {
-        return ANIMATIONS;
-    }
-
-    @Override
-    public Optional<AnimationState> getAnimationState(String animation) {
-        return Optional.ofNullable(getAnimations().get().get(ANIMATION_PREFIX + animation));
     }
 
     public static HollowEntity create(ServerPlayer player) {
@@ -111,13 +96,6 @@ public class HollowEntity extends LivingEntity implements Animatable<HollowModel
         setDeltaMovement(0, 0, 0);
 
         TransitioningState state = getEntityData().get(STATE);
-
-        if (this.level().isClientSide()) {
-            this.animateWhen("idle_orbless", state == TransitioningState.INACTIVE || state == TransitioningState.ACTIVE_TO_INACTIVE);
-            this.animateWhen("idle", state == TransitioningState.ACTIVE);
-            this.animateWhen("orb_spawn", state == TransitioningState.INACTIVE_TO_ACTIVE);
-            this.animateWhen("orb_despawn", state == TransitioningState.ACTIVE_TO_INACTIVE);
-        }
 
         if (transitionTicks > 0) {
             transitionTicks--;
@@ -165,11 +143,6 @@ public class HollowEntity extends LivingEntity implements Animatable<HollowModel
     @Override
     public HumanoidArm getMainArm() {
         return HumanoidArm.RIGHT;
-    }
-
-    @Override
-    public int tickCount() {
-        return tickCount;
     }
 
     @Override
@@ -301,6 +274,25 @@ public class HollowEntity extends LivingEntity implements Animatable<HollowModel
         super.addAdditionalSaveData(compound);
         if (storedInventory != null)
             compound.put("stored_inventory", storedInventory.getSaveData(registryAccess()));
+    }
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<GeoAnimatable>(this, "main", 5, state -> {
+            TransitioningState state1 = getEntityData().get(STATE);
+            if (state1 == TransitioningState.INACTIVE_TO_ACTIVE) return state.setAndContinue(ORB_SPAWN);
+            if (state1 == TransitioningState.ACTIVE_TO_INACTIVE) return state.setAndContinue(ORB_DESPAWN);
+            if (state1 == TransitioningState.INACTIVE) return state.setAndContinue(IDLE_ORBLESS);
+            if (state1 == TransitioningState.ACTIVE) return state.setAndContinue(IDLE);
+            return PlayState.STOP;
+        }));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 
     public record StoredInventory(UUID playerUuid, ListTag inventoryData, Optional<List<ItemStack>> additionalItems) {

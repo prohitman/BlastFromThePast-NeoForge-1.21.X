@@ -1,14 +1,13 @@
 package com.clonz.blastfromthepast.entity;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.client.models.PsychoBearModel;
-import com.clonz.blastfromthepast.entity.ai.goal.complex_animal.SeekShelterGoal;
-import com.clonz.blastfromthepast.entity.ai.goal.*;
-import com.clonz.blastfromthepast.entity.ai.goal.attacker.AnimatedMeleeAttackGoal;
-import com.clonz.blastfromthepast.entity.ai.goal.complex_animal.MoveToOrSitWithItemGoal;
 import com.clonz.blastfromthepast.entity.ai.controller.OverridableBodyRotationControl;
 import com.clonz.blastfromthepast.entity.ai.controller.OverridableLookControl;
 import com.clonz.blastfromthepast.entity.ai.controller.OverridableMoveControl;
+import com.clonz.blastfromthepast.entity.ai.goal.*;
+import com.clonz.blastfromthepast.entity.ai.goal.attacker.AnimatedMeleeAttackGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.complex_animal.MoveToOrSitWithItemGoal;
+import com.clonz.blastfromthepast.entity.ai.goal.complex_animal.SeekShelterGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.complex_animal.SleepGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.roar.RoarAtTargetGoal;
 import com.clonz.blastfromthepast.entity.ai.navigation.BFTPGroundPathNavigation;
@@ -19,8 +18,6 @@ import com.clonz.blastfromthepast.init.ModTags;
 import com.clonz.blastfromthepast.util.DebugFlags;
 import com.clonz.blastfromthepast.util.EntityHelper;
 import com.clonz.blastfromthepast.util.HitboxHelper;
-import io.github.itskillerluc.duclib.client.animation.DucAnimation;
-import io.github.itskillerluc.duclib.entity.Animatable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -30,7 +27,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -55,17 +51,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.util.Lazy;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.Map;
-import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Predicate;
 
-public class PsychoBearEntity extends Animal implements Animatable<PsychoBearModel>, OverrideAnimatedAttacker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType>, ComplexAnimal, Pacifiable, Roaring, BackScratcher {
-    public static final DucAnimation ADULT_ANIMATION = DucAnimation.create(ModEntities.PSYCHO_BEAR.getId());
-    public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.PSYCHO_BEAR.getId().withPrefix("baby_"));
+public class PsychoBearEntity extends Animal implements GeoEntity, OverrideAnimatedAttacker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType>, ComplexAnimal, Pacifiable, Roaring, BackScratcher {
     public static final EntityDimensions PSYCHO_BEAR_BABY_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(18.0F), HitboxHelper.pixelsToBlocks(13.0F));
     private static final EntityDataAccessor<OptionalInt> DATA_ACTIVE_ATTACK_TYPE = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.OPTIONAL_UNSIGNED_INT);
     private static final EntityDataAccessor<Byte> DATA_FLAGS = SynchedEntityData.defineId(PsychoBearEntity.class, EntityDataSerializers.BYTE);
@@ -82,8 +78,6 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     public static final int MAX_ROAR_TICKS = Mth.floor(2.5F * 20);
     private static final TargetingConditions ALERT_CONDITIONS = TargetingConditions.forCombat().ignoreLineOfSight();
     public static final float ADULT_VERTICAL_WIDTH = HitboxHelper.pixelsToBlocks(21.0F);
-    private final Lazy<Map<String, AnimationState>> babyAnimations = Lazy.of(() -> PsychoBearModel.createStateMap(BABY_ANIMATION));
-    private final Lazy<Map<String, AnimationState>> adultAnimations = Lazy.of(() -> PsychoBearModel.createStateMap(ADULT_ANIMATION));
     private final AttackTicker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType> attackTicker = new AttackTicker<>(this);
     private int pacifiedTicks = 0;
     private int eatCounter = 0;
@@ -97,14 +91,24 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     private final TransitioningState.TransitionTicker sleepTicker = new TransitioningState.TransitionTicker(this::getSleepState, this::setSleepState, LIE_DOWN_DURATION, WAKE_UP_DURATION);
     private final TransitioningState.TransitionTicker backScratchTicker = new TransitioningState.TransitionTicker(this::getBackScratchState, this::setBackScratchState, BACK_SCRATCH_START_DURATION, BACK_SCRATCH_END_DURATION);
 
+    public static final RawAnimation IDLE = RawAnimation.begin().then("animation.psycho_bear.idle", Animation.LoopType.DEFAULT);
+    public static final RawAnimation ROAR = RawAnimation.begin().then("animation.psycho_bear.roar", Animation.LoopType.DEFAULT);
+    public static final RawAnimation ATTACK_FLIPPED = RawAnimation.begin().then("animation.psycho_bear.attack_flipped", Animation.LoopType.DEFAULT);
+    public static final RawAnimation ATTACK = RawAnimation.begin().then("animation.psycho_bear.attack", Animation.LoopType.DEFAULT);
+    public static final RawAnimation EAT = RawAnimation.begin().then("animation.psycho_bear.eat", Animation.LoopType.DEFAULT);
+    public static final RawAnimation SLEEP_START = RawAnimation.begin().then("animation.psycho_bear.sleep_start", Animation.LoopType.DEFAULT);
+    public static final RawAnimation SLEEP = RawAnimation.begin().then("animation.psycho_bear.sleep", Animation.LoopType.DEFAULT);
+    public static final RawAnimation SLEEP_END = RawAnimation.begin().then("animation.psycho_bear.sleep_end", Animation.LoopType.DEFAULT);
+    public static final RawAnimation SCRATCH_START = RawAnimation.begin().then("animation.psycho_bear.back_scratch_start", Animation.LoopType.DEFAULT);
+    public static final RawAnimation SCRATCH_LOOP = RawAnimation.begin().then("animation.psycho_bear.back_scratch_loop", Animation.LoopType.DEFAULT);
+    public static final RawAnimation SCRATCH_STOP = RawAnimation.begin().then("animation.psycho_bear.back_scratch_stop", Animation.LoopType.DEFAULT);
+    public static final RawAnimation WALK = RawAnimation.begin().then("animation.psycho_bear.walk", Animation.LoopType.DEFAULT);
+
     public PsychoBearEntity(EntityType<? extends PsychoBearEntity> entityType, Level level) {
         super(entityType, level);
         this.lookControl = new OverridableLookControl<>(this);
         this.moveControl = new OverridableMoveControl<>(this);
         this.setCanPickUpLoot(true);
-    }
-
-    public static void init() {
     }
 
     public static AttributeSupplier.Builder createAttributes(){
@@ -313,35 +317,6 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     }
 
     @Override
-    public ResourceLocation getModelLocation() {
-        return null;
-    }
-
-    @Override
-    public DucAnimation getAnimation() {
-        return this.isBaby() ? BABY_ANIMATION : ADULT_ANIMATION;
-    }
-
-    @Override
-    public Lazy<Map<String, AnimationState>> getAnimations() {
-        return this.isBaby() ? this.babyAnimations : this.adultAnimations;
-    }
-
-    @Override
-    public Optional<AnimationState> getAnimationState(String animation) {
-        return Optional.ofNullable(this.getAnimations().get().get(this.getAnimationKey(animation)));
-    }
-
-    public String getAnimationKey(String animation) {
-        return "animation.psycho_bear." + animation;
-    }
-
-    @Override
-    public int tickCount() {
-        return this.tickCount;
-    }
-
-    @Override
     public void tick() {
         super.tick();
         if (this.isEffectiveAi()) {
@@ -358,23 +333,7 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
                 this.setEating(false);
             }
         }
-
-        PsychoBearEntity.PsychoBearAttackType activeAttackType = this.getActiveAttackType();
-        if (this.level().isClientSide()) {
-            this.animateWhen("idle", !this.isMoving(this) && !this.isAllActionBlocked() && this.onGround() && activeAttackType == null);
-            if(!this.isBaby()){
-                this.animateWhen("roar", this.isRoaring());
-                this.animateWhen("attack_flipped", activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && !this.isLeftHanded());
-                this.animateWhen("attack", activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && this.isLeftHanded());
-                this.animateWhen("eat", activeAttackType == null && this.isEating());
-                this.animateWhen("sleep_start", activeAttackType == null && this.getSleepState() == TransitioningState.INACTIVE_TO_ACTIVE);
-                this.animateWhen("sleep", activeAttackType == null && this.getSleepState() == TransitioningState.ACTIVE);
-                this.animateWhen("sleep_end", activeAttackType == null && this.getSleepState() == TransitioningState.ACTIVE_TO_INACTIVE);
-                this.animateWhen("back_scratch_start", activeAttackType == null && this.getBackScratchState() == TransitioningState.INACTIVE_TO_ACTIVE);
-                this.animateWhen("back_scratch_loop", activeAttackType == null && this.getBackScratchState() == TransitioningState.ACTIVE);
-                this.animateWhen("back_scratch_stop", activeAttackType == null && this.getBackScratchState() == TransitioningState.ACTIVE_TO_INACTIVE);
-            }
-        }
+        
         if (!this.canRotateHead()) {
             this.clampHeadRotationToBody();
         }
@@ -874,6 +833,35 @@ public class PsychoBearEntity extends Animal implements Animatable<PsychoBearMod
     private static final double MINIMUM_ATTACK_SIZE = HitboxHelper.calculateMinimumAttackHitboxWidth(ModEntities.PSYCHO_BEAR.get().getWidth());
     // Adding 1 to the minimum attack size allows targets whose hitboxes are up to 0.5F blocks away from one of the attackers hitbox's corners to be hit
     private static final Vec3 DEFAULT_ATTACK_SIZE = new Vec3(MINIMUM_ATTACK_SIZE + 1, MINIMUM_ATTACK_SIZE + 1, MINIMUM_ATTACK_SIZE + 1);
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<GeoAnimatable>(this, "main", 5, state -> {
+            PsychoBearEntity.PsychoBearAttackType activeAttackType = this.getActiveAttackType();
+            if(!this.isBaby()){
+                if (this.isRoaring()) return state.setAndContinue(ROAR);
+                if (activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && !this.isLeftHanded()) return state.setAndContinue(ATTACK_FLIPPED);
+                if (activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && this.isLeftHanded()) return state.setAndContinue(ATTACK);
+                if (activeAttackType == null && this.isEating()) state.setAndContinue(EAT);
+                if (activeAttackType == null && this.getSleepState() == TransitioningState.INACTIVE_TO_ACTIVE) return state.setAndContinue(SLEEP_START);
+                if (activeAttackType == null && this.getSleepState() == TransitioningState.ACTIVE) return state.setAndContinue(SLEEP);
+                if (activeAttackType == null && this.getSleepState() == TransitioningState.ACTIVE_TO_INACTIVE) return state.setAndContinue(SLEEP_END);
+                if (activeAttackType == null && this.getBackScratchState() == TransitioningState.INACTIVE_TO_ACTIVE) return state.setAndContinue(SCRATCH_START);
+                if (activeAttackType == null && this.getBackScratchState() == TransitioningState.ACTIVE) return state.setAndContinue(SCRATCH_LOOP);
+                if (activeAttackType == null && this.getBackScratchState() == TransitioningState.ACTIVE_TO_INACTIVE) return state.setAndContinue(SCRATCH_STOP);
+            }
+            if (!state.isMoving() && !this.isAllActionBlocked() && this.onGround() && activeAttackType == null) return state.setAndContinue(IDLE);
+            if (state.isMoving()) return state.setAndContinue(WALK);
+            return PlayState.STOP;
+        }));
+    }
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
+    }
 
     public enum PsychoBearAttackType implements AnimatedAttacker.AttackType<PsychoBearEntity, PsychoBearAttackType> {
         BITE(Mth.floor(0.38F * 20), 20, DEFAULT_ATTACK_SIZE, 8F, 0F),

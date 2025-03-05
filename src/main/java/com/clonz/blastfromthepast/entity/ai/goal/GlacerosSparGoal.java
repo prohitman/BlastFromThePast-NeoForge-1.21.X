@@ -1,9 +1,7 @@
 package com.clonz.blastfromthepast.entity.ai.goal;
 
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
-import com.clonz.blastfromthepast.init.ModSounds;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.level.pathfinder.Path;
 
 import javax.annotation.Nullable;

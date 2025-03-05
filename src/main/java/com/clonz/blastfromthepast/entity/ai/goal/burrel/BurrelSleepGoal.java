@@ -1,6 +1,6 @@
 package com.clonz.blastfromthepast.entity.ai.goal.burrel;
 
-import com.clonz.blastfromthepast.entity.Burrel;
+import com.clonz.blastfromthepast.entity.BurrelEntity;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.block.state.BlockState;
@@ -8,9 +8,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.EnumSet;
 
 public class BurrelSleepGoal extends Goal {
-    private final Burrel burrel;
+    private final BurrelEntity burrel;
 
-    public BurrelSleepGoal(Burrel burrel) {
+    public BurrelSleepGoal(BurrelEntity burrel) {
         this.burrel = burrel;
         this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP));
     }

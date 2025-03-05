@@ -1,6 +1,6 @@
 package com.clonz.blastfromthepast.entity.ai.goal.burrel;
 
-import com.clonz.blastfromthepast.entity.Burrel;
+import com.clonz.blastfromthepast.entity.BurrelEntity;
 import com.clonz.blastfromthepast.entity.ai.navigation.AzureNavigation;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
@@ -18,11 +18,11 @@ import net.minecraft.world.phys.Vec3;
 import java.util.EnumSet;
 
 public class BurrelGoToTreesGoal extends Goal {
-    private final Burrel burrel;
+    private final BurrelEntity burrel;
     private final double speed;
     private BlockPos target;
 
-    public BurrelGoToTreesGoal(Burrel burrel, double speed) {
+    public BurrelGoToTreesGoal(BurrelEntity burrel, double speed) {
         this.burrel = burrel;
         this.speed = speed;
         this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP));
@@ -149,9 +149,11 @@ public class BurrelGoToTreesGoal extends Goal {
     @Override
     public void stop() {
         BlockPos treePos = burrel.targetTree;
-        if (this.burrel.distanceToSqr(treePos.getX(), burrel.getY(), treePos.getZ()) <= 2) {
-            burrel.moveTo(target.getCenter());
-            burrel.setBesideClimbableBlock(true);
+        if (treePos != null) {
+            if (this.burrel.distanceToSqr(treePos.getX(), burrel.getY(), treePos.getZ()) <= 2) {
+                burrel.moveTo(target.getCenter());
+                burrel.setBesideClimbableBlock(true);
+            }
         }
         this.burrel.getNavigation().stop();
     }

@@ -10,6 +10,7 @@
   "mixins": [
     "AbstractArrowMixin",
     "AbstractChestedHorseAccessor",
+    "BoatAccessor",
     "BreedGoalAccessor",
     "ContainerOpenersCounterMixin",
     "DecoratedPotPatternsMixin",
@@ -21,16 +22,16 @@
     "MeleeAttackGoalAccessor",
     "MoveToBlockGoalAccessor",
     "PathAccessor",
+    "PlayerMixin",
     "ServerPlayerAccessor",
-    "WalkNodeEvaluatorAccess",
-    "PlayerMixin"
+    "WalkNodeEvaluatorAccess"
   ],
   "client": [
-    "client.HumanoidModelMixin",
     "client.CameraMixin",
     "client.FogRendererMixin",
     "client.FogTypeMixin",
-    "client.PlayerModelMixin",
-    "client.InventoryScreenMixin"
+    "client.HumanoidModelMixin",
+    "client.InventoryScreenMixin",
+    "client.PlayerModelMixin"
   ]
 }

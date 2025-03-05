@@ -1,24 +1,21 @@
 package com.clonz.blastfromthepast.entity.projectile;
 
-import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.client.models.SnowdoModel;
-import com.clonz.blastfromthepast.client.models.item.IceSpearModel;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
-import io.github.itskillerluc.duclib.client.animation.DucAnimation;
-import io.github.itskillerluc.duclib.entity.Animatable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
@@ -27,17 +24,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.util.Lazy;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
-import java.util.Map;
-import java.util.Optional;
 
-public class ThrownIceSpear extends AbstractArrow implements Animatable<IceSpearModel> {
-    public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "ice_spear");
-    public static final DucAnimation ANIMATION = DucAnimation.create(LOCATION);
-    private final Lazy<Map<String, AnimationState>> animations = Lazy.of(() -> SnowdoModel.createStateMap(getAnimation()));
-
+public class ThrownIceSpear extends AbstractArrow implements GeoItem {
     private final ItemStack spearItem = new ItemStack(ModItems.ICE_SPEAR.get());
     private static final EntityDataAccessor<Byte> ID_LOYALTY;
     private static final EntityDataAccessor<Boolean> ID_FOIL;
@@ -232,27 +226,12 @@ public class ThrownIceSpear extends AbstractArrow implements Animatable<IceSpear
     }
 
     @Override
-    public ResourceLocation getModelLocation() {
-        return null;
-    }
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {}
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     @Override
-    public DucAnimation getAnimation() {
-        return ANIMATION;
-    }
-
-    @Override
-    public Lazy<Map<String, AnimationState>> getAnimations() {
-        return animations;
-    }
-
-    @Override
-    public Optional<AnimationState> getAnimationState(String animation) {
-        return Optional.ofNullable(getAnimations().get().get("animation.ice_spear." + animation));
-    }
-
-    @Override
-    public int tickCount() {
-        return tickCount;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 }

@@ -1,7 +1,6 @@
 package com.clonz.blastfromthepast.item;
 
 import com.clonz.blastfromthepast.entity.projectile.ThrownIceSpear;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -33,12 +32,10 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 public class IceSpear extends Item implements ProjectileItem {
 

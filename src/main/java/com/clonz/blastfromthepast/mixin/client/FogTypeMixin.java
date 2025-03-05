@@ -1,7 +1,6 @@
 package com.clonz.blastfromthepast.mixin.client;
 
 import com.clonz.blastfromthepast.block.TarBlock;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.level.material.FogType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

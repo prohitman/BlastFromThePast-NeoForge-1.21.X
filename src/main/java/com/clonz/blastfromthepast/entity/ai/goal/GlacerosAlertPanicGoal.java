@@ -1,7 +1,6 @@
 package com.clonz.blastfromthepast.entity.ai.goal;
 
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
-import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.PanicGoal;
 
 public class GlacerosAlertPanicGoal extends PanicGoal {

@@ -1,8 +1,6 @@
 package com.clonz.blastfromthepast.events;
 
 import com.clonz.blastfromthepast.access.PlayerBFTPDataAccess;
-import com.google.common.collect.Streams;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;

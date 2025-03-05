@@ -1,22 +1,16 @@
 package com.clonz.blastfromthepast;
 
-import com.clonz.blastfromthepast.client.models.*;
 import com.clonz.blastfromthepast.client.models.boats.BFTPBoatModel;
 import com.clonz.blastfromthepast.client.models.boats.BFTPChestBoatModel;
-import com.clonz.blastfromthepast.client.models.item.IceSpearModel;
-import com.clonz.blastfromthepast.client.renderers.*;
 import com.clonz.blastfromthepast.client.renderers.boat.BFTPBoatRenderer;
+import com.clonz.blastfromthepast.client.renderers.entity.*;
+import com.clonz.blastfromthepast.client.renderers.projectile.TarArrowRenderer;
 import com.clonz.blastfromthepast.client.renderers.projectile.ThrownIceSpearRenderer;
-import com.clonz.blastfromthepast.entity.GlacerosEntity;
-import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
-import com.clonz.blastfromthepast.entity.Burrel;
 import com.clonz.blastfromthepast.entity.pack.EntityPacks;
-import com.clonz.blastfromthepast.entity.projectile.ThrownIceSpear;
 import com.clonz.blastfromthepast.events.CuriosCompat;
 import com.clonz.blastfromthepast.init.*;
 import com.mojang.logging.LogUtils;
-import io.github.itskillerluc.duclib.client.model.BaseDucModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
@@ -132,21 +126,6 @@ public class BlastFromThePast {
 
         @SubscribeEvent
         public static void registerLayers(final EntityRenderersEvent.RegisterLayerDefinitions event) {
-            event.registerLayerDefinition(IceSpearModel.LOCATION, () -> BaseDucModel.getLakeDefinition(ThrownIceSpear.LOCATION));
-            event.registerLayerDefinition(GlacerosModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(GlacerosEntity.LOCATION));
-            event.registerLayerDefinition(GlacerosModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.GLACEROS.getId().withPrefix("baby_")));
-            event.registerLayerDefinition(SnowdoModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.SNOWDO.getId().withPrefix("baby_")));
-            event.registerLayerDefinition(SnowdoModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(SnowdoEntity.LOCATION));
-            event.registerLayerDefinition(FrostomperModel.ADULT_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.FROSTOMPER.getId()));
-            event.registerLayerDefinition(FrostomperModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.FROSTOMPER.getId().withPrefix("baby_")));
-            event.registerLayerDefinition(SpeartoothModel.ADULT_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.SPEARTOOTH.getId()));
-            event.registerLayerDefinition(SpeartoothModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.SPEARTOOTH.getId().withPrefix("baby_")));
-            event.registerLayerDefinition(BurrelModel.LOCATION, () -> BaseDucModel.getLakeDefinition(Burrel.LOCATION));
-            event.registerLayerDefinition(BurrelModel.BABY_LOCATION, () -> BaseDucModel.getLakeDefinition(Burrel.BABY_LOCATION));
-            event.registerLayerDefinition(PsychoBearModel.ADULT_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.PSYCHO_BEAR.getId()));
-            event.registerLayerDefinition(PsychoBearModel.BABY_LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.PSYCHO_BEAR.getId().withPrefix("baby_")));
-            event.registerLayerDefinition(HollowModel.LAYER_LOCATION, () -> BaseDucModel.getLakeDefinition(ModEntities.HOLLOW.getId()));
-
             for (BFTPBoat.BoatType boat$type : BFTPBoat.BoatType.values()) {
                 event.registerLayerDefinition(BFTPBoatRenderer.createBoatModelName(boat$type), BFTPBoatModel::createBodyModel);
                 event.registerLayerDefinition(BFTPBoatRenderer.createChestBoatModelName(boat$type), BFTPChestBoatModel::createBodyModel);

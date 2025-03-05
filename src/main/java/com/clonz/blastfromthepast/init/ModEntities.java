@@ -4,7 +4,6 @@ import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.*;
 import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
 import com.clonz.blastfromthepast.entity.boats.BFTPChestBoat;
-import com.clonz.blastfromthepast.entity.Burrel;
 import com.clonz.blastfromthepast.entity.projectile.ThrownIceSpear;
 import com.clonz.blastfromthepast.entity.speartooth.SpeartoothEntity;
 import com.clonz.blastfromthepast.util.HitboxHelper;
@@ -15,7 +14,6 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -50,7 +48,7 @@ public class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<SpeartoothEntity>> SPEARTOOTH = registerMobWithEyeHeight("speartooth", SpeartoothEntity::new
             , 0.9F, 1.3F, 1.25F, 0x302220, 0xACACAC);
 
-    public static final DeferredHolder<EntityType<?>, EntityType<Burrel>> BURREL = registerMob("burrel", Burrel::new
+    public static final DeferredHolder<EntityType<?>, EntityType<BurrelEntity>> BURREL = registerMob("burrel", BurrelEntity::new
             , 1.0F, 1.0F, 0x302220, 0xACACAC);
 
     public static final DeferredHolder<EntityType<?>, EntityType<ThrownIceSpear>> ICE_SPEAR = ENTITIES.register("ice_spear",
@@ -85,26 +83,11 @@ public class ModEntities {
             .build(getName("tar_arrow")));
 
     @SubscribeEvent
-    public static void init(FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> GlacerosEntity.init());
-        event.enqueueWork(() -> SnowdoEntity.init());
-        event.enqueueWork(() -> SpeartoothEntity.init());
-        event.enqueueWork(() -> Burrel.init());
-        event.enqueueWork(() -> {
-            GlacerosEntity.init();
-            SnowdoEntity.init();
-            FrostomperEntity.init();
-            PsychoBearEntity.init();
-            HollowEntity.init();
-        });
-    }
-
-    @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(ModEntities.GLACEROS.get(), GlacerosEntity.createAttributes().build());
         event.put(ModEntities.SNOWDO.get(), SnowdoEntity.createAttributes().build());
         event.put(ModEntities.SPEARTOOTH.get(), SpeartoothEntity.createAttributes().build());
-        event.put(ModEntities.BURREL.get(), Burrel.createAttributes().build());
+        event.put(ModEntities.BURREL.get(), BurrelEntity.createAttributes().build());
         event.put(ModEntities.FROSTOMPER.get(), FrostomperEntity.createAttributes().build());
         event.put(ModEntities.PSYCHO_BEAR.get(), PsychoBearEntity.createAttributes().build());
         event.put(ModEntities.HOLLOW.get(), HollowEntity.createLivingAttributes().add(Attributes.MAX_HEALTH, 200F).add(Attributes.GRAVITY, 0).build());

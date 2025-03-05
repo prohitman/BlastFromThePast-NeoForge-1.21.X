@@ -1,15 +1,14 @@
 package com.clonz.blastfromthepast.entity;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.client.models.FrostomperModel;
+import com.clonz.blastfromthepast.entity.ai.controller.OverridableBodyRotationControl;
+import com.clonz.blastfromthepast.entity.ai.controller.OverridableLookControl;
+import com.clonz.blastfromthepast.entity.ai.controller.OverridableMoveControl;
 import com.clonz.blastfromthepast.entity.ai.goal.CustomPanicGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.HitboxAdjustedBreedGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.HitboxAdjustedFollowParentGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.attacker.AnimatedMeleeAttackGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.charge.ChargeForwardAttackGoal;
-import com.clonz.blastfromthepast.entity.ai.controller.OverridableBodyRotationControl;
-import com.clonz.blastfromthepast.entity.ai.controller.OverridableLookControl;
-import com.clonz.blastfromthepast.entity.ai.controller.OverridableMoveControl;
 import com.clonz.blastfromthepast.entity.ai.goal.pack.PackHurtByTargetGoal;
 import com.clonz.blastfromthepast.entity.ai.navigation.AzureNavigation;
 import com.clonz.blastfromthepast.entity.misc.AnimatedAttacker;
@@ -17,25 +16,24 @@ import com.clonz.blastfromthepast.entity.misc.ChargeForward;
 import com.clonz.blastfromthepast.entity.misc.OverrideAnimatedAttacker;
 import com.clonz.blastfromthepast.entity.misc.StateValue;
 import com.clonz.blastfromthepast.entity.pack.EntityPack;
-import com.clonz.blastfromthepast.entity.ai.navigation.BFTPGroundPathNavigation;
 import com.clonz.blastfromthepast.entity.pack.EntityPackAgeableMobData;
 import com.clonz.blastfromthepast.entity.pack.EntityPackHolder;
-import com.clonz.blastfromthepast.init.*;
+import com.clonz.blastfromthepast.init.ModDataSerializers;
+import com.clonz.blastfromthepast.init.ModEntities;
+import com.clonz.blastfromthepast.init.ModSounds;
+import com.clonz.blastfromthepast.init.ModTags;
 import com.clonz.blastfromthepast.mixin.AbstractChestedHorseAccessor;
 import com.clonz.blastfromthepast.network.FrostomperCollidePayload;
 import com.clonz.blastfromthepast.util.DebugFlags;
 import com.clonz.blastfromthepast.util.EntityHelper;
 import com.clonz.blastfromthepast.util.HitboxHelper;
 import com.google.common.base.Predicates;
-import io.github.itskillerluc.duclib.client.animation.DucAnimation;
-import io.github.itskillerluc.duclib.entity.Animatable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -67,18 +65,23 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
-import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.Predicate;
 @ParametersAreNonnullByDefault
-public class FrostomperEntity extends AbstractChestedHorse implements Animatable<FrostomperModel>, EntityPackHolder<FrostomperEntity>, OverrideAnimatedAttacker<FrostomperEntity, FrostomperEntity.FrostomperAttackType>, ChargeForward, Roaring {
-    public static final DucAnimation ADULT_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId());
-    public static final DucAnimation BABY_ANIMATION = DucAnimation.create(ModEntities.FROSTOMPER.getId().withPrefix("baby_"));
+public class FrostomperEntity extends AbstractChestedHorse implements GeoEntity, EntityPackHolder<FrostomperEntity>, OverrideAnimatedAttacker<FrostomperEntity, FrostomperEntity.FrostomperAttackType>, ChargeForward, Roaring {
     public static final EntityDimensions BABY_FROSTOMPER_DIMENSIONS = EntityDimensions.scalable(HitboxHelper.pixelsToBlocks(28.0F), HitboxHelper.pixelsToBlocks(22.0F));
     private static final EntityDataAccessor<OptionalInt> DATA_ACTIVE_ATTACK_TYPE = SynchedEntityData.defineId(FrostomperEntity.class, EntityDataSerializers.OPTIONAL_UNSIGNED_INT);
     private static final EntityDataAccessor<IdleState> DATA_IDLE_STATE = SynchedEntityData.defineId(FrostomperEntity.class, ModDataSerializers.FROSTOMPER_IDLE_STATE.get());
@@ -89,8 +92,6 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     private static final UniformInt CHARGE_ATTACK_DURATION = UniformInt.of(Mth.floor(20 / 0.3F), Mth.floor(25 / 0.3F)); // Distances in blocks divided by Frostomper's base speed of 0.3 blocks/tick
     public static final int MAX_TRUMPET_TICKS_ADULT = Mth.floor(1.5F * 20);
     public static final int MAX_TRUMPET_TICKS_BABY = Mth.floor(0.4167F * 20);
-    private final Lazy<Map<String, AnimationState>> babyAnimations = Lazy.of(() -> FrostomperModel.createStateMap(BABY_ANIMATION));
-    private final Lazy<Map<String, AnimationState>> adultAnimations = Lazy.of(() -> FrostomperModel.createStateMap(ADULT_ANIMATION));
     protected static final TargetingConditions PARENT_TARGETING = TargetingConditions.forNonCombat()
             .ignoreLineOfSight()
             .selector(entity -> entity instanceof FrostomperEntity && ((FrostomperEntity)entity).isBred());
@@ -104,6 +105,17 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
     private int idleAnimationTimer = -1;
     private boolean lastCollide = false;
     public boolean serverHorizontalCollide = false;
+
+    public static final RawAnimation IDLE = RawAnimation.begin().then("animation.frostomper.idle", Animation.LoopType.DEFAULT);
+    public static final RawAnimation CRUSH = RawAnimation.begin().then("animation.frostomper.crush", Animation.LoopType.DEFAULT);
+    public static final RawAnimation STOMP = RawAnimation.begin().then("animation.frostomper.stomp", Animation.LoopType.DEFAULT);
+    public static final RawAnimation STOMP_FLIPPED = RawAnimation.begin().then("animation.frostomper.stomp_flipped", Animation.LoopType.DEFAULT);
+    public static final RawAnimation FLING = RawAnimation.begin().then("animation.frostomper.fling", Animation.LoopType.DEFAULT);
+    public static final RawAnimation CHARGE = RawAnimation.begin().then("animation.frostomper.charge", Animation.LoopType.DEFAULT);
+    public static final RawAnimation TAILS = RawAnimation.begin().then("animation.frostomper.tails", Animation.LoopType.DEFAULT);
+    public static final RawAnimation EARS = RawAnimation.begin().then("animation.frostomper.ears", Animation.LoopType.DEFAULT);
+    public static final RawAnimation WALK = RawAnimation.begin().then("animation.frostomper.walk", Animation.LoopType.DEFAULT);
+    public static final RawAnimation TRUMPET = RawAnimation.begin().then("animation.frostomper.trumpet", Animation.LoopType.DEFAULT);
 
     public FrostomperEntity(EntityType<? extends FrostomperEntity> entityType, Level level) {
         super(entityType, level);
@@ -123,9 +135,6 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 .add(Attributes.ATTACK_KNOCKBACK, 1.5)
                 .add(Attributes.FOLLOW_RANGE, 32.0)
                 .add(Attributes.STEP_HEIGHT, 1.0);
-    }
-
-    public static void init() {
     }
 
     @Override
@@ -204,26 +213,6 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
 
     public int getMaxHeadYRot() {
         return 45;
-    }
-
-    @Override
-    public ResourceLocation getModelLocation() {
-        return null;
-    }
-
-    @Override
-    public DucAnimation getAnimation() {
-        return this.isBaby() ? BABY_ANIMATION : ADULT_ANIMATION;
-    }
-
-    @Override
-    public Lazy<Map<String, AnimationState>> getAnimations() {
-        return this.isBaby() ? this.babyAnimations : this.adultAnimations;
-    }
-
-    @Override
-    public Optional<AnimationState> getAnimationState(String animation) {
-        return Optional.ofNullable(this.getAnimations().get().get(this.getAnimationKey(animation)));
     }
 
     public String getAnimationKey(String animation) {
@@ -495,24 +484,6 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             }
         }
 
-        FrostomperAttackType activeAttackType = this.getActiveAttackType();
-        if (this.level().isClientSide()) {
-            this.animateWhen("idle", !this.isMoving(this) && this.onGround() && activeAttackType == null);
-            this.animateWhen("trumpet", this.isRoaring());
-            if(!this.isBaby()) {
-                if (!this.canRotateHead()) {
-                    this.setYBodyRot(this.getYRot());
-                }
-                this.animateWhen("crush", activeAttackType == FrostomperAttackType.DOUBLE_STOMP);
-                this.animateWhen("stomp", activeAttackType == FrostomperAttackType.SINGLE_STOMP && !this.isLeftHanded());
-                this.animateWhen("stomp_flipped", activeAttackType == FrostomperAttackType.SINGLE_STOMP && this.isLeftHanded());
-                this.animateWhen("fling", activeAttackType == FrostomperAttackType.FLING);
-                this.animateWhen("charge", activeAttackType == FrostomperAttackType.CHARGE);
-                IdleState idleState = this.getEntityData().get(DATA_IDLE_STATE);
-                this.animateWhen("tail", idleState == IdleState.TAIL);
-                this.animateWhen("ears", idleState == IdleState.EARS);
-            }
-        }
         this.attackTicker.tick();
         // tick charge cooldown
         if (this.ticksUntilNextCharge > 0) {
@@ -534,11 +505,6 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
                 trumpetCounter--;
             }
         }
-    }
-
-    @Override
-    public int tickCount() {
-        return this.tickCount;
     }
 
     @Override
@@ -766,6 +732,37 @@ public class FrostomperEntity extends AbstractChestedHorse implements Animatable
             return false;
         }
         return OverrideAnimatedAttacker.super.canAnimateLook();
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<GeoAnimatable>(this, "main", 5, state -> {
+            FrostomperAttackType activeAttackType = this.getActiveAttackType();
+            if(!this.isBaby()) {
+                if (!this.canRotateHead()) {
+                    this.setYBodyRot(this.getYRot());
+                }
+                if (activeAttackType == FrostomperAttackType.DOUBLE_STOMP) return state.setAndContinue(CRUSH);
+                if (activeAttackType == FrostomperAttackType.SINGLE_STOMP && !this.isLeftHanded()) return state.setAndContinue(STOMP);
+                if (activeAttackType == FrostomperAttackType.SINGLE_STOMP && this.isLeftHanded()) return state.setAndContinue(STOMP_FLIPPED);
+                if (activeAttackType == FrostomperAttackType.FLING) return state.setAndContinue(FLING);
+                if (activeAttackType == FrostomperAttackType.CHARGE) return state.setAndContinue(CHARGE);
+                IdleState idleState = this.getEntityData().get(DATA_IDLE_STATE);
+                if (idleState == IdleState.TAIL) return state.setAndContinue(TAILS);
+                if (idleState == IdleState.EARS) return state.setAndContinue(EARS);
+            }
+            if (this.isRoaring()) return state.setAndContinue(TRUMPET);
+            if (!state.isMoving() && this.onGround() && activeAttackType == null) return state.setAndContinue(IDLE);
+            if (state.isMoving()) return state.setAndContinue(WALK);
+            return PlayState.STOP;
+        }));
+    }
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
     }
 
     protected static class FrostomperGroupData extends EntityPackAgeableMobData<FrostomperEntity> {

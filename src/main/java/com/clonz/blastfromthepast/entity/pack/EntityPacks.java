@@ -2,10 +2,6 @@ package com.clonz.blastfromthepast.entity.pack;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.google.common.collect.Maps;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
-
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -14,6 +10,10 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.saveddata.SavedData;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 
 public class EntityPacks extends SavedData {
     private static final String ENTITY_PACKS_FILE_ID = "entity_packs";

@@ -10,7 +10,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.*;
+import java.util.EnumSet;
 
 public class ChargeForwardAttackGoal<T extends PathfinderMob & ChargeForward> extends Goal {
     private final T mob;

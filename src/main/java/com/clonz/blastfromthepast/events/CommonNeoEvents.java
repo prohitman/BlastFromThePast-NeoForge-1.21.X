@@ -1,14 +1,13 @@
 package com.clonz.blastfromthepast.events;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.network.BurrelEatPayload;
+import com.clonz.blastfromthepast.block.BFTPWoodGroup;
+import com.clonz.blastfromthepast.init.ModBlocks;
+import com.clonz.blastfromthepast.init.ModDecoratedPatterns;
 import com.clonz.blastfromthepast.network.FrostomperCollidePayload;
 import com.clonz.blastfromthepast.network.RiddenEntityPayload;
 import com.clonz.blastfromthepast.network.ServerPayloadHandler;
 import com.clonz.blastfromthepast.worldgen.biome.BFTPOverworldRegion;
-import com.clonz.blastfromthepast.block.BFTPWoodGroup;
-import com.clonz.blastfromthepast.init.ModBlocks;
-import com.clonz.blastfromthepast.init.ModDecoratedPatterns;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -43,7 +42,6 @@ public class CommonNeoEvents {
                 RiddenEntityPayload.STREAM_CODEC,
                 ServerPayloadHandler::handleRiddenEntityPayload
         );
-        registrar.playToClient(BurrelEatPayload.TYPE, BurrelEatPayload.STREAM_CODEC, ServerPayloadHandler::handleBurrelEatPayload);
         registrar.playToServer(FrostomperCollidePayload.TYPE, FrostomperCollidePayload.STREAM_CODEC, ServerPayloadHandler::handleFroststomperCollidePayload);
     }
 

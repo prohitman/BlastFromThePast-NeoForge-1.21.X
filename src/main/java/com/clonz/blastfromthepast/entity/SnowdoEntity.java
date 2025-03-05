@@ -1,56 +1,54 @@
 package com.clonz.blastfromthepast.entity;
 
-import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.block.SnowdoEggBlock;
-import com.clonz.blastfromthepast.client.models.SnowdoModel;
 import com.clonz.blastfromthepast.entity.ai.goal.SnowdoBreedGoal;
-import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
 import com.clonz.blastfromthepast.init.ModSounds;
-import io.github.itskillerluc.duclib.client.animation.DucAnimation;
-import io.github.itskillerluc.duclib.entity.Animatable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.control.LookControl;
-import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.util.Lazy;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class SnowdoEntity extends Animal implements Animatable<SnowdoModel> {
-    public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "snowdo");
-    public static final DucAnimation ANIMATION = DucAnimation.create(LOCATION);
-    private final Lazy<Map<String, AnimationState>> animations = Lazy.of(() -> SnowdoModel.createStateMap(getAnimation()));
+public class SnowdoEntity extends Animal implements GeoEntity {
     public  static final EntityDataAccessor<Boolean> TRIPPED = SynchedEntityData.defineId(SnowdoEntity.class, EntityDataSerializers.BOOLEAN);
     public  static final EntityDataAccessor<Optional<UUID>> RIDDEN_PLAYER = SynchedEntityData.defineId(SnowdoEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     public  static final EntityDataAccessor<Boolean> GLIDING = SynchedEntityData.defineId(SnowdoEntity.class, EntityDataSerializers.BOOLEAN);
     public static final float movementSpeed = 0.12f;
     public int tripTicks;
+
+    public static final RawAnimation IDLE = RawAnimation.begin().then("animation.snowdo.idle", Animation.LoopType.DEFAULT);
+    public static final RawAnimation TRIP = RawAnimation.begin().then("animation.snowdo.trip", Animation.LoopType.DEFAULT);
+    public static final RawAnimation GLIDE = RawAnimation.begin().then("animation.snowdo.glide", Animation.LoopType.DEFAULT);
+    public static final RawAnimation TAIL = RawAnimation.begin().then("animation.snowdo.tail", Animation.LoopType.DEFAULT);
+    public static final RawAnimation WALK = RawAnimation.begin().then("animation.snowdo.walk", Animation.LoopType.DEFAULT);
 
     public SnowdoEntity(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -128,16 +126,6 @@ public class SnowdoEntity extends Animal implements Animatable<SnowdoModel> {
             }
         }
 
-        if (level().isClientSide()) {
-            animateWhen("idle", !isMoving(this) && onGround() && !this.isTripped());
-            animateWhen("trip", this.isTripped());
-            if(!this.isBaby()){
-                animateWhen("glide", this.isGliding());
-            }
-            if(this.getRandom().nextInt(100) == 0 && !this.isBaby()){
-                playAnimation("tail");
-            }
-        }
         if(this.getVehicle() == null){
             Vec3 vec3 = this.getDeltaMovement();
             if (!this.onGround() && vec3.y < 0.0) {
@@ -146,7 +134,7 @@ public class SnowdoEntity extends Animal implements Animatable<SnowdoModel> {
         }
 
         if(!this.level().isClientSide()){
-          if(this.getRandom().nextInt(500) == 0 && this.isMoving(this) && this.onGround() && !this.isPassenger()){
+          if(this.getRandom().nextInt(500) == 0 && getDeltaMovement().horizontalDistanceSqr() > 1.0E-6D && this.onGround() && !this.isPassenger()){
               this.setTripped(true);
               this.level().playSound(null, this.blockPosition(), ModSounds.SNOWDO_TRIP.get(), SoundSource.AMBIENT, 1, 1);
           }
@@ -185,6 +173,10 @@ public class SnowdoEntity extends Animal implements Animatable<SnowdoModel> {
         if (player == null || player.isCrouching()) {
             this.stopRiding();
             this.setRiddenPlayer(Optional.empty());
+        }
+
+        if(this.getRandom().nextInt(100) == 0 && !this.isBaby()){
+            triggerAnim("second", "tail");
         }
     }
 
@@ -233,31 +225,6 @@ public class SnowdoEntity extends Animal implements Animatable<SnowdoModel> {
     }
 
     @Override
-    public ResourceLocation getModelLocation() {
-        return null;
-    }
-
-    @Override
-    public DucAnimation getAnimation() {
-        return ANIMATION;
-    }
-
-    @Override
-    public Lazy<Map<String, AnimationState>> getAnimations() {
-        return animations;
-    }
-
-    @Override
-    public Optional<AnimationState> getAnimationState(String animation) {
-        return Optional.ofNullable(getAnimations().get().get("animation.snowdo." + animation));
-    }
-
-    @Override
-    public int tickCount() {
-        return tickCount;
-    }
-
-    @Override
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         this.setTripped(compound.getBoolean("tripped"));
@@ -277,5 +244,25 @@ public class SnowdoEntity extends Animal implements Animatable<SnowdoModel> {
         }
     }
 
-    public static void init(){}
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<GeoAnimatable>(this, "main", 5, state -> {
+            if (this.isTripped()) return state.setAndContinue(TRIP);
+            if(!this.isBaby()){
+                if (this.isGliding()) return state.setAndContinue(GLIDE);
+            }
+            if (!state.isMoving() && onGround() && !this.isTripped()) return state.setAndContinue(IDLE);
+            if (state.isMoving()) return state.setAndContinue(WALK);
+            return PlayState.STOP;
+        }));
+        controllers.add(new AnimationController(this, "second", 0, state -> PlayState.STOP)
+                .triggerableAnim("tail", TAIL));
+    }
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return cache;
+    }
 }

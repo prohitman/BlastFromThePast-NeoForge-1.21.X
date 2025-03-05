@@ -3,6 +3,7 @@ package com.clonz.blastfromthepast.entity.boats;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
+import com.clonz.blastfromthepast.mixin.BoatAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -24,7 +25,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.openjdk.nashorn.internal.objects.annotations.Getter;
 
 import java.util.function.IntFunction;
 
@@ -79,7 +79,7 @@ public class BFTPBoat extends Boat{
 
     @Override
     protected void checkFallDamage(double pY, boolean pOnGround, BlockState pState, BlockPos pPos) {
-        this.lastYd = this.getDeltaMovement().y;
+        ((BoatAccessor)this).setLastYd(this.getDeltaMovement().y);
         if (!this.isPassenger()) {
             if (pOnGround) {
                 if (this.fallDistance > 3.0F) {

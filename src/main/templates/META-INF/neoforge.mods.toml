@@ -67,9 +67,9 @@ file="templates/META-INF/accesstransformer.cfg"
     side="BOTH"
 
 [[dependencies.blastfromthepast]]
-    modId="duclib"
+    modId="geckolib"
     mandatory=true
-    versionRange="[1.0,)"
+    versionRange="[${geckolib_version},)"
     ordering="NONE"
     side="BOTH"
 
