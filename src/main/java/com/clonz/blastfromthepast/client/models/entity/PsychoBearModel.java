@@ -55,8 +55,4 @@ public class PsychoBearModel extends GeoModel<PsychoBearEntity> {
         if (animatable.isBaby()) return BABY_ANIMATION;
         return ANIMATION;
     }
-
-    public float getMotionAnimThreshold(PsychoBearEntity animatable) {
-        return 1.0E-6F;
-    }
 }

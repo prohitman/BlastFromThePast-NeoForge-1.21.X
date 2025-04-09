@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
+import terrablender.api.ParameterUtils;
 import terrablender.api.Region;
 import terrablender.api.RegionType;
 
@@ -26,6 +27,7 @@ public class BFTPOverworldRegion extends Region
     {
         this.addModifiedVanillaOverworldBiomes(mapper, b -> {
             b.replaceBiome(Biomes.SNOWY_TAIGA, ModBiomes.FROSTBITE_FOREST);
+            b.replaceBiome(Biomes.SNOWY_PLAINS, ModBiomes.FROSTBITE_FOREST);
             b.replaceBiome(Biomes.FROZEN_RIVER, ModBiomes.FROSTBITE_RIVER);
         });
     }

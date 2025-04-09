@@ -28,10 +28,10 @@ public class ModBlockStateGen extends BlockStateProvider {
         logBlock(ModBlocks.SAPPY_CEDAR_LOG.get());
         registerWoodGroup(ModBlocks.CEDAR);
         registerStoneGroup(ModBlocks.PERMAFROST);
-        createDoublePlantBlock(ModBlocks.WHITE_DELPHINIUM);
-        createDoublePlantBlock(ModBlocks.BLUE_DELPHINIUM);
-        createDoublePlantBlock(ModBlocks.PINK_DELPHINIUM);
-        createDoublePlantBlock(ModBlocks.VIOLET_DELPHINIUM);
+        createDoublePlantBlock(ModBlocks.ROYAL_LARKSPUR);
+        createDoublePlantBlock(ModBlocks.SHIVER_LARKSPUR);
+        createDoublePlantBlock(ModBlocks.BLUSH_LARKSPUR);
+        createDoublePlantBlock(ModBlocks.SNOW_LARKSPUR);
         createFemurBlock();
         createPsychoBerryBush();
         createSinglePlant(ModBlocks.PSYCHO_BERRY_SPROUT);
@@ -43,6 +43,41 @@ public class ModBlockStateGen extends BlockStateProvider {
         generateTarModel();
         registerBlockGroup(ModBlocks.SNOW_BRICK);
         registerBlockGroup(ModBlocks.ICE_BRICK);
+        createSinglePlant(ModBlocks.SILENE);
+        simpleBlock(ModBlocks.CHILLY_MOSS.get());
+        simpleBlock(ModBlocks.CHILLY_MOSS_SPROUT.get(), models().cubeBottomTop(ModBlocks.CHILLY_MOSS_SPROUT.getId().getPath(), modLoc("block/" + ModBlocks.CHILLY_MOSS_SPROUT.getId().getPath()), modLoc("block/empty"), modLoc("block/empty")).renderType("cutout_mipped"));
+
+        generatePermafrostPainting(ModBlocks.PERMAFROST_BURREL_PAINTING);
+        generatePermafrostPainting(ModBlocks.PERMAFROST_SNOWDO_PAINTING);
+        generatePermafrostPainting(ModBlocks.PERMAFROST_GLACEROS_PAINTING);
+        generatePermafrostPainting(ModBlocks.PERMAFROST_PSYCHO_BEAR_PAINTING);
+        generatePermafrostPainting(ModBlocks.PERMAFROST_SPEARTOOTH_PAINTING);
+        generatePermafrostPainting(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_TOP_RIGHT);
+        generatePermafrostPainting(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_TOP_LEFT);
+        generatePermafrostPainting(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_BOTTOM_RIGHT);
+        generatePermafrostPainting(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_BOTTOM_LEFT);
+
+        generateTotemPole(ModBlocks.BURREL_TOTEM_POLE);
+        generateTotemPole(ModBlocks.SNOWDO_TOTEM_POLE);
+        generateTotemPole(ModBlocks.GLACEROS_TOTEM_POLE);
+        generateTotemPole(ModBlocks.PSYCHO_BEAR_TOTEM_POLE);
+        generateTotemPole(ModBlocks.SPEARTOOTH_TOTEM_POLE);
+        generateTotemPole(ModBlocks.FROSTOMPER_TOTEM_POLE);
+    }
+    
+    public void generateTotemPole(DeferredBlock<?> block) {
+        this.getVariantBuilder(block.get()).forAllStates((state) -> {
+            Direction dir = state.getValue(BlockStateProperties.FACING);
+            return ConfiguredModel.builder().modelFile(models().getExistingFile(block.getId())).rotationY(dir.getAxis().isVertical() ? 0 : ((int)dir.toYRot() + 180) % 360).build();
+        });
+    }
+    
+    public void generatePermafrostPainting(DeferredBlock<?> block) {
+        ResourceLocation permafrost = modLoc("block/permafrost");
+        this.getVariantBuilder(block.get()).forAllStates((state) -> {
+            Direction dir = state.getValue(BlockStateProperties.FACING);
+            return ConfiguredModel.builder().modelFile(models().cube(block.getId().getPath(), permafrost, modLoc("block/" + block.getId().getPath()), permafrost, permafrost, permafrost, permafrost).texture("particle", permafrost)).rotationX(dir == Direction.DOWN ? 180 : (dir.getAxis().isHorizontal() ? -90 : 0)).rotationY(dir.getAxis().isVertical() ? 0 : (int)dir.toYRot() % 360).build();
+        });
     }
 
     public void generateTarModel(){
@@ -180,9 +215,13 @@ public class ModBlockStateGen extends BlockStateProvider {
         slabBlock(stoneGroup.POLISHED_SLAB.get(), this.blockTexture(stoneGroup.POLISHED.get()), this.blockTexture(stoneGroup.POLISHED.get()));
         wallBlock(stoneGroup.POLISHED_WALL.get(), this.blockTexture(stoneGroup.POLISHED.get()));
         simpleBlock(stoneGroup.CHISELED_BRICKS.get());
+
+        for (DeferredBlock<?> block : stoneGroup.blocks) {
+            if (block.getId().getPath().contains("ore")) simpleBlock(block.get());
+        }
     }
 
-    private void registerWoodGroup(BFTPWoodGroup group){
+    private void registerWoodGroup(BFTPWoodGroup group) {
         simpleBlock(group.BLOCK.get());
         if (group != ModBlocks.CEDAR) {
             simpleBlock(group.LEAVES.get());

@@ -2,10 +2,7 @@ package com.clonz.blastfromthepast.init;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
-import com.clonz.blastfromthepast.item.BFTPBoatItem;
-import com.clonz.blastfromthepast.item.FrostbiteArmor;
-import com.clonz.blastfromthepast.item.IceSpear;
-import com.clonz.blastfromthepast.item.TarArrowItem;
+import com.clonz.blastfromthepast.item.*;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ArmorItem;
@@ -34,7 +31,7 @@ public class ModItems {
             () -> new Item(new Item.Properties().food(ModFoods.COOKED_VENSION)));
 
     public static final DeferredItem<Item> SAP_BALL = register("sap_ball",
-            () -> new Item(new Item.Properties()));
+            () -> new SapItem(ModEntities.SAP.get(), new Item.Properties()));
 
     public static final DeferredItem<Item> STRAIGHT_GLACEROS_ANTLERS = register("straight_glaceros_antlers",
             () -> new Item(new Item.Properties()));
@@ -79,8 +76,13 @@ public class ModItems {
 
     public static final DeferredItem<Item> MELON_ICE_CREAM = registerIceCream("melon_ice_cream");
 
+    public static final DeferredItem<Item> SCHRODINGERS_ICE_CREAM = registerIceCream("schrodingers_ice_cream");
+
     public static final DeferredItem<Item> BEAR_CLAW = register("bear_claw",
             () -> new Item(new Item.Properties()));
+
+    public static final DeferredItem<Item> BEAR_GLOVES = register("bear_glove",
+            () -> new BearGloveItem((new Item.Properties()).stacksTo(1).attributes(BearGloveItem.createAttributes(5.0F, -3.0F))));
 
     public static final DeferredItem<Item> PSYCHO_BEAR_SPAWN_EGG = register("psycho_bear_spawn_egg",
             () -> new DeferredSpawnEggItem(ModEntities.PSYCHO_BEAR, 0x141418, 0xB432D0, new Item.Properties()));
@@ -102,32 +104,37 @@ public class ModItems {
 
     public static final DeferredItem<Item> SHAGGY_PELT = ITEMS.register("shaggy_pelt", () -> new Item(new Item.Properties()));
 
-    public static final DeferredItem<ArmorItem> FROST_BITE_HELMET = ITEMS.register("frost_bite_helmet", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.HELMET, new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(10))));
-    public static final DeferredItem<ArmorItem> FROST_BITE_CHESTPLATE = ITEMS.register("frost_bite_chestplate", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ArmorItem.Type.CHESTPLATE.getDurability(10))));
-    public static final DeferredItem<ArmorItem> FROST_BITE_LEGGINGS = ITEMS.register("frost_bite_leggings", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ArmorItem.Type.LEGGINGS.getDurability(10))));
-    public static final DeferredItem<ArmorItem> FROST_BITE_BOOTS = ITEMS.register("frost_bite_boots", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.BOOTS, new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(10))));
+    public static final DeferredItem<ArmorItem> FROST_BITE_HELMET = ITEMS.register("frostbite_helmet", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.HELMET, new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(10))));
+    public static final DeferredItem<ArmorItem> FROST_BITE_CHESTPLATE = ITEMS.register("frostbite_chestplate", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ArmorItem.Type.CHESTPLATE.getDurability(10))));
+    public static final DeferredItem<ArmorItem> FROST_BITE_LEGGINGS = ITEMS.register("frostbite_leggings", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ArmorItem.Type.LEGGINGS.getDurability(10))));
+    public static final DeferredItem<ArmorItem> FROST_BITE_BOOTS = ITEMS.register("frostbite_boots", () -> new FrostbiteArmor(ModArmorMaterials.FROST_BITE, ArmorItem.Type.BOOTS, new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(10))));
     public static final DeferredItem<Item> IDOL_OF_RETRIEVAL = register("idol_of_retrieval",
             () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
 
+
+    public static final DeferredItem<Item> GLACIAL_GUIDEBOOK = register("glacial_guidebook",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+
+
+    public static final DeferredItem<Item> SPEARTOOTH_DISPLAY = register("speartooth_display",
+            () -> new EntityDisplayItem(new Item.Properties().stacksTo(1), ModEntities.SPEARTOOTH.get()));
+
+    public static final DeferredItem<Item> FROSTOMPER_DISPLAY = register("frostomper_display",
+            () -> new EntityDisplayItem(new Item.Properties().stacksTo(1), ModEntities.FROSTOMPER.get()));
+
+    public static final DeferredItem<Item> SNOWDO_DISPLAY = register("snowdo_display",
+            () -> new EntityDisplayItem(new Item.Properties().stacksTo(1), ModEntities.SNOWDO.get()));
+
+    public static final DeferredItem<Item> BURREL_DISPLAY = register("burrel_display",
+            () -> new EntityDisplayItem(new Item.Properties().stacksTo(1), ModEntities.BURREL.get()));
+
+    public static final DeferredItem<Item> PSYCHO_BEAR_DISPLAY = register("psycho_bear_display",
+            () -> new EntityDisplayItem(new Item.Properties().stacksTo(1), ModEntities.PSYCHO_BEAR.get()));
+
+    public static final DeferredItem<Item> GLACEROS_DISPLAY = register("glaceros_display",
+            () -> new EntityDisplayItem(new Item.Properties().stacksTo(1), ModEntities.GLACEROS.get()));
+
     public static final DeferredItem<TarArrowItem> TAR_ARROW = ITEMS.register("tar_arrow", () -> new TarArrowItem(new Item.Properties().stacksTo(64)));
-
-
-/*    public static final DeferredItem<BlockItem> FROZEN_PINE_LOG =
-            ITEMS.registerSimpleBlockItem("cedar_log", ModBlocks.CEDAR_LOG);
-
-    public static final DeferredItem<BlockItem> STRIPPED_FROZEN_PINE_LOG =
-            ITEMS.registerSimpleBlockItem("stripped_cedar_log", ModBlocks.STRIPPED_CEDAR_LOG);
-
-    public static final DeferredItem<BlockItem> SAPPY_FROZEN_PINE_LOG =
-            ITEMS.registerSimpleBlockItem("sappy_cedar_log", ModBlocks.SAPPY_CEDAR_LOG);
-
-    public static final DeferredItem<BlockItem> CEDAR_PLANKS =
-            ITEMS.registerSimpleBlockItem("cedar_planks", ModBlocks.CEDAR_PLANKS);
-
-    public static final DeferredItem<BlockItem> CEDAR_LEAVES =
-            ITEMS.registerSimpleBlockItem("cedar_leaves", ModBlocks.CEDAR_LEAVES);
-    public static final DeferredItem<BlockItem> CEDAR_DOOR =
-            ITEMS.registerSimpleBlockItem("cedar_door", ModBlocks.CEDAR_DOOR);*/
 
     public static DeferredItem<Item> register(String name, Supplier<Item> block) {
         return ITEMS.register(name, block);

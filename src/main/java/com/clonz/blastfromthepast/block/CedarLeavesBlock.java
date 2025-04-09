@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 public class CedarLeavesBlock extends LeavesBlock {
     public static final MapCodec<CedarLeavesBlock> CODEC = simpleCodec(CedarLeavesBlock::new);
     public static final BooleanProperty SNOWY = BlockStateProperties.SNOWY;
+    public static final BooleanProperty RUSTY = BooleanProperty.create("rusty");
 
     @Override
     public MapCodec<? extends CedarLeavesBlock> codec() {
@@ -34,7 +35,7 @@ public class CedarLeavesBlock extends LeavesBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState blockstate = context.getLevel().getBlockState(context.getClickedPos().above());
-        return super.getStateForPlacement(context).setValue(SNOWY, Boolean.valueOf(isSnowySetting(blockstate, context.getLevel(), context.getClickedPos())));
+        return super.getStateForPlacement(context).setValue(RUSTY, false).setValue(SNOWY, Boolean.valueOf(isSnowySetting(blockstate, context.getLevel(), context.getClickedPos())));
     }
 
     private static boolean isSnowySetting(BlockState state, LevelAccessor level, BlockPos pos) {
@@ -46,5 +47,6 @@ public class CedarLeavesBlock extends LeavesBlock {
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(SNOWY);
+        builder.add(RUSTY);
     }
 }

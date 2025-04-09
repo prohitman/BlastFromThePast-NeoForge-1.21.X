@@ -1,4 +1,12 @@
 {
+  "aurora_frolics": {
+    "sounds": [
+      {
+        "name": "blastfromthepast:aurora_frolics",
+        "stream": true
+      }
+    ]
+  },
   "blizzard_revelry": {
     "subtitle": "sounds.blastfromthepast.blizzard_revelry",
     "sounds": [
@@ -6,6 +14,30 @@
         "name": "blastfromthepast:blizzard_revelry",
         "stream": true
       }
+    ]
+  },
+  "bear_trap": {
+    "subtitle": "sounds.blastfromthepast.bear_trap",
+    "sounds": [
+      "blastfromthepast:bear_trap"
+    ]
+  },
+  "bear_glove_slash": {
+    "subtitle": "sounds.blastfromthepast.bear_glove_slash",
+    "sounds": [
+      "blastfromthepast:bear_glove_slash"
+    ]
+  },
+  "bear_glove_slash_crit": {
+    "subtitle": "sounds.blastfromthepast.bear_glove_slash_crit",
+    "sounds": [
+      "blastfromthepast:bear_glove_slash_crit"
+    ]
+  },
+  "wall_grab": {
+    "subtitle": "sounds.blastfromthepast.wall_grab",
+    "sounds": [
+      "blastfromthepast:wall_grab"
     ]
   },
   "speartooth_death": {

@@ -9,6 +9,7 @@ import software.bernie.geckolib.model.GeoModel;
 
 public class SnowdoModel extends GeoModel<SnowdoEntity> {
     private static final ResourceLocation TEXTURE = ClientResourceHelper.entityTexLocWithTypeSubFolder(ModEntities.SNOWDO.getId());
+    private static final ResourceLocation SHAVED = TEXTURE.withSuffix("_shaved");
     private static final ResourceLocation BABY_TEXTURE = ClientResourceHelper.entityTexLocWithTypeSubFolderWithPrefix(ModEntities.SNOWDO.getId(), "baby_");
     public static final ResourceLocation MODEL = BlastFromThePast.location("geo/entity/snowdo.geo.json");
     public static final ResourceLocation BABY_MODEL = BlastFromThePast.location("geo/entity/baby_snowdo.geo.json");
@@ -28,6 +29,7 @@ public class SnowdoModel extends GeoModel<SnowdoEntity> {
     @Override
     public ResourceLocation getTextureResource(SnowdoEntity animatable) {
         if (animatable.isBaby()) return BABY_TEXTURE;
+        if (animatable.isSheared()) return SHAVED;
         return TEXTURE;
     }
 
@@ -35,9 +37,5 @@ public class SnowdoModel extends GeoModel<SnowdoEntity> {
     public ResourceLocation getAnimationResource(SnowdoEntity animatable) {
         if (animatable.isBaby()) return BABY_ANIMATION;
         return ANIMATION;
-    }
-
-    public float getMotionAnimThreshold(SnowdoModel animatable) {
-        return 1.0E-6F;
     }
 }

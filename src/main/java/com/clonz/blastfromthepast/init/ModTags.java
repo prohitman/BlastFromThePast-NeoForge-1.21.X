@@ -20,6 +20,7 @@ public class ModTags {
         public static final TagKey<Item> PSYCHO_BEAR_PACIFIER = TagKey.create(Registries.ITEM, ModEntities.PSYCHO_BEAR.getId().withSuffix("_pacifier"));
         public static final TagKey<Item> GLACEROS_ANTLERS = TagKey.create(Registries.ITEM, BlastFromThePast.location("glaceros_antlers"));
         public static final TagKey<Item> ALLOWS_WALKING_ON_TAR = TagKey.create(Registries.ITEM, BlastFromThePast.location("allows_walking_on_tar"));
+        public static final TagKey<Item> PERMAFROST_PAINTING = TagKey.create(Registries.ITEM, BlastFromThePast.location("permafrost_painting"));
     }
     public static class Blocks{
         public static final TagKey<Block> FROSTOMPER_CAN_BREAK = TagKey.create(Registries.BLOCK, ModEntities.FROSTOMPER.getId().withSuffix("_can_break"));

@@ -9,17 +9,23 @@
   "downfall": 0.4,
   "effects": {
     "fog_color": 12638463,
-    "foliage_color": 11445290,
-    "grass_color": 12564309,
+    "foliage_color": 6000247,
+    "grass_color": 6000247,
     "mood_sound": {
       "block_search_extent": 8,
       "offset": 2.0,
       "sound": "minecraft:ambient.cave",
       "tick_delay": 6000
     },
+    "music": {
+      "max_delay": 12000,
+      "min_delay": 0,
+      "replace_current_music": true,
+      "sound": "blastfromthepast:aurora_frolics"
+    },
     "sky_color": 8625919,
-    "water_color": 4445678,
-    "water_fog_color": 270131
+    "water_color": 8764102,
+    "water_fog_color": 8764102
   },
   "features": [
     [],
@@ -32,10 +38,14 @@
       "minecraft:amethyst_geode"
     ],
     [
+      "blastfromthepast:frostbite_fossils_upper",
+      "blastfromthepast:frostbite_fossils_lower",
       "minecraft:monster_room",
       "minecraft:monster_room_deep"
     ],
-    [],
+    [
+      "blastfromthepast:permafrost_boulders"
+    ],
     [],
     [
       "minecraft:ore_dirt",
@@ -77,14 +87,15 @@
       "minecraft:glow_lichen",
       "minecraft:patch_large_fern",
       "blastfromthepast:cedar_placed",
+      "blastfromthepast:rusty_cedar_placed",
       "blastfromthepast:frostbite_forest_flowers",
       "minecraft:patch_grass_taiga_2",
       "minecraft:brown_mushroom_taiga",
       "minecraft:red_mushroom_taiga",
       "minecraft:patch_sugar_cane",
       "minecraft:patch_pumpkin",
-      "minecraft:patch_berry_rare",
-      "minecraft:patch_melon_sparse"
+      "minecraft:patch_melon_sparse",
+      "blastfromthepast:psycho_berry"
     ],
     [
       "minecraft:freeze_top_layer"
@@ -93,14 +104,7 @@
   "has_precipitation": true,
   "spawn_costs": {},
   "spawners": {
-    "ambient": [
-      {
-        "type": "minecraft:bat",
-        "maxCount": 8,
-        "minCount": 8,
-        "weight": 10
-      }
-    ],
+    "ambient": [],
     "axolotls": [],
     "creature": [
       {
@@ -141,64 +145,8 @@
       }
     ],
     "misc": [],
-    "monster": [
-      {
-        "type": "minecraft:spider",
-        "maxCount": 4,
-        "minCount": 4,
-        "weight": 100
-      },
-      {
-        "type": "minecraft:zombie",
-        "maxCount": 4,
-        "minCount": 4,
-        "weight": 95
-      },
-      {
-        "type": "minecraft:zombie_villager",
-        "maxCount": 1,
-        "minCount": 1,
-        "weight": 5
-      },
-      {
-        "type": "minecraft:skeleton",
-        "maxCount": 4,
-        "minCount": 4,
-        "weight": 100
-      },
-      {
-        "type": "minecraft:creeper",
-        "maxCount": 4,
-        "minCount": 4,
-        "weight": 100
-      },
-      {
-        "type": "minecraft:slime",
-        "maxCount": 4,
-        "minCount": 4,
-        "weight": 100
-      },
-      {
-        "type": "minecraft:enderman",
-        "maxCount": 4,
-        "minCount": 1,
-        "weight": 10
-      },
-      {
-        "type": "minecraft:witch",
-        "maxCount": 1,
-        "minCount": 1,
-        "weight": 5
-      }
-    ],
-    "underground_water_creature": [
-      {
-        "type": "minecraft:glow_squid",
-        "maxCount": 6,
-        "minCount": 4,
-        "weight": 10
-      }
-    ],
+    "monster": [],
+    "underground_water_creature": [],
     "water_ambient": [],
     "water_creature": []
   },

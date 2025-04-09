@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.block;
 
 import com.clonz.blastfromthepast.init.ModBlocks;
+import com.clonz.blastfromthepast.init.ModTreeGrowers;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
@@ -46,6 +47,17 @@ public class PineconeBlock extends SaplingBlock {
 
     protected boolean mayPlaceOn(BlockState state, BlockGetter level, BlockPos pos) {
         return super.mayPlaceOn(state, level, pos) || state.is(Blocks.CLAY);
+    }
+
+    @Override
+    public void advanceTree(ServerLevel level, BlockPos pos, BlockState state, RandomSource random) {
+        if (state.getValue(STAGE) == 0) {
+            level.setBlock(pos, state.cycle(STAGE), 4);
+        } else {
+            if (random.nextInt(100) < 20 || level.getBlockState(pos.below()).is(Blocks.PODZOL))
+                ModTreeGrowers.RUSTY_CEDAR.growTree(level, level.getChunkSource().getGenerator(), pos, state, random);
+            else this.treeGrower.growTree(level, level.getChunkSource().getGenerator(), pos, state, random);
+        }
     }
 
     @Override

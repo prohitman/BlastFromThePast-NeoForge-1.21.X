@@ -156,9 +156,15 @@ public class RaidFoodContainerGoal<T extends PathfinderMob & ComplexAnimal> exte
             if(DebugFlags.DEBUG_RAID_FOOD_CONTAINER)
                 BlastFromThePast.LOGGER.info("Opening menu {} for {}", menu, player);
             if (menu != null) {
-                ((ServerPlayerAccessor)player).blastfromthepast$initMenu(menu);
-                player.containerMenu = menu;
-                //NeoForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, player.containerMenu));
+                try {
+                    ((ServerPlayerAccessor) player).blastfromthepast$initMenu(menu);
+                    player.containerMenu = menu;
+                    //NeoForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, player.containerMenu));
+                } catch (Exception e) {
+                    // The piece of code above just crashed my game.
+                    // But I have no clue what it does, so this will have to do for now.
+                    BlastFromThePast.LOGGER.debug("Check RaidFoodContainerGoal class line 164.", e);
+                }
             }
         }
     }

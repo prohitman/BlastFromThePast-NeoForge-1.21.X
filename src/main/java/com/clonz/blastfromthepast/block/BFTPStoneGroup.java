@@ -2,6 +2,8 @@ package com.clonz.blastfromthepast.block;
 
 import com.clonz.blastfromthepast.block.signs.SnowyStoneBlock;
 import com.clonz.blastfromthepast.init.ModBlocks;
+import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -31,9 +33,16 @@ public class BFTPStoneGroup {
     public final DeferredBlock<SlabBlock> POLISHED_SLAB;
     public final DeferredBlock<WallBlock> POLISHED_WALL;
 
+    public final DeferredBlock<DropExperienceBlock> COAL_ORE;
+    public final DeferredBlock<DropExperienceBlock> COPPER_ORE;
+    public final DeferredBlock<DropExperienceBlock> DIAMOND_ORE;
+    public final DeferredBlock<DropExperienceBlock> EMERALD_ORE;
+    public final DeferredBlock<DropExperienceBlock> GOLD_ORE;
+    public final DeferredBlock<DropExperienceBlock> IRON_ORE;
+    public final DeferredBlock<DropExperienceBlock> LAPIS_ORE;
+    public final DeferredBlock<RedStoneOreBlock> REDSTONE_ORE;
 
     public final List<DeferredBlock<?>> blocks;
-
 
     public BFTPStoneGroup(String name, MapColor mapColor, Item.Properties empty){
         BLOCK = ModBlocks.createRegistry(name, () -> new SnowyStoneBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).mapColor(mapColor)), empty);
@@ -48,13 +57,13 @@ public class BFTPStoneGroup {
         BRICKS_SLAB = ModBlocks.createRegistry(name + "_bricks_slab", () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(BRICKS.get()).mapColor(mapColor)), empty);
         BRICKS_WALL = ModBlocks.createRegistry(name + "_bricks_wall", () -> new WallBlock(BlockBehaviour.Properties.ofFullCopy(BRICKS.get()).mapColor(mapColor)), empty);
 
-        COBBLESTONE = ModBlocks.createRegistry(name + "_cobblestone", () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).mapColor(mapColor)), empty);
+        COBBLESTONE = ModBlocks.createRegistry("cobbled_" + name, () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).mapColor(mapColor)), empty);
 
-        COBBLESTONE_STAIRS = ModBlocks.createRegistry(name + "_cobblestone_stairs", () -> new StairBlock(COBBLESTONE.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(COBBLESTONE.get()).mapColor(mapColor)), empty);
-        COBBLESTONE_SLAB = ModBlocks.createRegistry(name + "_cobblestone_slab", () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(COBBLESTONE.get()).mapColor(mapColor)), empty);
-        COBBLESTONE_WALL = ModBlocks.createRegistry(name + "_cobblestone_wall", () -> new WallBlock(BlockBehaviour.Properties.ofFullCopy(COBBLESTONE.get()).mapColor(mapColor)), empty);
+        COBBLESTONE_STAIRS = ModBlocks.createRegistry("cobbled_" + name + "_stairs", () -> new StairBlock(COBBLESTONE.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(COBBLESTONE.get()).mapColor(mapColor)), empty);
+        COBBLESTONE_SLAB = ModBlocks.createRegistry("cobbled_" + name + "_slab", () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(COBBLESTONE.get()).mapColor(mapColor)), empty);
+        COBBLESTONE_WALL = ModBlocks.createRegistry("cobbled_" + name + "_wall", () -> new WallBlock(BlockBehaviour.Properties.ofFullCopy(COBBLESTONE.get()).mapColor(mapColor)), empty);
 
-        CHISELED_BRICKS = ModBlocks.createRegistry(name + "_chiseled_bricks", () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).mapColor(mapColor)), empty);
+        CHISELED_BRICKS = ModBlocks.createRegistry("chiseled_" + name + "_bricks", () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).mapColor(mapColor)), empty);
 
         POLISHED = ModBlocks.createRegistry("polished_" + name, () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).mapColor(mapColor)), empty);
 
@@ -62,7 +71,16 @@ public class BFTPStoneGroup {
         POLISHED_SLAB = ModBlocks.createRegistry("polished_" + name + "_slab", () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(POLISHED.get()).mapColor(mapColor)), empty);
         POLISHED_WALL = ModBlocks.createRegistry("polished_" + name + "_wall", () -> new WallBlock(BlockBehaviour.Properties.ofFullCopy(POLISHED.get()).mapColor(mapColor)), empty);
 
-        blocks = new ArrayList<>(Arrays.asList(BLOCK, STAIRS, SLAB, WALL, BRICKS, BRICKS_STAIRS, BRICKS_SLAB, BRICKS_WALL, COBBLESTONE, COBBLESTONE_STAIRS, COBBLESTONE_SLAB, COBBLESTONE_WALL, POLISHED, POLISHED_STAIRS, POLISHED_SLAB, POLISHED_WALL, CHISELED_BRICKS));
+        COAL_ORE = ModBlocks.createRegistry(name + "_coal_ore", () -> new DropExperienceBlock(UniformInt.of(0, 2), BlockBehaviour.Properties.ofFullCopy(Blocks.COAL_ORE).mapColor(mapColor)), empty);
+        COPPER_ORE = ModBlocks.createRegistry(name + "_copper_ore", () -> new DropExperienceBlock(ConstantInt.of(0), BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_ORE).mapColor(mapColor)), empty);
+        DIAMOND_ORE = ModBlocks.createRegistry(name + "_diamond_ore", () -> new DropExperienceBlock(UniformInt.of(3, 7), BlockBehaviour.Properties.ofFullCopy(Blocks.DIAMOND_ORE).mapColor(mapColor)), empty);
+        EMERALD_ORE = ModBlocks.createRegistry(name + "_emerald_ore", () -> new DropExperienceBlock(UniformInt.of(3, 7), BlockBehaviour.Properties.ofFullCopy(Blocks.EMERALD_ORE).mapColor(mapColor)), empty);
+        GOLD_ORE = ModBlocks.createRegistry(name + "_gold_ore", () -> new DropExperienceBlock(ConstantInt.of(0), BlockBehaviour.Properties.ofFullCopy(Blocks.GOLD_ORE).mapColor(mapColor)), empty);
+        IRON_ORE = ModBlocks.createRegistry(name + "_iron_ore", () -> new DropExperienceBlock(ConstantInt.of(0), BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_ORE).mapColor(mapColor)), empty);
+        LAPIS_ORE = ModBlocks.createRegistry(name + "_lapis_ore", () -> new DropExperienceBlock(UniformInt.of(2, 5), BlockBehaviour.Properties.ofFullCopy(Blocks.LAPIS_ORE).mapColor(mapColor)), empty);
+        REDSTONE_ORE = ModBlocks.createRegistry(name + "_redstone_ore", () -> new RedStoneOreBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.REDSTONE_ORE).mapColor(mapColor)), empty);
+
+        blocks = new ArrayList<>(Arrays.asList(BLOCK, STAIRS, SLAB, WALL, BRICKS, BRICKS_STAIRS, BRICKS_SLAB, BRICKS_WALL, COBBLESTONE, COBBLESTONE_STAIRS, COBBLESTONE_SLAB, COBBLESTONE_WALL, POLISHED, POLISHED_STAIRS, POLISHED_SLAB, POLISHED_WALL, CHISELED_BRICKS, COAL_ORE, COPPER_ORE, DIAMOND_ORE, EMERALD_ORE, GOLD_ORE, IRON_ORE, LAPIS_ORE, REDSTONE_ORE));
     }
 
     public List<DeferredBlock<StairBlock>> getStairs(){

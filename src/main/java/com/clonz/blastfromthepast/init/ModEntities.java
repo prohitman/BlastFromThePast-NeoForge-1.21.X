@@ -40,10 +40,10 @@ public class ModEntities {
             1f, 2.2f, 0x302219, 0xACACAC);
 
     public static final DeferredHolder<EntityType<?>, EntityType<SnowdoEntity>> SNOWDO = registerMob("snowdo", SnowdoEntity::new,
-            0.6f, 1.1f, 0x302219, 0xACACAC);
+            0.6f, 1.1f, 0x3E3E68, 0xD7DFE6);
 
-    public static final DeferredHolder<EntityType<?>, EntityType<FrostomperEntity>> FROSTOMPER = registerMob("frostomper", FrostomperEntity::new,
-            HitboxHelper.pixelsToBlocks(77.0F), HitboxHelper.pixelsToBlocks(70.0F), 0x302219, 0xACACAC);
+    public static final DeferredHolder<EntityType<?>, EntityType<FrostomperEntity>> FROSTOMPER = registerMobWithEyeHeight("frostomper", FrostomperEntity::new,
+            HitboxHelper.pixelsToBlocks(77.0F), HitboxHelper.pixelsToBlocks(70.0F), HitboxHelper.pixelsToBlocks(70.0F), 0x302219, 0xACACAC);
 
     public static final DeferredHolder<EntityType<?>, EntityType<SpeartoothEntity>> SPEARTOOTH = registerMobWithEyeHeight("speartooth", SpeartoothEntity::new
             , 0.9F, 1.3F, 1.25F, 0x302220, 0xACACAC);
@@ -54,6 +54,13 @@ public class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<ThrownIceSpear>> ICE_SPEAR = ENTITIES.register("ice_spear",
             () -> EntityType.Builder.<ThrownIceSpear>of(ThrownIceSpear::new, MobCategory.MISC).sized(0.5F, 0.5F).clientTrackingRange(4).updateInterval(20).build("ice_spear"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<SapEntity>> SAP = ENTITIES.register("sap", () -> EntityType.Builder
+            .<SapEntity>of(SapEntity::new, MobCategory.MISC)
+            .sized(0.5F, 0.5F)
+            .eyeHeight(0.0F)
+            .clientTrackingRange(10)
+            .updateInterval(Integer.MAX_VALUE)
+            .build(getName("sap")));
 
     public static final DeferredHolder<EntityType<?>, EntityType<BFTPBoat>> BFTPBOAT = ENTITIES.register("boat", () -> EntityType.Builder
             .<BFTPBoat>of(BFTPBoat::new, MobCategory.MISC)

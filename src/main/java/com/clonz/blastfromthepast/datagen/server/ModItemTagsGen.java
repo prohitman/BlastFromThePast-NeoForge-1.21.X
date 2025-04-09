@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.datagen.server;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
+import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModItems;
 import com.clonz.blastfromthepast.init.ModTags;
 import net.minecraft.core.HolderLookup;
@@ -30,9 +31,11 @@ public class ModItemTagsGen extends ItemTagsProvider {
 
         tag(ItemTags.MEAT)
                 .add(ModItems.COOKED_VENISON.get())
-                .add(ModItems.RAW_VENISON.get());
+                .add(ModItems.RAW_VENISON.get())
+                .add(ModBlocks.BEAST_CHOPS_COOKED.asItem());
         tag(Tags.Items.FOODS_COOKED_MEAT)
-                .add(ModItems.COOKED_VENISON.get());
+                .add(ModItems.COOKED_VENISON.get())
+                .add(ModBlocks.BEAST_CHOPS_COOKED.asItem());
         copy(BlockTags.LOGS_THAT_BURN, ItemTags.LOGS_THAT_BURN);
         copy(BlockTags.PLANKS, ItemTags.PLANKS);
         copy(BlockTags.LEAVES, ItemTags.LEAVES);
@@ -64,5 +67,18 @@ public class ModItemTagsGen extends ItemTagsProvider {
                 .add(ModItems.STRAIGHT_GLACEROS_ANTLERS.get());
         tag(ItemTags.ARROWS)
                 .add(ModItems.TAR_ARROW.get());
+
+        tag(ItemTags.STONE_TOOL_MATERIALS).add(ModBlocks.PERMAFROST.COBBLESTONE.asItem());
+
+        tag(ModTags.Items.PERMAFROST_PAINTING)
+                .add(ModBlocks.PERMAFROST_BURREL_PAINTING.asItem()).
+                add(ModBlocks.PERMAFROST_SNOWDO_PAINTING.asItem()).
+                add(ModBlocks.PERMAFROST_GLACEROS_PAINTING.asItem()).
+                add(ModBlocks.PERMAFROST_PSYCHO_BEAR_PAINTING.asItem()).
+                add(ModBlocks.PERMAFROST_SPEARTOOTH_PAINTING.asItem()).
+                add(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_TOP_RIGHT.asItem()).
+                add(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_TOP_LEFT.asItem()).
+                add(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_BOTTOM_RIGHT.asItem()).
+                add(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_BOTTOM_LEFT.asItem());
     }
 }

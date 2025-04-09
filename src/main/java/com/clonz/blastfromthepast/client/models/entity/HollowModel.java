@@ -8,8 +8,4 @@ public class HollowModel extends DefaultedEntityGeoModel<HollowEntity> {
     public HollowModel() {
         super(BlastFromThePast.location("hollow"));
     }
-
-    public float getMotionAnimThreshold(HollowModel animatable) {
-        return 1.0E-6F;
-    }
 }

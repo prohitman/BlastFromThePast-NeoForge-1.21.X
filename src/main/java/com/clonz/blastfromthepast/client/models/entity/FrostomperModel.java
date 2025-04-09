@@ -5,6 +5,9 @@ import com.clonz.blastfromthepast.client.ClientResourceHelper;
 import com.clonz.blastfromthepast.entity.FrostomperEntity;
 import com.clonz.blastfromthepast.init.ModEntities;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import software.bernie.geckolib.animation.AnimationState;
+import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.model.GeoModel;
 
 public class FrostomperModel extends GeoModel<FrostomperEntity> {
@@ -46,7 +49,19 @@ public class FrostomperModel extends GeoModel<FrostomperEntity> {
         return ANIMATION;
     }
 
-    public float getMotionAnimThreshold(FrostomperEntity animatable) {
-        return 1.0E-6F;
+    @Override
+    public void setCustomAnimations(FrostomperEntity pEntity, long instanceId, AnimationState<FrostomperEntity> animationState) {
+        float partialTick = animationState.getPartialTick();
+        if (pEntity.canAnimateLook()) {
+            float f = Mth.rotLerp(partialTick, pEntity.yBodyRotO, pEntity.yBodyRot);
+            float f1 = Mth.rotLerp(partialTick, pEntity.yHeadRotO, pEntity.yHeadRot);
+            this.animateLook(f1 - f, pEntity.getXRot());
+        }
+    }
+
+    private void animateLook(float pNetHeadYaw, float pHeadPitch) {
+        GeoBone head = this.getBone("head").orElseThrow();
+        head.setRotX(pHeadPitch * Mth.DEG_TO_RAD);
+        head.setRotY(pNetHeadYaw * Mth.DEG_TO_RAD);
     }
 }

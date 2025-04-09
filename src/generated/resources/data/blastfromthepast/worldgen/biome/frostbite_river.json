@@ -9,17 +9,23 @@
   "downfall": 0.5,
   "effects": {
     "fog_color": 12638463,
-    "foliage_color": 11445290,
-    "grass_color": 12564309,
+    "foliage_color": 6000247,
+    "grass_color": 6000247,
     "mood_sound": {
       "block_search_extent": 8,
       "offset": 2.0,
       "sound": "minecraft:ambient.cave",
       "tick_delay": 6000
     },
+    "music": {
+      "max_delay": 12000,
+      "min_delay": 0,
+      "replace_current_music": true,
+      "sound": "blastfromthepast:aurora_frolics"
+    },
     "sky_color": 8299263,
-    "water_color": 4445678,
-    "water_fog_color": 270131
+    "water_color": 8764102,
+    "water_fog_color": 8764102
   },
   "features": [
     [],
@@ -75,13 +81,15 @@
     [
       "minecraft:glow_lichen",
       "blastfromthepast:cedar_placed",
+      "blastfromthepast:rusty_cedar_placed",
       "blastfromthepast:frostbite_forest_flowers",
       "minecraft:patch_grass_badlands",
       "minecraft:brown_mushroom_normal",
       "minecraft:red_mushroom_normal",
       "minecraft:patch_sugar_cane",
       "minecraft:patch_pumpkin",
-      "minecraft:seagrass_river"
+      "minecraft:seagrass_river",
+      "blastfromthepast:chilly_moss"
     ],
     [
       "minecraft:freeze_top_layer"
@@ -90,97 +98,51 @@
   "has_precipitation": true,
   "spawn_costs": {},
   "spawners": {
-    "ambient": [
-      {
-        "type": "minecraft:bat",
-        "maxCount": 8,
-        "minCount": 8,
-        "weight": 10
-      }
-    ],
+    "ambient": [],
     "axolotls": [],
-    "creature": [],
-    "misc": [],
-    "monster": [
+    "creature": [
       {
-        "type": "minecraft:spider",
-        "maxCount": 4,
-        "minCount": 4,
-        "weight": 100
-      },
-      {
-        "type": "minecraft:zombie",
-        "maxCount": 4,
-        "minCount": 4,
-        "weight": 95
-      },
-      {
-        "type": "minecraft:zombie_villager",
-        "maxCount": 1,
+        "type": "blastfromthepast:burrel",
+        "maxCount": 2,
         "minCount": 1,
-        "weight": 5
+        "weight": 8
       },
       {
-        "type": "minecraft:skeleton",
-        "maxCount": 4,
-        "minCount": 4,
-        "weight": 100
-      },
-      {
-        "type": "minecraft:creeper",
-        "maxCount": 4,
-        "minCount": 4,
-        "weight": 100
-      },
-      {
-        "type": "minecraft:slime",
-        "maxCount": 4,
-        "minCount": 4,
-        "weight": 100
-      },
-      {
-        "type": "minecraft:enderman",
-        "maxCount": 4,
-        "minCount": 1,
-        "weight": 10
-      },
-      {
-        "type": "minecraft:witch",
-        "maxCount": 1,
-        "minCount": 1,
-        "weight": 5
-      },
-      {
-        "type": "minecraft:drowned",
-        "maxCount": 1,
-        "minCount": 1,
-        "weight": 1
-      }
-    ],
-    "underground_water_creature": [
-      {
-        "type": "minecraft:glow_squid",
-        "maxCount": 6,
-        "minCount": 4,
-        "weight": 10
-      }
-    ],
-    "water_ambient": [
-      {
-        "type": "minecraft:salmon",
+        "type": "blastfromthepast:snowdo",
         "maxCount": 5,
+        "minCount": 2,
+        "weight": 8
+      },
+      {
+        "type": "blastfromthepast:glaceros",
+        "maxCount": 7,
+        "minCount": 3,
+        "weight": 8
+      },
+      {
+        "type": "blastfromthepast:speartooth",
+        "maxCount": 6,
+        "minCount": 3,
+        "weight": 8
+      },
+      {
+        "type": "blastfromthepast:psycho_bear",
+        "maxCount": 1,
         "minCount": 1,
-        "weight": 5
+        "weight": 8
+      },
+      {
+        "type": "blastfromthepast:frostomper",
+        "maxCount": 6,
+        "minCount": 1,
+        "weight": 8
       }
     ],
-    "water_creature": [
-      {
-        "type": "minecraft:squid",
-        "maxCount": 4,
-        "minCount": 1,
-        "weight": 2
-      }
-    ]
+    "misc": [],
+    "monster": [],
+    "underground_water_creature": [],
+    "water_ambient": [],
+    "water_creature": []
   },
   "temperature": 0.15
 }

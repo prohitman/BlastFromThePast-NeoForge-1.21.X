@@ -77,7 +77,7 @@ public class PsychoBerryBush extends Block implements SimpleWaterloggedBlock, IS
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!level.isAreaLoaded(pos, 1)) return;
-        if (!state.canSurvive(level, pos)) {
+        if (!canSurvive(state, level, pos)) {
             level.destroyBlock(pos, true);
         }
     }
@@ -162,6 +162,6 @@ public class PsychoBerryBush extends Block implements SimpleWaterloggedBlock, IS
     @Override
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockState blockState = level.getBlockState(pos.below());
-        return blockState.isSolidRender(level, pos.below()) || blockState.is(ModBlocks.PSYCHO_BERRY_BUSH);
+        return blockState.isSolidRender(level, pos) || blockState.is(ModBlocks.PSYCHO_BERRY_BUSH);
     }
 }

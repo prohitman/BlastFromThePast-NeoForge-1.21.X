@@ -13,7 +13,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 public class BurrelEatGoal extends TargetGoal {
-
     private final BurrelEntity burrel;
     private int unseenTicks;
     ItemEntity itemTarget;
@@ -60,7 +59,7 @@ public class BurrelEatGoal extends TargetGoal {
         ItemEntity targetCandidate = null;
         float distance = 0;
         for (ItemEntity entry : itemEntityList) {
-            if (burrel.isFood(entry.getItem()) || entry.getItem().is(ModItems.SAP_BALL)) {
+            if ((burrel.isFood(entry.getItem()) || entry.getItem().is(ModItems.SAP_BALL)) && burrel.hasLineOfSight(entry)) {
                 float entityDistance = burrel.distanceTo(entry);
                 if (entityDistance < 1.5) {
                     burrel.makeSound(ModSounds.BURREL_EAT.get());
@@ -79,12 +78,13 @@ public class BurrelEatGoal extends TargetGoal {
         itemTarget = targetCandidate;
         if (targetCandidate != null) {
             this.burrel.getNavigation().moveTo(itemTarget, 1);
+            this.burrel.getLookControl().setLookAt(itemTarget);
         }
     }
 
     @Override
     public boolean canContinueToUse() {
-        if (itemTarget == null || itemTarget.isRemoved()) {
+        if (itemTarget == null || itemTarget.isRemoved() || !burrel.hasLineOfSight(itemTarget)) {
             findTarget();
             if (itemTarget == null || itemTarget.isRemoved()) {
                 return false;

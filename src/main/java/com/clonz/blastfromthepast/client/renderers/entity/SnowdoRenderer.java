@@ -23,9 +23,14 @@ public class SnowdoRenderer extends GeoEntityRenderer<SnowdoEntity> {
                 model.getBone("neck").orElseThrow().setRotX(animatable.getXRot() * ((float)Math.PI / 180F));
                 model.getBone("neck").orElseThrow().setRotY((f1 - f) * ((float)Math.PI / 180F));
             } else {
-                model.getBone("Body").orElseThrow().setRotX(animatable.getXRot() * ((float)Math.PI / 180F));
-                model.getBone("Body").orElseThrow().setRotY((f1 - f) * ((float)Math.PI / 180F));
+                model.getBone("body").orElseThrow().setRotX(animatable.getXRot() * ((float)Math.PI / 180F));
+                model.getBone("body").orElseThrow().setRotY((f1 - f) * ((float)Math.PI / 180F));
             }
         }
+    }
+
+    @Override
+    public float getMotionAnimThreshold(SnowdoEntity animatable) {
+        return 1.0E-6F;
     }
 }

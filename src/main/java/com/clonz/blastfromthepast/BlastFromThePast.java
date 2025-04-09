@@ -1,13 +1,16 @@
 package com.clonz.blastfromthepast;
 
+import com.clonz.blastfromthepast.client.models.block.AntlerDisplayBlockModel;
 import com.clonz.blastfromthepast.client.models.boats.BFTPBoatModel;
 import com.clonz.blastfromthepast.client.models.boats.BFTPChestBoatModel;
+import com.clonz.blastfromthepast.client.renderers.block.BearTrapRenderer;
 import com.clonz.blastfromthepast.client.renderers.boat.BFTPBoatRenderer;
 import com.clonz.blastfromthepast.client.renderers.entity.*;
 import com.clonz.blastfromthepast.client.renderers.projectile.TarArrowRenderer;
 import com.clonz.blastfromthepast.client.renderers.projectile.ThrownIceSpearRenderer;
 import com.clonz.blastfromthepast.entity.boats.BFTPBoat;
 import com.clonz.blastfromthepast.entity.pack.EntityPacks;
+import com.clonz.blastfromthepast.events.CommonNeoEvents;
 import com.clonz.blastfromthepast.events.CuriosCompat;
 import com.clonz.blastfromthepast.init.*;
 import com.mojang.logging.LogUtils;
@@ -34,6 +37,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.slf4j.Logger;
+import software.bernie.geckolib.renderer.GeoBlockRenderer;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(BlastFromThePast.MODID)
@@ -43,17 +47,9 @@ public class BlastFromThePast {
     public static final boolean CURIOS_LOADED = ModList.get().isLoaded("curios");
 
     public BlastFromThePast(IEventBus modEventBus, ModContainer modContainer) {
-        // Register the commonSetup method for modloading
-        //modEventBus.addListener(CommonNeoEvents::setup);
-
-        // Register ourselves for server and other game events we are interested in.
-        // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
-        // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this);
 
-        // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
-
 
         ModEntities.ENTITIES.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
@@ -70,8 +66,6 @@ public class BlastFromThePast {
         if (CURIOS_LOADED) {
             NeoForge.EVENT_BUS.register(CuriosCompat.class);
         }
-
-        // Register our mod's ModConfigSpec so that FML can create and load the config file for us
     }
 
     public static EntityPacks getEntityPacks(ServerLevel level) {
@@ -112,12 +106,16 @@ public class BlastFromThePast {
                 EntityRenderers.register(ModEntities.BURREL.get(), BurrelRenderer::new);
                 EntityRenderers.register(ModEntities.HOLLOW.get(), HollowRenderer::new);
                 EntityRenderers.register(ModEntities.TAR_ARROW.get(), TarArrowRenderer::new);
+                EntityRenderers.register(ModEntities.SAP.get(), SapRenderer::new);
 
                 EntityRenderers.register(ModEntities.BFTPBOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, false)));
                 EntityRenderers.register(ModEntities.BFTPCHEST_BOAT.get(), (pContext -> new BFTPBoatRenderer(pContext, true)));
                 EntityRenderers.register(ModEntities.ICE_SPEAR.get(), ThrownIceSpearRenderer::new);
+
+                BlockEntityRenderers.register(ModBlockEntities.BEAR_TRAP.get(), BearTrapRenderer::new);
                 BlockEntityRenderers.register(ModBlockEntities.SIGN.get(), SignRenderer::new);
                 BlockEntityRenderers.register(ModBlockEntities.HANGING_SIGN.get(), HangingSignRenderer::new);
+                BlockEntityRenderers.register(ModBlockEntities.ANTLER_DISPLAY.get(), (context) -> new GeoBlockRenderer<>(new AntlerDisplayBlockModel()));
 
                 ItemProperties.register(ModItems.ICE_SPEAR.get(), ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "throwing"), (stack, level, living, j) ->
                         living != null && living.isUsingItem() && living.getUseItem() == stack ? 1.0F : 0.0F);

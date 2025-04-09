@@ -58,6 +58,8 @@ import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
@@ -75,10 +77,7 @@ import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
+import java.util.*;
 import java.util.function.Predicate;
 @ParametersAreNonnullByDefault
 public class FrostomperEntity extends AbstractChestedHorse implements GeoEntity, EntityPackHolder<FrostomperEntity>, OverrideAnimatedAttacker<FrostomperEntity, FrostomperEntity.FrostomperAttackType>, ChargeForward, Roaring {
@@ -105,6 +104,11 @@ public class FrostomperEntity extends AbstractChestedHorse implements GeoEntity,
     private int idleAnimationTimer = -1;
     private boolean lastCollide = false;
     public boolean serverHorizontalCollide = false;
+    public boolean canAnimateLook = true;
+
+    private boolean party;
+    @javax.annotation.Nullable
+    private BlockPos jukebox;
 
     public static final RawAnimation IDLE = RawAnimation.begin().then("animation.frostomper.idle", Animation.LoopType.DEFAULT);
     public static final RawAnimation CRUSH = RawAnimation.begin().then("animation.frostomper.crush", Animation.LoopType.DEFAULT);
@@ -116,6 +120,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements GeoEntity,
     public static final RawAnimation EARS = RawAnimation.begin().then("animation.frostomper.ears", Animation.LoopType.DEFAULT);
     public static final RawAnimation WALK = RawAnimation.begin().then("animation.frostomper.walk", Animation.LoopType.DEFAULT);
     public static final RawAnimation TRUMPET = RawAnimation.begin().then("animation.frostomper.trumpet", Animation.LoopType.DEFAULT);
+    public static final RawAnimation DANCE = RawAnimation.begin().then("animation.frostomper.dance", Animation.LoopType.DEFAULT);
 
     public FrostomperEntity(EntityType<? extends FrostomperEntity> entityType, Level level) {
         super(entityType, level);
@@ -215,10 +220,6 @@ public class FrostomperEntity extends AbstractChestedHorse implements GeoEntity,
         return 45;
     }
 
-    public String getAnimationKey(String animation) {
-        return "animation.frostomper." + animation;
-    }
-
     @Override
     public boolean isFood(ItemStack itemStack) {
         return itemStack.is(this.isBaby() ? ModTags.Items.BABY_FROSTOMPER_FOOD : ModTags.Items.FROSTOMPER_FOOD);
@@ -299,8 +300,13 @@ public class FrostomperEntity extends AbstractChestedHorse implements GeoEntity,
     }
 
     @Override
-    protected void playJumpSound() {
-    }
+    protected void playJumpSound() {}
+
+    @Override
+    protected void playGallopSound(SoundType soundType) {}
+
+    @Override
+    protected void playStepSound(BlockPos pos, BlockState block) {}
 
     @Override
     protected void playChestEquipsSound() {
@@ -360,6 +366,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements GeoEntity,
                     SoundEvent eatingSound = this.getEatingSound();
                     this.makeSound(eatingSound);
                 }
+                this.heal(4);
 
                 this.gameEvent(GameEvent.EAT);
                 return true;
@@ -517,7 +524,18 @@ public class FrostomperEntity extends AbstractChestedHorse implements GeoEntity,
     }
 
     @Override
+    public boolean hurt(DamageSource source, float amount) {
+        this.jukebox = null;
+        this.party = false;
+        return super.hurt(source, amount);
+    }
+
+    @Override
     public void aiStep() {
+        if (this.jukebox == null || !this.jukebox.closerToCenterThan(this.position(), 15) || !this.level().getBlockState(this.jukebox).is(Blocks.JUKEBOX)) {
+            this.party = false;
+            this.jukebox = null;
+        }
         super.aiStep();
         if (this.isAlive() && !this.level().isClientSide) {
             if ((this.horizontalCollision || this.serverHorizontalCollide) && EventHooks.canEntityGrief(this.level(), this)) {
@@ -547,6 +565,12 @@ public class FrostomperEntity extends AbstractChestedHorse implements GeoEntity,
                 }
             }
         }
+    }
+
+    @Override
+    public void setRecordPlayingNearby(BlockPos pos, boolean isPartying) {
+        this.jukebox = pos;
+        this.party = isPartying;
     }
 
     @Override
@@ -731,7 +755,7 @@ public class FrostomperEntity extends AbstractChestedHorse implements GeoEntity,
         if(this.isRoaring()){
             return false;
         }
-        return OverrideAnimatedAttacker.super.canAnimateLook();
+        return OverrideAnimatedAttacker.super.canAnimateLook() && canAnimateLook;
     }
 
     @Override
@@ -747,13 +771,16 @@ public class FrostomperEntity extends AbstractChestedHorse implements GeoEntity,
                 if (activeAttackType == FrostomperAttackType.SINGLE_STOMP && this.isLeftHanded()) return state.setAndContinue(STOMP_FLIPPED);
                 if (activeAttackType == FrostomperAttackType.FLING) return state.setAndContinue(FLING);
                 if (activeAttackType == FrostomperAttackType.CHARGE) return state.setAndContinue(CHARGE);
-                IdleState idleState = this.getEntityData().get(DATA_IDLE_STATE);
-                if (idleState == IdleState.TAIL) return state.setAndContinue(TAILS);
-                if (idleState == IdleState.EARS) return state.setAndContinue(EARS);
             }
             if (this.isRoaring()) return state.setAndContinue(TRUMPET);
-            if (!state.isMoving() && this.onGround() && activeAttackType == null) return state.setAndContinue(IDLE);
             if (state.isMoving()) return state.setAndContinue(WALK);
+            if (this.party && !this.isBaby()) return state.setAndContinue(DANCE);
+            return state.setAndContinue(IDLE);
+        }));
+        controllers.add(new AnimationController<GeoAnimatable>(this, "idle", 5, state -> {
+            IdleState idleState = this.getEntityData().get(DATA_IDLE_STATE);
+            if (idleState == IdleState.TAIL) return state.setAndContinue(TAILS);
+            if (idleState == IdleState.EARS) return state.setAndContinue(EARS);
             return PlayState.STOP;
         }));
     }

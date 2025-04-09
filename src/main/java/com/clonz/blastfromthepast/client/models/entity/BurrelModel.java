@@ -66,8 +66,4 @@ public class BurrelModel extends GeoModel<BurrelEntity> {
         if (burrel.isBaby()) return BABY_ANIMATION;
         return ANIMATION;
     }
-
-    public float getMotionAnimThreshold(BurrelEntity animatable) {
-        return 1.0E-6F;
-    }
 }

@@ -9,6 +9,7 @@ import com.clonz.blastfromthepast.init.ModTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.WallBlock;
@@ -28,7 +29,8 @@ public class ModBlockTagsGen extends BlockTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         tag(BlockTags.LEAVES)
-                .add(ModBlocks.PSYCHO_BERRY_BUSH.get());
+                .add(ModBlocks.PSYCHO_BERRY_BUSH.get())
+                .add(ModBlocks.CEDAR.LEAVES.get());
         tag(BlockTags.LOGS_THAT_BURN)
                 .add(ModBlocks.SAPPY_CEDAR_LOG.get());
         tag(ModTags.Blocks.FROSTOMPER_CAN_BREAK)
@@ -40,13 +42,37 @@ public class ModBlockTagsGen extends BlockTagsProvider {
         loadStoneGroupBlockTags(ModBlocks.PERMAFROST);
 
         tag(BlockTags.TALL_FLOWERS)
-                .add(ModBlocks.WHITE_DELPHINIUM.get())
-                .add(ModBlocks.BLUE_DELPHINIUM.get())
-                .add(ModBlocks.PINK_DELPHINIUM.get())
-                .add(ModBlocks.VIOLET_DELPHINIUM.get());
+                .add(ModBlocks.ROYAL_LARKSPUR.get())
+                .add(ModBlocks.SHIVER_LARKSPUR.get())
+                .add(ModBlocks.BLUSH_LARKSPUR.get())
+                .add(ModBlocks.SNOW_LARKSPUR.get());
+
+        tag(BlockTags.FLOWERS)
+                .add(ModBlocks.SILENE.get());
 
         tag(BlockTags.MINEABLE_WITH_SHOVEL)
                 .add(ModBlocks.TAR.get());
+
+        tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                .add(ModBlocks.PERMAFROST_BURREL_PAINTING.get()).
+                add(ModBlocks.PERMAFROST_SNOWDO_PAINTING.get()).
+                add(ModBlocks.PERMAFROST_GLACEROS_PAINTING.get()).
+                add(ModBlocks.PERMAFROST_PSYCHO_BEAR_PAINTING.get()).
+                add(ModBlocks.PERMAFROST_SPEARTOOTH_PAINTING.get()).
+                add(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_TOP_RIGHT.get()).
+                add(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_TOP_LEFT.get()).
+                add(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_BOTTOM_RIGHT.get()).
+                add(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_BOTTOM_LEFT.get());
+        tag(BlockTags.NEEDS_STONE_TOOL)
+                .add(ModBlocks.PERMAFROST_BURREL_PAINTING.get()).
+                add(ModBlocks.PERMAFROST_SNOWDO_PAINTING.get()).
+                add(ModBlocks.PERMAFROST_GLACEROS_PAINTING.get()).
+                add(ModBlocks.PERMAFROST_PSYCHO_BEAR_PAINTING.get()).
+                add(ModBlocks.PERMAFROST_SPEARTOOTH_PAINTING.get()).
+                add(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_TOP_RIGHT.get()).
+                add(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_TOP_LEFT.get()).
+                add(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_BOTTOM_RIGHT.get()).
+                add(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_BOTTOM_LEFT.get());
 
         loadBlockGroupBlockTags(ModBlocks.ICE_BRICK);
         loadBlockGroupBlockTags(ModBlocks.SNOW_BRICK);

@@ -18,6 +18,7 @@ import com.clonz.blastfromthepast.init.ModTags;
 import com.clonz.blastfromthepast.util.DebugFlags;
 import com.clonz.blastfromthepast.util.EntityHelper;
 import com.clonz.blastfromthepast.util.HitboxHelper;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -28,6 +29,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -47,6 +49,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
@@ -81,9 +84,13 @@ public class PsychoBearEntity extends Animal implements GeoEntity, OverrideAnima
     private final AttackTicker<PsychoBearEntity, PsychoBearEntity.PsychoBearAttackType> attackTicker = new AttackTicker<>(this);
     private int pacifiedTicks = 0;
     private int eatCounter = 0;
+    private Player lastFedPlayer;
     private int moreFoodTicks;
     private int itchReliefTicks;
     private int roarCounter;
+    private boolean party;
+    @javax.annotation.Nullable
+    private BlockPos jukebox;
     private static final int LIE_DOWN_DURATION = Mth.floor(1F * 20);
     private static final int WAKE_UP_DURATION = Mth.floor(1F * 20);
     private static final int BACK_SCRATCH_START_DURATION = Mth.floor(0.5F * 20);
@@ -103,6 +110,7 @@ public class PsychoBearEntity extends Animal implements GeoEntity, OverrideAnima
     public static final RawAnimation SCRATCH_LOOP = RawAnimation.begin().then("animation.psycho_bear.back_scratch_loop", Animation.LoopType.DEFAULT);
     public static final RawAnimation SCRATCH_STOP = RawAnimation.begin().then("animation.psycho_bear.back_scratch_stop", Animation.LoopType.DEFAULT);
     public static final RawAnimation WALK = RawAnimation.begin().then("animation.psycho_bear.walk", Animation.LoopType.DEFAULT);
+    public static final RawAnimation DANCE = RawAnimation.begin().then("animation.psycho_bear.dance", Animation.LoopType.DEFAULT);
 
     public PsychoBearEntity(EntityType<? extends PsychoBearEntity> entityType, Level level) {
         super(entityType, level);
@@ -217,7 +225,7 @@ public class PsychoBearEntity extends Animal implements GeoEntity, OverrideAnima
     }
 
     protected boolean canBeAggressive(){
-        return !this.isPacified() && !this.isBaby();
+        return !this.isPacified() && !this.isBaby() && !this.isSleeping();
     }
 
     protected boolean canTarget(LivingEntity target) {
@@ -271,6 +279,7 @@ public class PsychoBearEntity extends Animal implements GeoEntity, OverrideAnima
 
             if(!this.level().isClientSide){
                 this.tryToSit();
+                lastFedPlayer = player;
                 this.setEating(true);
                 ItemStack mainHandItem = this.getItemInMouth();
                 if (!mainHandItem.isEmpty() && !player.hasInfiniteMaterials()) {
@@ -409,7 +418,17 @@ public class PsychoBearEntity extends Animal implements GeoEntity, OverrideAnima
             this.xxa = 0.0F;
             this.zza = 0.0F;
         }
+        if (this.jukebox == null || !this.jukebox.closerToCenterThan(this.position(), 7) || !this.level().getBlockState(this.jukebox).is(Blocks.JUKEBOX)) {
+            this.party = false;
+            this.jukebox = null;
+        }
         super.aiStep();
+    }
+
+    @Override
+    public void setRecordPlayingNearby(BlockPos pos, boolean isPartying) {
+        this.jukebox = pos;
+        this.party = isPartying;
     }
 
     @Override
@@ -484,6 +503,8 @@ public class PsychoBearEntity extends Animal implements GeoEntity, OverrideAnima
                     if (this.isPacifier(eatItem)) {
                         this.setPacified(true);
                         this.setTarget(null);
+                        if (lastFedPlayer != null)
+                            CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer) lastFedPlayer, eatItem);
                     }
                     this.putItemInMouth(ItemStack.EMPTY, false);
                     this.gameEvent(GameEvent.EAT);
@@ -560,6 +581,8 @@ public class PsychoBearEntity extends Animal implements GeoEntity, OverrideAnima
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
+        this.jukebox = null;
+        this.party = false;
         if (!this.level().isClientSide) {
             this.clearStates();
         }
@@ -838,7 +861,7 @@ public class PsychoBearEntity extends Animal implements GeoEntity, OverrideAnima
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<GeoAnimatable>(this, "main", 5, state -> {
             PsychoBearEntity.PsychoBearAttackType activeAttackType = this.getActiveAttackType();
-            if(!this.isBaby()){
+            if (!this.isBaby()) {
                 if (this.isRoaring()) return state.setAndContinue(ROAR);
                 if (activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && !this.isLeftHanded()) return state.setAndContinue(ATTACK_FLIPPED);
                 if (activeAttackType == PsychoBearEntity.PsychoBearAttackType.SLASH && this.isLeftHanded()) return state.setAndContinue(ATTACK);
@@ -850,9 +873,9 @@ public class PsychoBearEntity extends Animal implements GeoEntity, OverrideAnima
                 if (activeAttackType == null && this.getBackScratchState() == TransitioningState.ACTIVE) return state.setAndContinue(SCRATCH_LOOP);
                 if (activeAttackType == null && this.getBackScratchState() == TransitioningState.ACTIVE_TO_INACTIVE) return state.setAndContinue(SCRATCH_STOP);
             }
-            if (!state.isMoving() && !this.isAllActionBlocked() && this.onGround() && activeAttackType == null) return state.setAndContinue(IDLE);
             if (state.isMoving()) return state.setAndContinue(WALK);
-            return PlayState.STOP;
+            if (this.party && !this.isBaby()) return state.setAndContinue(DANCE);
+            return state.setAndContinue(IDLE);
         }));
     }
 

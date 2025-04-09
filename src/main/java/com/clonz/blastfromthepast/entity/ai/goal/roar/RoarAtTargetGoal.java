@@ -56,7 +56,7 @@ public class RoarAtTargetGoal<T extends Mob & Roaring> extends Goal {
 
     private void lookOrRoarAtTarget() {
         LivingEntity target = this.mob.getTarget();
-        if(target != null && !this.mob.isRoaring()){
+        if(target != null && !this.mob.isRoaring()) {
             // If we are already looking at the target, start roaring
             if(this.isFacingTarget(target)){
                 if(!this.didRoar){
@@ -71,6 +71,16 @@ public class RoarAtTargetGoal<T extends Mob & Roaring> extends Goal {
             // Otherwise, look at the target
             else{
                 this.mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
+            }
+        }
+        else if (this.mob.getRandom().nextIntBetweenInclusive(1, 2500) == 1) {
+            if(!this.didRoar){
+                this.mob.roarIfPossible();
+                if(this.mob.isRoaring()){
+                    if(DebugFlags.DEBUG_ROAR)
+                        BlastFromThePast.LOGGER.info("{} started roaring at {}", this.mob, target);
+                    this.didRoar = true;
+                }
             }
         }
     }

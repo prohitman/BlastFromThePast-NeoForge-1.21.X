@@ -29,4 +29,9 @@ public class PsychoBearRenderer extends GeoEntityRenderer<PsychoBearEntity> {
         head.setRotX(pHeadPitch * Mth.DEG_TO_RAD);
         head.setRotY(pNetHeadYaw * Mth.DEG_TO_RAD);
     }
+
+    @Override
+    public float getMotionAnimThreshold(PsychoBearEntity animatable) {
+        return 1.0E-6F;
+    }
 }

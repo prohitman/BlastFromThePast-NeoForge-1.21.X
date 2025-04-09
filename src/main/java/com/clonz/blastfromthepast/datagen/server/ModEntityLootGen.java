@@ -97,6 +97,8 @@ public class ModEntityLootGen extends EntityLootSubProvider {
                         .add(
                                 LootItem.lootTableItem(ModBlocks.BEAST_CHOPS)
                                         .setWeight(3)
+                                        .apply(SmeltItemFunction.smelted()
+                                                .when(AnyOfCondition.anyOf(this.shouldSmeltLoot())))
                                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 3.0F)))
                                         .apply(EnchantedCountIncreaseFunction.lootingMultiplier(this.registries, UniformGenerator.between(0.0F, 1.0F))))
                 ).withPool(LootPool.lootPool()

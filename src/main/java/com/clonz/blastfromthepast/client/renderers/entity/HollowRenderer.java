@@ -15,4 +15,9 @@ public class HollowRenderer extends GeoEntityRenderer<HollowEntity> {
     public boolean shouldShowName(HollowEntity entity) {
         return false;
     }
+
+    @Override
+    public float getMotionAnimThreshold(HollowEntity animatable) {
+        return 1.0E-6F;
+    }
 }

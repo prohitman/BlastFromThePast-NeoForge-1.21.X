@@ -50,7 +50,7 @@ public class PsychoBerrySprout extends BushBlock implements IShearable, Bonemeal
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!level.isAreaLoaded(pos, 1)) return;
-        if (!state.canSurvive(level, pos)) {
+        if (!canSurvive(state, level, pos)) {
             level.destroyBlock(pos, true);
         }
     }
@@ -76,16 +76,16 @@ public class PsychoBerrySprout extends BushBlock implements IShearable, Bonemeal
 
     public void generateRandomBlocksAround(Level level, BlockPos pos, BlockState state) {
         RandomSource random = level.getRandom();
-        for (int j = 0; j < 17; j++) {
+        for (int j = 0; j < 20; j++) {
             if (random.nextBoolean()) {
                 int xOffset = random.nextInt(3) - 1;
-                int yOffset = random.nextInt(3) - 1;
+                int yOffset = random.nextInt(1);
                 int zOffset = random.nextInt(3) - 1;
 
                 if (!(xOffset == 0 && yOffset == 0 && zOffset == 0)) {
                     BlockPos newPos = pos.offset(xOffset, yOffset, zOffset);
 
-                    if (level.isEmptyBlock(newPos)) {
+                    if (level.getBlockState(newPos).canBeReplaced() && canSurvive(null, level, newPos)) {
                         level.setBlock(newPos, state, 2);
                     }
                 }
@@ -126,6 +126,7 @@ public class PsychoBerrySprout extends BushBlock implements IShearable, Bonemeal
 
     @Override
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
-        return level.getBlockState(pos.below()).isSolidRender(level, pos.below());
+        BlockState blockState = level.getBlockState(pos.below());
+        return blockState.isSolidRender(level, pos) || blockState.is(ModBlocks.PSYCHO_BERRY_BUSH);
     }
 }

@@ -1,14 +1,19 @@
 package com.clonz.blastfromthepast.entity;
 
+import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.datagen.server.ModEntityLootGen;
 import com.clonz.blastfromthepast.entity.ai.goal.EatDelphiniumGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.GlacerosAlertPanicGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.GlacerosSparGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.MoveAwayFromBlockGoal;
+import com.clonz.blastfromthepast.entity.pack.EntityPack;
+import com.clonz.blastfromthepast.entity.pack.EntityPackAgeableMobData;
+import com.clonz.blastfromthepast.entity.pack.EntityPackHolder;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModItems;
 import com.clonz.blastfromthepast.init.ModSounds;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -50,7 +55,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.IntFunction;
 
-public class GlacerosEntity extends Animal implements GeoEntity, VariantHolder<GlacerosEntity.Variant> {
+public class GlacerosEntity extends Animal implements GeoEntity, VariantHolder<GlacerosEntity.Variant>, EntityPackHolder<GlacerosEntity> {
     private static final EntityDataAccessor<Integer> DATA_VARIANT_ID = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.INT);
     public  static final EntityDataAccessor<Boolean> PANICKING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
     public  static final EntityDataAccessor<Boolean> EATING = SynchedEntityData.defineId(GlacerosEntity.class, EntityDataSerializers.BOOLEAN);
@@ -66,6 +71,12 @@ public class GlacerosEntity extends Animal implements GeoEntity, VariantHolder<G
     public int sparringCooldown = 150 + this.getRandom().nextInt(50);
     public int chargeTimer;
 
+    private boolean party;
+    @javax.annotation.Nullable
+    private BlockPos jukebox;
+
+    private EntityPack<GlacerosEntity> pack;
+
     public static final RawAnimation IDLE = RawAnimation.begin().then("animation.glaceros.idle", Animation.LoopType.DEFAULT);
     public static final RawAnimation EAT = RawAnimation.begin().then("animation.glaceros.eat", Animation.LoopType.DEFAULT);
     public static final RawAnimation CHARGE = RawAnimation.begin().then("animation.glaceros.charge", Animation.LoopType.DEFAULT);
@@ -73,6 +84,7 @@ public class GlacerosEntity extends Animal implements GeoEntity, VariantHolder<G
     public static final RawAnimation TAIL = RawAnimation.begin().then("animation.glaceros.tail", Animation.LoopType.DEFAULT);
     public static final RawAnimation WALK = RawAnimation.begin().then("animation.glaceros.walk", Animation.LoopType.DEFAULT);
     public static final RawAnimation FLEE = RawAnimation.begin().then("animation.glaceros.run", Animation.LoopType.DEFAULT);
+    public static final RawAnimation DANCE = RawAnimation.begin().then("animation.glaceros.dance", Animation.LoopType.DEFAULT);
 
     public GlacerosEntity(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -109,12 +121,13 @@ public class GlacerosEntity extends Animal implements GeoEntity, VariantHolder<G
         RandomSource randomsource = level.getRandom();
         //this.setRandomStrength(randomsource);
         GlacerosEntity.Variant glaceros$variant;
-        if (spawnGroupData instanceof GlacerosEntity.GlacerosGroupData) {
+        if (spawnGroupData instanceof GlacerosEntity.GlacerosGroupData glacerosGroupData) {
             glaceros$variant = ((GlacerosEntity.GlacerosGroupData)spawnGroupData).variant;
+            glacerosGroupData.addPackMember(this);
         } else {
             //glaceros$variant = Util.getRandom(GlacerosEntity.Variant.values(), randomsource);
             glaceros$variant = getVariantFromChance(randomsource);
-            spawnGroupData = new GlacerosEntity.GlacerosGroupData(glaceros$variant);
+            spawnGroupData = new GlacerosEntity.GlacerosGroupData(BlastFromThePast.getUniversalEntityPacks(level.getLevel().getServer()).createFreshPack(), glaceros$variant);
         }
 
         this.setVariant(glaceros$variant);
@@ -135,15 +148,30 @@ public class GlacerosEntity extends Animal implements GeoEntity, VariantHolder<G
     }
 
     @Override
+    public void aiStep() {
+        if (this.jukebox == null || !this.jukebox.closerToCenterThan(this.position(), 7) || !this.level().getBlockState(this.jukebox).is(Blocks.JUKEBOX)) {
+            this.party = false;
+            this.jukebox = null;
+        }
+        super.aiStep();
+    }
+
+    @Override
+    public void setRecordPlayingNearby(BlockPos pos, boolean isPartying) {
+        this.jukebox = pos;
+        this.party = isPartying;
+    }
+
+    @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<GeoAnimatable>(this, "main", 5, state -> {
             if (this.isRushing()) return state.setAndContinue(CHARGE);
             if (this.isCharging()) return state.setAndContinue(CHARGE_PREPARE);
             if (this.isEating()) return state.setAndContinue(EAT);
-            if (!state.isMoving() && onGround()) return state.setAndContinue(IDLE);
             if (isPanicking() || isRunning()) return state.setAndContinue(FLEE);
             if (getDeltaMovement().horizontalDistanceSqr() > 1.0E-6D) return state.setAndContinue(WALK);
-            return PlayState.STOP;
+            if (this.party && !this.isBaby()) return state.setAndContinue(DANCE);
+            return state.setAndContinue(IDLE);
         })).add(new AnimationController<GeoAnimatable>(this, "second", 5, state -> PlayState.STOP)
                 .triggerableAnim("tail", TAIL));
     }
@@ -155,13 +183,30 @@ public class GlacerosEntity extends Animal implements GeoEntity, VariantHolder<G
         return cache;
     }
 
-    static class GlacerosGroupData extends AgeableMob.AgeableMobGroupData {
+    @Override
+    public @Nullable EntityPack<GlacerosEntity> getPack() {
+        return pack;
+    }
+
+    @Override
+    public void setPack(@Nullable EntityPack<GlacerosEntity> pack) {
+        this.pack = pack;
+    }
+
+    static class GlacerosGroupData extends EntityPackAgeableMobData<GlacerosEntity> {
         public final GlacerosEntity.Variant variant;
 
-        GlacerosGroupData(Variant variant) {
-            super(true);
+        GlacerosGroupData(EntityPack<GlacerosEntity> pack, Variant variant) {
+            super(pack, true);
             this.variant = variant;
         }
+    }
+
+    @Override
+    public boolean hurt(DamageSource source, float amount) {
+        this.jukebox = null;
+        this.party = false;
+        return super.hurt(source, amount);
     }
 
     @Override
@@ -421,10 +466,10 @@ public class GlacerosEntity extends Animal implements GeoEntity, VariantHolder<G
     }
 
     public enum Variant implements StringRepresentable {
-        STRAIGHT(0,"normal", ModBlocks.VIOLET_DELPHINIUM.get(), ModItems.STRAIGHT_GLACEROS_ANTLERS.get()),
-        BROAD(1, "broad", ModBlocks.BLUE_DELPHINIUM.get(), ModItems.BROAD_GLACEROS_ANTLERS.get()),
-        CURLY(2, "curly", ModBlocks.PINK_DELPHINIUM.get(), ModItems.CURLY_GLACEROS_ANTLERS.get()),
-        SPIKEY(3, "spikey", ModBlocks.WHITE_DELPHINIUM.get(), ModItems.SPIKEY_GLACEROS_ANTLERS.get());
+        STRAIGHT(0,"normal", ModBlocks.SNOW_LARKSPUR.get(), ModItems.STRAIGHT_GLACEROS_ANTLERS.get()),
+        BROAD(1, "broad", ModBlocks.SHIVER_LARKSPUR.get(), ModItems.BROAD_GLACEROS_ANTLERS.get()),
+        CURLY(2, "curly", ModBlocks.BLUSH_LARKSPUR.get(), ModItems.CURLY_GLACEROS_ANTLERS.get()),
+        SPIKEY(3, "spikey", ModBlocks.ROYAL_LARKSPUR.get(), ModItems.SPIKEY_GLACEROS_ANTLERS.get());
 
         //public static final Codec<GlacerosEntity.Variant> CODEC = StringRepresentable.fromEnum(GlacerosEntity.Variant::values);
         private static final IntFunction<GlacerosEntity.Variant> BY_ID = ByIdMap.continuous(GlacerosEntity.Variant::getId, values(), ByIdMap.OutOfBoundsStrategy.CLAMP);

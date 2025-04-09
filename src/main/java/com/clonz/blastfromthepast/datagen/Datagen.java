@@ -5,6 +5,7 @@ import com.clonz.blastfromthepast.datagen.client.ModBlockStateGen;
 import com.clonz.blastfromthepast.datagen.client.ModItemModelGen;
 import com.clonz.blastfromthepast.datagen.client.ModLangGen;
 import com.clonz.blastfromthepast.datagen.server.*;
+import com.clonz.blastfromthepast.init.ModCriteriaTriggers;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -12,9 +13,11 @@ import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.data.AdvancementProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @EventBusSubscriber(modid = BlastFromThePast.MODID, bus = EventBusSubscriber.Bus.MOD)
@@ -34,6 +37,7 @@ public class Datagen {
         generator.addProvider(event.includeServer(), new ModLootTableGen(packOutput, lookupProvider));
         CompletableFuture<HolderLookup.Provider> datapackGen = generator.addProvider(event.includeServer(), new ModDatapackRegistriesGen(packOutput, lookupProvider)).getRegistryProvider();
         generator.addProvider(event.includeServer(), new ModBiomeTagsGen(packOutput, datapackGen, fileHelper));
+        generator.addProvider(event.includeServer(), new AdvancementProvider(packOutput, datapackGen, fileHelper, List.of(new ModAdvancementGen())));
 
         generator.addProvider(event.includeClient(), new ModBlockStateGen(packOutput, fileHelper));
         generator.addProvider(event.includeClient(), new ModItemModelGen(packOutput, fileHelper));

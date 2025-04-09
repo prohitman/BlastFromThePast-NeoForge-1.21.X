@@ -3,14 +3,19 @@ package com.clonz.blastfromthepast.entity.speartooth;
 import com.clonz.blastfromthepast.BlastFromThePast;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.entity.Roaring;
+import com.clonz.blastfromthepast.entity.ai.goal.pack.PackHurtByTargetGoal;
 import com.clonz.blastfromthepast.entity.ai.goal.roar.RoarAtTargetGoal;
 import com.clonz.blastfromthepast.entity.misc.ComplexAnimal;
 import com.clonz.blastfromthepast.entity.misc.StateValue;
+import com.clonz.blastfromthepast.entity.pack.EntityPack;
+import com.clonz.blastfromthepast.entity.pack.EntityPackAgeableMobData;
+import com.clonz.blastfromthepast.entity.pack.EntityPackHolder;
 import com.clonz.blastfromthepast.entity.speartooth.ai.*;
 import com.clonz.blastfromthepast.init.*;
 import com.clonz.blastfromthepast.util.EntityHelper;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -40,6 +45,7 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
@@ -53,10 +59,11 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.UUID;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, GeoEntity, Roaring /*, OverrideAnimatedAttacker<SpeartoothEntity, AAAAAAAAAAAAAAAAASpeartoothAttackType> */ {
+public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, GeoEntity, Roaring, EntityPackHolder<SpeartoothEntity> /*, OverrideAnimatedAttacker<SpeartoothEntity, AAAAAAAAAAAAAAAAASpeartoothAttackType> */ {
     private static final EntityDimensions BABY_DIMENSIONS = ModEntities.SPEARTOOTH.get().getDimensions().scale(0.5F).withEyeHeight(0.55F);
 
     protected static final EntityDataAccessor<State> STATE = SynchedEntityData.defineId(SpeartoothEntity.class, ModDataSerializers.SPEARTOOTH_STATE.get());
@@ -86,6 +93,13 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, Ge
     public long lastRoarTime;
 
     private int roarTimer;
+    private int huntCooldown;
+
+    private boolean party;
+    @javax.annotation.Nullable
+    private BlockPos jukebox;
+
+    private EntityPack<SpeartoothEntity> pack;
 
     public SpeartoothEntity(EntityType<? extends TamableAnimal> entityType, Level level) {
         super(entityType, level);
@@ -134,6 +148,7 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, Ge
         this.targetSelector.addGoal(t++, new OwnerHurtTargetGoal(this));
         // Then those who hurt the entity itself
         this.targetSelector.addGoal(t++, new HurtByTargetGoal(this).setAlertOthers());
+        this.targetSelector.addGoal(t++, new PackHurtByTargetGoal<>(this, Predicate.not(AgeableMob::isBaby), AgeableMob::isBaby));
         // Hunt Glaceros and players
         this.targetSelector.addGoal(t, new NearestAttackableTargetGoal<>(this, GlacerosEntity.class, false));
         this.targetSelector.addGoal(t, new NearestAttackableTargetGoal<>(this, Player.class, true));
@@ -159,6 +174,10 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, Ge
     public void setTarget(@Nullable LivingEntity target) {
         // Prevents speartooth from attacking on low health
         //             / Always allow removing target /
+        if (target != null) {
+            if (huntCooldown > 0) return;
+            huntCooldown = 300;
+        }
         if (!shouldRetreat() || target == null) super.setTarget(target);
     }
 
@@ -167,6 +186,7 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, Ge
         super.tick();
         State state = this.getState();
         if (!this.level().isClientSide) {
+            huntCooldown--;
             if (this.getTexture() == Texture.STALKING && state != State.STALK) {
                 this.setTexture(Texture.DEFAULT);
             }
@@ -299,7 +319,20 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, Ge
 
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
+        if (spawnGroupData == null) {
+            spawnGroupData = new SpeartoothGroupData(BlastFromThePast.getUniversalEntityPacks(level.getLevel().getServer()).createFreshPack(), true);
+        }
+
+        if(spawnGroupData instanceof SpeartoothGroupData speartoothGroupData){
+            speartoothGroupData.addPackMember(this);
+        }
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
+    }
+
+    protected static class SpeartoothGroupData extends EntityPackAgeableMobData<SpeartoothEntity> {
+        public SpeartoothGroupData(EntityPack<SpeartoothEntity> entityPack, boolean shouldSpawnBaby) {
+            super(entityPack, shouldSpawnBaby);
+        }
     }
 
     public boolean isLookingAtMe(LivingEntity pEntity) {
@@ -345,7 +378,17 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, Ge
             this.xxa = 0.0F;
             this.zza = 0.0F;
         }
+        if (this.jukebox == null || !this.jukebox.closerToCenterThan(this.position(), 7) || !this.level().getBlockState(this.jukebox).is(Blocks.JUKEBOX)) {
+            this.party = false;
+            this.jukebox = null;
+        }
         super.aiStep();
+    }
+
+    @Override
+    public void setRecordPlayingNearby(BlockPos pos, boolean isPartying) {
+        this.jukebox = pos;
+        this.party = isPartying;
     }
 
     @Override
@@ -365,6 +408,17 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, Ge
     @Override
     public void setSitting(boolean sitting) {
         this.setState(sitting ? State.SIT : State.IDLE);
+    }
+
+    @Override
+    @Nullable
+    public EntityPack<SpeartoothEntity> getPack() {
+        return this.pack;
+    }
+
+    @Override
+    public void setPack(@Nullable EntityPack<SpeartoothEntity> pack) {
+        this.pack = pack;
     }
 
     @Override
@@ -467,6 +521,13 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, Ge
     }
 
     @Override
+    public boolean hurt(DamageSource source, float amount) {
+        this.jukebox = null;
+        this.party = false;
+        return super.hurt(source, amount);
+    }
+
+    @Override
     public void roarIfPossible() {
         if (this.canRoar()) {
             this.setRoaring(true);
@@ -511,11 +572,12 @@ public class SpeartoothEntity extends TamableAnimal implements ComplexAnimal, Ge
                 if (state == State.ROAR) return state1.setAndContinue(ROAR);
                 if (state == State.LUNGE) return state1.setAndContinue(LUNGE);
             }
-            if (state != State.SLEEP && state != State.COLD && !state1.isMoving() && this.onGround()) return state1.setAndContinue(IDLE);
             if (state1.isMoving()) {
                 if (!this.isBaby() && this.shouldRun()) return state1.setAndContinue(RUN);
                 return state1.setAndContinue(WALK);
             }
+            if (this.party && !this.isBaby()) return state1.setAndContinue(DANCE);
+            if (state != State.SLEEP && state != State.COLD && !state1.isMoving() && this.onGround()) return state1.setAndContinue(IDLE);
             return PlayState.STOP;
         }));
     }

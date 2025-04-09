@@ -1,8 +1,7 @@
 package com.clonz.blastfromthepast.init;
 
 import com.clonz.blastfromthepast.BlastFromThePast;
-import com.clonz.blastfromthepast.block.PineconeBlock;
-import com.clonz.blastfromthepast.block.TarBlock;
+import com.clonz.blastfromthepast.block.*;
 import com.clonz.blastfromthepast.worldgen.feature.CedarFoliagePlacer;
 import com.clonz.blastfromthepast.worldgen.feature.PitFeature;
 import net.minecraft.core.Direction;
@@ -17,6 +16,7 @@ import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.BlockPileConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.SimpleRandomFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
@@ -31,10 +31,18 @@ import java.util.Optional;
 public class ModConfiguredFeatures {
     public static ResourceKey<ConfiguredFeature<?, ?>> CEDAR_TREE = ResourceKey.create(Registries.CONFIGURED_FEATURE,
             ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "cedar_tree"));
+    public static ResourceKey<ConfiguredFeature<?, ?>> RUSTY_CEDAR_TREE = ResourceKey.create(Registries.CONFIGURED_FEATURE,
+            ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "rusty_cedar_tree"));
     public static ResourceKey<ConfiguredFeature<?, ?>> FROSTBITE_FOREST_FLOWERS = ResourceKey.create(Registries.CONFIGURED_FEATURE,
             ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "frostbite_forest_flowers"));
     public static ResourceKey<ConfiguredFeature<?, ?>> TAR_PIT = ResourceKey.create(Registries.CONFIGURED_FEATURE,
             ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "tar_pit"));
+    public static ResourceKey<ConfiguredFeature<?, ?>> PSYCHO_BERRY = ResourceKey.create(Registries.CONFIGURED_FEATURE,
+            ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "psycho_berry"));
+    public static ResourceKey<ConfiguredFeature<?, ?>> CHILLY_MOSS = ResourceKey.create(Registries.CONFIGURED_FEATURE,
+            ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "chilly_moss"));
+    public static ResourceKey<ConfiguredFeature<?, ?>> PERMAFROST_BOULDERS = ResourceKey.create(Registries.CONFIGURED_FEATURE,
+            ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "permafrost_boulders"));
 
     public static void register(BootstrapContext<ConfiguredFeature<?, ?>> context){
         FeatureUtils.register(
@@ -43,8 +51,22 @@ public class ModConfiguredFeatures {
                 Feature.TREE,
                 new TreeConfiguration.TreeConfigurationBuilder(
                         BlockStateProvider.simple(ModBlocks.CEDAR.LOG.get()),
-                        new StraightTrunkPlacer(11, 1, 0),
-                        BlockStateProvider.simple(ModBlocks.CEDAR.LEAVES.get()),
+                        new StraightTrunkPlacer(11, 5, 0),
+                        BlockStateProvider.simple(ModBlocks.CEDAR.LEAVES.get().defaultBlockState().setValue(CedarLeavesBlock.RUSTY, false)),
+                        new CedarFoliagePlacer(ConstantInt.of(3), ConstantInt.of(0)),
+                        new TwoLayersFeatureSize(1, 0, 2)
+                )
+                        .decorators(List.of(new AttachedToLeavesDecorator(0.14F, 0, 0, BlockStateProvider.simple(ModBlocks.PINECONE.get().defaultBlockState().setValue(PineconeBlock.HANGING, true)), 1, List.of(Direction.DOWN))))
+                        .build()
+        );
+        FeatureUtils.register(
+                context,
+                RUSTY_CEDAR_TREE,
+                Feature.TREE,
+                new TreeConfiguration.TreeConfigurationBuilder(
+                        BlockStateProvider.simple(ModBlocks.CEDAR.LOG.get()),
+                        new StraightTrunkPlacer(11, 5, 0),
+                        BlockStateProvider.simple(ModBlocks.CEDAR.LEAVES.get().defaultBlockState().setValue(CedarLeavesBlock.RUSTY, true)),
                         new CedarFoliagePlacer(ConstantInt.of(3), ConstantInt.of(0)),
                         new TwoLayersFeatureSize(1, 0, 2)
                 )
@@ -61,25 +83,32 @@ public class ModConfiguredFeatures {
                                         Feature.RANDOM_PATCH,
                                         FeatureUtils.simplePatchConfiguration(
                                                 Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(BlockStateProvider.simple(
-                                                        ModBlocks.BLUE_DELPHINIUM.get())))
+                                                        ModBlocks.SHIVER_LARKSPUR.get())))
                                 ),
                                 PlacementUtils.inlinePlaced(
                                         Feature.RANDOM_PATCH,
                                         FeatureUtils.simplePatchConfiguration(
                                                 Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(BlockStateProvider.simple(
-                                                        ModBlocks.PINK_DELPHINIUM.get())))
+                                                        ModBlocks.BLUSH_LARKSPUR.get())))
                                 ),
                                 PlacementUtils.inlinePlaced(
                                         Feature.RANDOM_PATCH,
                                         FeatureUtils.simplePatchConfiguration(
                                                 Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(BlockStateProvider.simple(
-                                                        ModBlocks.VIOLET_DELPHINIUM.get())))
+                                                        ModBlocks.SNOW_LARKSPUR.get())))
                                 ),
                                 PlacementUtils.inlinePlaced(
                                         Feature.RANDOM_PATCH,
                                         FeatureUtils.simplePatchConfiguration(
                                                 Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(BlockStateProvider.simple(
-                                                        ModBlocks.WHITE_DELPHINIUM.get()))
+                                                        ModBlocks.ROYAL_LARKSPUR.get()))
+                                        )
+                                ),
+                                PlacementUtils.inlinePlaced(
+                                        Feature.RANDOM_PATCH,
+                                        FeatureUtils.simplePatchConfiguration(
+                                                Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(BlockStateProvider.simple(
+                                                        ModBlocks.SILENE.get()))
                                         )
                                 )
                         )
@@ -91,8 +120,13 @@ public class ModConfiguredFeatures {
                 TAR_PIT,
                 ModFeatures.PIT.get(),
                 new PitFeature.Configuration(
-                        BlockStateProvider.simple(ModBlocks.TAR.get().defaultBlockState()), Optional.of(BlockStateProvider.simple(ModBlocks.TAR.get().defaultBlockState().setValue(TarBlock.COVER, true))), BlockStateProvider.simple(Blocks.STONE.defaultBlockState())
+                        BlockStateProvider.simple(ModBlocks.TAR.get().defaultBlockState()), Optional.of(BlockStateProvider.simple(ModBlocks.TAR.get().defaultBlockState().setValue(TarBlock.COVER, true))), BlockStateProvider.simple(ModBlocks.PERMAFROST.BLOCK.get().defaultBlockState())
                 )
         );
+
+        FeatureUtils.register(context, PSYCHO_BERRY, Feature.RANDOM_PATCH, FeatureUtils.simplePatchConfiguration(Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(BlockStateProvider.simple(ModBlocks.PSYCHO_BERRY_SPROUT.get().defaultBlockState().setValue(PsychoBerrySprout.AGE, 1))), List.of(Blocks.GRASS_BLOCK)));
+        FeatureUtils.register(context, CHILLY_MOSS, Feature.RANDOM_PATCH, FeatureUtils.simplePatchConfiguration(Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(BlockStateProvider.simple(ModBlocks.CHILLY_MOSS_SPROUT.get().defaultBlockState().setValue(ChillyMossSprout.AGE, 1))), List.of(Blocks.GRASS_BLOCK)));
+
+        FeatureUtils.register(context, PERMAFROST_BOULDERS, ModFeatures.BOULDER.get(), new BlockPileConfiguration(BlockStateProvider.simple(ModBlocks.PERMAFROST.BLOCK.get())));
     }
 }

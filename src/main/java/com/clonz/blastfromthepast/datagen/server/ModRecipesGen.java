@@ -1,6 +1,7 @@
 package com.clonz.blastfromthepast.datagen.server;
 
 import com.clonz.blastfromthepast.block.BFTPBlockGroup;
+import com.clonz.blastfromthepast.block.BFTPStoneGroup;
 import com.clonz.blastfromthepast.block.BFTPWoodGroup;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModItems;
@@ -27,7 +28,9 @@ public class ModRecipesGen extends RecipeProvider {
         createIceCream(recipeOutput, ModItems.PSYCHO_BERRY_ICE_CREAM, ModItems.PSYCHO_BERRY);
         createIceCream(recipeOutput, ModItems.MELON_ICE_CREAM, Items.MELON_SLICE);
         smeltingResultFromBase(recipeOutput, ModItems.COOKED_VENISON, ModItems.RAW_VENISON);
+        smeltingResultFromBase(recipeOutput, ModBlocks.BEAST_CHOPS.asItem(), ModBlocks.BEAST_CHOPS_COOKED.asItem());
 
+        stoneGroup(recipeOutput, ModBlocks.PERMAFROST);
         woodGroup(recipeOutput, ModBlocks.CEDAR);
         woodenBoat(recipeOutput, ModItems.CEDAR_BOAT, ModBlocks.CEDAR.BLOCK);
         chestBoat(recipeOutput, ModItems.CEDAR_CHEST_BOAT, ModItems.CEDAR_BOAT);
@@ -86,6 +89,12 @@ public class ModRecipesGen extends RecipeProvider {
                 .save(recipeOutput);
     }
 
+    private void stoneGroup(RecipeOutput pRecipeOutput, BFTPStoneGroup group) {
+        smeltingResultFromBase(pRecipeOutput, group.COBBLESTONE.asItem(), group.BLOCK.asItem());
+        stairBuilder(group.STAIRS, Ingredient.of(group.BLOCK)).unlockedBy(getHasName(group.BLOCK), has(group.BLOCK)).save(pRecipeOutput);
+        slab(pRecipeOutput, RecipeCategory.BUILDING_BLOCKS, group.SLAB, group.BLOCK);
+    }
+
     private void woodGroup(RecipeOutput pRecipeOutput, BFTPWoodGroup group) {
         stairBuilder(group.STAIRS, Ingredient.of(group.BLOCK)).unlockedBy(getHasName(group.BLOCK), has(group.BLOCK)).save(pRecipeOutput);
         slab(pRecipeOutput, RecipeCategory.BUILDING_BLOCKS, group.SLAB, group.BLOCK);
@@ -100,9 +109,9 @@ public class ModRecipesGen extends RecipeProvider {
         polished(pRecipeOutput, RecipeCategory.BUILDING_BLOCKS, group.LOG, group.WOOD);
         polished(pRecipeOutput, RecipeCategory.BUILDING_BLOCKS, group.STRIPPED_LOG, group.STRIPPED_WOOD);
         ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, group.BLOCK, 4).requires(group.LOG).unlockedBy(getHasName(group.LOG), has(group.BLOCK)).save(pRecipeOutput);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, group.BLOCK, 4).requires(group.STRIPPED_LOG).unlockedBy(getHasName(group.STRIPPED_LOG), has(group.BLOCK)).save(pRecipeOutput, "cedar_from_stripped_log");
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, group.BLOCK, 4).requires(group.WOOD).unlockedBy(getHasName(group.WOOD), has(group.BLOCK)).save(pRecipeOutput, "cedar_from_wood");
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, group.BLOCK, 4).requires(group.STRIPPED_WOOD).unlockedBy(getHasName(group.STRIPPED_WOOD), has(group.BLOCK)).save(pRecipeOutput, "cedar_from_stripped_wood");
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, group.BLOCK, 4).requires(group.STRIPPED_LOG).unlockedBy(getHasName(group.STRIPPED_LOG), has(group.BLOCK)).save(pRecipeOutput, group.BLOCK.getId().getPath().split("_")[0] + "_from_stripped_log");
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, group.BLOCK, 4).requires(group.WOOD).unlockedBy(getHasName(group.WOOD), has(group.BLOCK)).save(pRecipeOutput, group.BLOCK.getId().getPath().split("_")[0] + "_from_wood");
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, group.BLOCK, 4).requires(group.STRIPPED_WOOD).unlockedBy(getHasName(group.STRIPPED_WOOD), has(group.BLOCK)).save(pRecipeOutput, group.BLOCK.getId().getPath().split("_")[0] + "_from_stripped_wood");
     }
 
     private void blockGroup(RecipeOutput pRecipeOutput, BFTPBlockGroup group) {

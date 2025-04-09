@@ -2,7 +2,10 @@ package com.clonz.blastfromthepast.entity.speartooth.ai;
 
 import com.clonz.blastfromthepast.entity.speartooth.SpeartoothEntity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.PanicGoal;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 
 import javax.annotation.Nullable;
@@ -42,11 +45,11 @@ public class SpeartoothStalkTargetGoal extends Goal {
         return this.target != null
                 && this.target.canBeSeenByAnyone()
                 && this.tiger.distanceToSqr(this.target) >= (double) (this.minStartDistance)
-                && !this.pounceGoal.canUse();
+                && !this.pounceGoal.canUse() && !isTargetPanicking();
     }
 
     public boolean canContinueToUse() {
-        return this.target.canBeSeenByAnyone() && (this.tiger.distanceToSqr(this.target) > (double) (this.approachDistanceSqr)) && !this.pounceGoal.canUse();
+        return this.target.canBeSeenByAnyone() && (this.tiger.distanceToSqr(this.target) > (double) (this.approachDistanceSqr)) && !this.pounceGoal.canUse() && !isTargetPanicking();
     }
 
     public void start() {
@@ -73,5 +76,14 @@ public class SpeartoothStalkTargetGoal extends Goal {
             this.navigation.moveTo(this.target, this.speedModifier);
 //            this.tiger.getLookControl().setLookAt(this.target);
         }
+    }
+
+    public boolean isTargetPanicking() {
+        if (this.target instanceof Mob mob) {
+            for (WrappedGoal goal : mob.goalSelector.getAvailableGoals()) {
+                if (goal.getGoal() instanceof PanicGoal && goal.isRunning()) return true;
+            }
+        }
+        return false;
     }
 }

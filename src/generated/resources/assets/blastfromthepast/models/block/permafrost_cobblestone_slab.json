@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "blastfromthepast:block/permafrost_cobblestone",
-    "side": "blastfromthepast:block/permafrost_cobblestone",
-    "top": "blastfromthepast:block/permafrost_cobblestone"
-  }
-}

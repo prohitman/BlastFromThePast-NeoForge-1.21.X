@@ -5,7 +5,6 @@ import com.clonz.blastfromthepast.entity.BurrelEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.core.Direction;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 public class BurrelRenderer extends GeoEntityRenderer<BurrelEntity> {
@@ -21,22 +20,10 @@ public class BurrelRenderer extends GeoEntityRenderer<BurrelEntity> {
             return;
         }
         super.applyRotations(entity, poseStack, ageInTicks, rotationYaw, partialTick, nativeScale);
-        float prevProg = (entity.prevAttachChangeProgress + (entity.attachChangeProgress - entity.prevAttachChangeProgress) * partialTick);
-        float yawMul = 0F;
-        float trans = entity.isBaby() ? 0.2F : 0.4F;
-        if(entity.prevAttachDir == entity.getAttachmentFacing() && entity.getAttachmentFacing().getAxis() == Direction.Axis.Y){
-            yawMul = 1.0F;
-        }
-        poseStack.mulPose(Axis.YP.rotationDegrees ( (180.0F - yawMul * rotationYaw)));
+    }
 
-        if(entity.getAttachmentFacing() == Direction.DOWN){
-            poseStack.translate(0.0D, trans, 0.0D);
-            if(entity.yo <= entity.getY()){
-                poseStack.mulPose(Axis.XP.rotationDegrees(90 * prevProg));
-            }else{
-                poseStack.mulPose(Axis.XP.rotationDegrees(-90 * prevProg));
-            }
-            poseStack.translate(0.0D, -trans, 0.0D);
-        }
+    @Override
+    public float getMotionAnimThreshold(BurrelEntity animatable) {
+        return 1.0E-6F;
     }
 }

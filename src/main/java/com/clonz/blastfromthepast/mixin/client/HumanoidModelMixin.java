@@ -1,5 +1,6 @@
 package com.clonz.blastfromthepast.mixin.client;
 
+import com.clonz.blastfromthepast.access.PlayerBFTPDataAccess;
 import com.clonz.blastfromthepast.entity.SnowdoEntity;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,7 +23,18 @@ public abstract class HumanoidModelMixin {
                 HumanoidModel<LivingEntity> model = (HumanoidModel<LivingEntity>) (Object) this;
                 blastFromThePast$raiseArms(model);
             }
+            else if (((PlayerBFTPDataAccess)player).bftp$shouldPlayBearGloveWallAnim()) blastFromThePast$wallAnim((HumanoidModel<LivingEntity>) (Object) this);
         }
+    }
+
+    @Unique
+    private void blastFromThePast$wallAnim(HumanoidModel<?> model) {
+        model.rightArm.xRot = -2.5743606F;
+        model.leftArm.xRot = -2.5743606F;
+        model.rightLeg.xRot = 0;
+        model.leftLeg.xRot = 0;
+        model.rightLeg.zRot = 0.261799F;
+        model.leftLeg.zRot = -0.261799F;
     }
 
     @Unique

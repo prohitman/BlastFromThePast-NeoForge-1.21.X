@@ -45,10 +45,12 @@ public class ModItemModelGen extends ItemModelProvider {
         basicItem(ModItems.SAP_ICE_CREAM.get());
         basicItem(ModItems.PSYCHO_BERRY_ICE_CREAM.get());
         basicItem(ModItems.MELON_ICE_CREAM.get());
+        basicItem(ModItems.SCHRODINGERS_ICE_CREAM.get());
         basicItem(ModItems.BEAR_CLAW.get());
         basicItem(ModItems.SHAGGY_PELT.get());
 
         basicItem(ModItems.IDOL_OF_RETRIEVAL.get());
+        basicItem(ModItems.GLACIAL_GUIDEBOOK.get());
 
         basicItem(ModItems.FROST_BITE_HELMET.get());
         basicItem(ModItems.FROST_BITE_BOOTS.get());
@@ -60,10 +62,10 @@ public class ModItemModelGen extends ItemModelProvider {
         registerStoneGroup(ModBlocks.PERMAFROST);
         createWithParent(ModBlocks.SAPPY_CEDAR_LOG);
         createWithParent(ModBlocks.SHAGGY_BLOCK);
-        singleTextureDoublePlantBlock(ModBlocks.WHITE_DELPHINIUM, true);
-        singleTextureDoublePlantBlock(ModBlocks.BLUE_DELPHINIUM, true);
-        singleTextureDoublePlantBlock(ModBlocks.VIOLET_DELPHINIUM, true);
-        singleTextureDoublePlantBlock(ModBlocks.PINK_DELPHINIUM, true);
+        singleTextureDoublePlantBlock(ModBlocks.ROYAL_LARKSPUR, true);
+        singleTextureDoublePlantBlock(ModBlocks.SHIVER_LARKSPUR, true);
+        singleTextureDoublePlantBlock(ModBlocks.SNOW_LARKSPUR, true);
+        singleTextureDoublePlantBlock(ModBlocks.BLUSH_LARKSPUR, true);
         withExistingParent(ModBlocks.BEASTLY_FEMUR.getId().getPath(), modLoc( "block/femur"));
         withExistingParent(ModBlocks.PSYCHO_BERRY_BUSH.getId().getPath(), modLoc("block/grown_psycho_berry_bush"));
         singleTexturePlantBlock(ModBlocks.PSYCHO_BERRY_SPROUT);
@@ -71,6 +73,26 @@ public class ModItemModelGen extends ItemModelProvider {
         createWithParent(ModBlocks.TAR);
         registerBlockGroup(ModBlocks.SNOW_BRICK);
         registerBlockGroup(ModBlocks.ICE_BRICK);
+        singleTexturePlantBlock(ModBlocks.SILENE);
+        createWithParent(ModBlocks.CHILLY_MOSS);
+        createWithCutoutParent(ModBlocks.CHILLY_MOSS_SPROUT);
+
+        createWithParent(ModBlocks.PERMAFROST_BURREL_PAINTING);
+        createWithParent(ModBlocks.PERMAFROST_SNOWDO_PAINTING);
+        createWithParent(ModBlocks.PERMAFROST_GLACEROS_PAINTING);
+        createWithParent(ModBlocks.PERMAFROST_PSYCHO_BEAR_PAINTING);
+        createWithParent(ModBlocks.PERMAFROST_SPEARTOOTH_PAINTING);
+        createWithParent(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_TOP_RIGHT);
+        createWithParent(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_TOP_LEFT);
+        createWithParent(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_BOTTOM_RIGHT);
+        createWithParent(ModBlocks.PERMAFROST_FROSTOMPER_PAINTING_BOTTOM_LEFT);
+
+        createWithParent(ModBlocks.BURREL_TOTEM_POLE);
+        createWithParent(ModBlocks.SNOWDO_TOTEM_POLE);
+        createWithParent(ModBlocks.GLACEROS_TOTEM_POLE);
+        createWithParent(ModBlocks.PSYCHO_BEAR_TOTEM_POLE);
+        createWithParent(ModBlocks.SPEARTOOTH_TOTEM_POLE);
+        createWithParent(ModBlocks.FROSTOMPER_TOTEM_POLE);
     }
 
     private void registerStoneGroup(BFTPStoneGroup stoneGroup){
@@ -99,6 +121,9 @@ public class ModItemModelGen extends ItemModelProvider {
         withExistingParent(stoneGroup.COBBLESTONE_WALL.getId().getPath(), mcLoc("block/wall_inventory"))
                 .texture("wall", modLoc("block/" + stoneGroup.COBBLESTONE_WALL.getId().getPath().replaceAll("_wall", "")));
 
+        for (DeferredBlock<?> block : stoneGroup.blocks) {
+            if (block.getId().getPath().contains("ore")) createWithParent(block);
+        }
     }
 
     private void registerWoodGroup(BFTPWoodGroup woodGroup){
@@ -131,6 +156,10 @@ public class ModItemModelGen extends ItemModelProvider {
 
     private void createWithParent(DeferredBlock<? extends Block> key) {
         withExistingParent(key.getId().getPath(), modLoc( "block/" + key.getId().getPath()));
+    }
+
+    private void createWithCutoutParent(DeferredBlock<? extends Block> key) {
+        withExistingParent(key.getId().getPath(), modLoc( "block/" + key.getId().getPath())).renderType("cutout_mipped");
     }
 
     private void singleTextureBlock(DeferredBlock<? extends Block> key){

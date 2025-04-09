@@ -5,6 +5,8 @@ import com.clonz.blastfromthepast.client.ClientResourceHelper;
 import com.clonz.blastfromthepast.entity.GlacerosEntity;
 import com.clonz.blastfromthepast.init.ModEntities;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.model.GeoModel;
 
 public class GlacerosModel extends GeoModel<GlacerosEntity> {
@@ -48,7 +50,18 @@ public class GlacerosModel extends GeoModel<GlacerosEntity> {
         return ANIMATION;
     }
 
-    public float getMotionAnimThreshold(GlacerosEntity animatable) {
-        return 1.0E-6F;
+    @Override
+    public void setCustomAnimations(GlacerosEntity animatable, long instanceId, AnimationState<GlacerosEntity> animationState) {
+        float partialTick = animationState.getPartialTick();
+        if (animationState.isCurrentAnimation(GlacerosEntity.IDLE)) this.getBone("neck").orElseThrow().setRotZ(0);
+        if(!animatable.isBaby()){
+            this.getBone("Antlers1").orElseThrow().setHidden(animatable.isSheared());
+        }
+        float f = Mth.rotLerp(partialTick, animatable.yBodyRotO, animatable.yBodyRot);
+        float f1 = Mth.rotLerp(partialTick, animatable.yHeadRotO, animatable.yHeadRot);
+        if (!animatable.isSparring()) {
+            this.getBone("neck").orElseThrow().setRotX(animatable.getXRot() * ((float) Math.PI / 180F));
+        }
+        this.getBone("neck").orElseThrow().setRotY((f1 - f) * ((float)Math.PI / 180F));
     }
 }

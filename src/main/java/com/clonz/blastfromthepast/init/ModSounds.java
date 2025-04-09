@@ -17,6 +17,8 @@ public class ModSounds {
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
             DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, BlastFromThePast.MODID);
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> AURORA_FROLICS = registerSoundEvent(BlastFromThePast.location("aurora_frolics"));
+
     // MUSIC DISC
     public static final DeferredHolder<SoundEvent, SoundEvent> BLIZZARD_REVELRY = registerSoundEvent(ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, "blizzard_revelry"));
     public static final ResourceKey<JukeboxSong> BLIZZARD_REVELRY_KEY = registerSong("blizzard_revelry");
@@ -68,6 +70,11 @@ public class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> BURREL_HURT = registerSoundEventForEntityType(ModEntities.BURREL, "_hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> BURREL_IDLE = registerSoundEventForEntityType(ModEntities.BURREL, "_idle");
     public static final DeferredHolder<SoundEvent, SoundEvent> BURREL_EAT = registerSoundEventForEntityType(ModEntities.BURREL, "_eat");
+
+    public static final DeferredHolder<SoundEvent, SoundEvent> BEAR_TRAP = registerSoundEvent(BlastFromThePast.location("bear_trap"));
+    public static final DeferredHolder<SoundEvent, SoundEvent> BEAR_GLOVE_SLASH = registerSoundEvent(BlastFromThePast.location("bear_glove_slash"));
+    public static final DeferredHolder<SoundEvent, SoundEvent> BEAR_GLOVE_SLASH_CRIT = registerSoundEvent(BlastFromThePast.location("bear_glove_slash_crit"));
+    public static final DeferredHolder<SoundEvent, SoundEvent> WALL_GRAB = registerSoundEvent(BlastFromThePast.location("wall_grab"));
 
     private static ResourceKey<JukeboxSong> registerSong(String name) {
          return ResourceKey.create(Registries.JUKEBOX_SONG, ResourceLocation.fromNamespaceAndPath(BlastFromThePast.MODID, name));

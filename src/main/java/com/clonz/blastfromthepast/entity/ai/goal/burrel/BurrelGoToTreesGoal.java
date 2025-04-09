@@ -71,6 +71,8 @@ public class BurrelGoToTreesGoal extends Goal {
         AzureNavigation navigation = (AzureNavigation) this.burrel.getNavigation();
         target = getClimbingPosition(burrel.targetTree);
         navigation.moveTo(navigation.createPath(target, 1), this.speed);
+        Vec3 targetCentre = target.getCenter();
+        burrel.getLookControl().setLookAt(targetCentre.x(), targetCentre.y(), targetCentre.z());
     }
 
     private BlockPos getClimbingPosition(BlockPos pos) {

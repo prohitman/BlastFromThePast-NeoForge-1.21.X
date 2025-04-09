@@ -6,6 +6,7 @@ import com.clonz.blastfromthepast.entity.ai.navigation.AzureNavigation;
 import com.clonz.blastfromthepast.init.ModBlocks;
 import com.clonz.blastfromthepast.init.ModEntities;
 import com.clonz.blastfromthepast.init.ModSounds;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -14,6 +15,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -115,7 +117,7 @@ public class BurrelEntity extends TamableAnimal implements GeoEntity {
 
     @Override
     public void aiStep() {
-        if (this.jukebox == null || !this.jukebox.closerToCenterThan(this.position(), 3.46) || !this.level().getBlockState(this.jukebox).is(Blocks.JUKEBOX)) {
+        if (this.jukebox == null || !this.jukebox.closerToCenterThan(this.position(), 7) || !this.level().getBlockState(this.jukebox).is(Blocks.JUKEBOX)) {
             this.partyBurrel = false;
             this.jukebox = null;
         }
@@ -208,6 +210,7 @@ public class BurrelEntity extends TamableAnimal implements GeoEntity {
             if (!level().isClientSide) {
                 this.makeSound(ModSounds.BURREL_EAT.get());
                 this.getNavigation().stop();
+                CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer) player, itemStack);
             }
             itemStack.consume(1, this);
             return InteractionResult.CONSUME;
@@ -337,9 +340,9 @@ public class BurrelEntity extends TamableAnimal implements GeoEntity {
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<GeoAnimatable>(this, "main", 5, state -> {
             if (this.isSleeping()) return state.setAndContinue(SLEEP);
-            if (this.partyBurrel) return state.setAndContinue(DANCE);
             if (this.isBesideClimbableBlock()) return state.setAndContinue(CLIMB);
             if (state.isMoving()) return state.setAndContinue(WALK);
+            if (this.partyBurrel) return state.setAndContinue(DANCE);
             return state.setAndContinue(IDLE);
         }));
         controllers.add(new AnimationController<GeoAnimatable>(this, "second", state -> PlayState.STOP)
